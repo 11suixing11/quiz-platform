@@ -148,7 +148,10 @@ const TEST_REGISTRY = [
     { id: 'stress-coping', category: 'fun', file: 'stress-coping', icon: '🎯', zh: { name: '压力应对风格测试', description: '了解你应对压力的方式。' }, en: { name: 'Stress Coping Style Test', description: 'Discover how you cope with stress.' }, questions: 16, time: '3-5', pattern: 'type' },
 ];
 
-// Load test data dynamically
+// Test data cache
+const _testDataCache = {};
+
+// Load test data dynamically via fetch + eval
 function loadTest(testId, callback) {
     const entry = TEST_REGISTRY.find(t => t.id === testId);
     if (!entry) {
@@ -156,25 +159,40 @@ function loadTest(testId, callback) {
         return;
     }
 
-    // Check if already loaded
     const globalName = entry.file.toUpperCase().replace(/-/g, '_') + '_TEST';
+
+    // Return cached data
+    if (_testDataCache[globalName]) {
+        callback(null, _testDataCache[globalName]);
+        return;
+    }
+
+    // Also check window in case it was loaded via var
     if (window[globalName]) {
+        _testDataCache[globalName] = window[globalName];
         callback(null, window[globalName]);
         return;
     }
 
-    // Dynamically load script
-    const script = document.createElement('script');
-    script.src = `js/tests/${entry.file}.js`;
-    script.onload = () => {
-        if (window[globalName]) {
-            callback(null, window[globalName]);
-        } else {
-            callback(new Error(`Test data not found after loading: ${globalName}`));
-        }
-    };
-    script.onerror = () => callback(new Error(`Failed to load: ${entry.file}.js`));
-    document.head.appendChild(script);
+    // Fetch script as text and eval in global scope
+    fetch(`js/tests/${entry.file}.js`)
+        .then(function(response) {
+            if (!response.ok) throw new Error('Failed to load: ' + entry.file + '.js');
+            return response.text();
+        })
+        .then(function(code) {
+            // Indirect eval runs in global scope, making var/const accessible
+            (0, eval)(code);
+            if (window[globalName]) {
+                _testDataCache[globalName] = window[globalName];
+                callback(null, window[globalName]);
+            } else {
+                callback(new Error('Test data not found: ' + globalName));
+            }
+        })
+        .catch(function(err) {
+            callback(err);
+        });
 }
 
 // Get test entry by ID
