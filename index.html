@@ -61,7 +61,9 @@
         <div class="search-bar" id="searchBar">
             <div class="search-input-wrap">
                 <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
-                <input type="text" class="search-input" id="searchInput" placeholder="搜索测试..." oninput="filterTests()">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索测试..." oninput="onSearchInput()" onfocus="onSearchFocus()" autocomplete="off">
+                <button class="search-clear" id="searchClear" onclick="clearSearch()" style="display:none">&#10005;</button>
+                <div class="search-dropdown" id="searchDropdown"></div>
             </div>
             <div class="category-tags" id="categoryTags">
                 <button class="tag active" data-category="all" onclick="filterByCategory('all')">全部</button>
@@ -199,27 +201,106 @@
             }
         }
 
-        // Search filter
-        function filterTests() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) {
-                renderAllCategories();
-                filterByCategory(activeCategory);
+        // === Fuzzy Autocomplete Search ===
+        let searchDebounce = null;
+
+        function onSearchInput() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('searchClear');
+            const q = input.value.trim();
+            clearBtn.style.display = q ? 'flex' : 'none';
+
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                if (q) {
+                    showDropdown(q);
+                    renderSearchResults(q);
+                } else {
+                    hideDropdown();
+                    renderAllCategories();
+                    filterByCategory(activeCategory);
+                }
+            }, 150);
+        }
+
+        function onSearchFocus() {
+            const q = document.getElementById('searchInput').value.trim();
+            if (q) showDropdown(q);
+            else showPopularDropdown();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            document.getElementById('searchClear').style.display = 'none';
+            hideDropdown();
+            renderAllCategories();
+            filterByCategory(activeCategory);
+            input.focus();
+        }
+
+        function showDropdown(query) {
+            const results = searchTests(query, currentLang);
+            const dropdown = document.getElementById('searchDropdown');
+            const isZh = currentLang === 'zh';
+            if (results.length === 0) {
+                dropdown.innerHTML = `<div class="dropdown-empty">${isZh ? '未找到匹配结果，试试其他关键词' : 'No matches, try other keywords'}</div>`;
+                dropdown.classList.add('show');
                 return;
             }
+            const items = results.slice(0, 8);
+            dropdown.innerHTML = items.map(t => `
+                <a class="dropdown-item" href="quiz.html?type=${t.id}">
+                    <span class="dropdown-icon">${t.icon}</span>
+                    <div class="dropdown-info">
+                        <div class="dropdown-name">${isZh ? t.zh.name : t.en.name}</div>
+                        <div class="dropdown-desc">${isZh ? t.zh.description : t.en.description}</div>
+                    </div>
+                    <span class="dropdown-cat">${getCategoryLabel(t.category, isZh)}</span>
+                </a>
+            `).join('');
+            dropdown.classList.add('show');
+        }
 
+        function showPopularDropdown() {
+            const popular = getPopularTests();
+            const dropdown = document.getElementById('searchDropdown');
+            const isZh = currentLang === 'zh';
+            dropdown.innerHTML = `<div class="dropdown-label">${isZh ? '热门测试' : 'Popular Tests'}</div>` +
+                popular.map(t => `
+                <a class="dropdown-item" href="quiz.html?type=${t.id}">
+                    <span class="dropdown-icon">${t.icon}</span>
+                    <div class="dropdown-info">
+                        <div class="dropdown-name">${isZh ? t.zh.name : t.en.name}</div>
+                        <div class="dropdown-desc">${isZh ? t.zh.description : t.en.description}</div>
+                    </div>
+                </a>
+            `).join('');
+            dropdown.classList.add('show');
+        }
+
+        function hideDropdown() {
+            document.getElementById('searchDropdown').classList.remove('show');
+        }
+
+        function getCategoryLabel(catId, isZh) {
+            const cat = TEST_CATEGORIES.find(c => c.id === catId);
+            return cat ? (isZh ? cat.zh : cat.en) : '';
+        }
+
+        function renderSearchResults(query) {
             const results = searchTests(query, currentLang);
             const container = document.getElementById('categoriesContainer');
             const isZh = currentLang === 'zh';
             container.innerHTML = '';
 
             if (results.length === 0) {
-                container.innerHTML = `<div class="no-results">${isZh ? '未找到相关测试' : 'No tests found'}</div>`;
+                container.innerHTML = `<div class="no-results">${isZh ? '未找到相关测试，试试其他关键词' : 'No tests found, try other keywords'}</div>`;
                 return;
             }
 
             const section = document.createElement('section');
-            section.className = 'category-section';
+            section.className = 'category-section visible';
             section.innerHTML = `
                 <div class="category-header">
                     <span class="category-icon">🔍</span>
@@ -244,6 +325,12 @@
             `;
             container.appendChild(section);
         }
+
+        // Close dropdown on outside click
+        document.addEventListener('click', function(e) {
+            const wrap = document.querySelector('.search-input-wrap');
+            if (wrap && !wrap.contains(e.target)) hideDropdown();
+        });
 
         // Hero particles
         function initHeroParticles() {

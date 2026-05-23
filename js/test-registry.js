@@ -205,12 +205,64 @@ function getTestsByCategory(categoryId) {
     return TEST_REGISTRY.filter(t => t.category === categoryId);
 }
 
-// Search tests
+// Fuzzy search tests — matches partial pinyin-like chars, substrings, and word fragments
 function searchTests(query, lang) {
-    const q = query.toLowerCase();
-    return TEST_REGISTRY.filter(t => {
+    if (!query || !query.trim()) return [];
+    const q = query.toLowerCase().trim();
+
+    // Score each test: higher = better match
+    const scored = TEST_REGISTRY.map(t => {
         const name = t[lang].name.toLowerCase();
         const desc = t[lang].description.toLowerCase();
-        return name.includes(q) || desc.includes(q);
-    });
+        const nameEn = t.en.name.toLowerCase();
+        const cat = TEST_CATEGORIES.find(c => c.id === t.category);
+        const catName = cat ? (lang === 'zh' ? cat.zh : cat.en).toLowerCase() : '';
+        let score = 0;
+
+        // Exact name match
+        if (name === q || nameEn === q) { score = 1000; }
+        // Name starts with query
+        else if (name.startsWith(q) || nameEn.startsWith(q)) { score = 800; }
+        // Name contains query
+        else if (name.includes(q) || nameEn.includes(q)) { score = 600; }
+        // Description contains query
+        else if (desc.includes(q)) { score = 400; }
+        // Category name matches
+        else if (catName.includes(q)) { score = 300; }
+        // Fuzzy: all chars of query appear in order in name
+        else {
+            let idx = 0;
+            for (let i = 0; i < name.length && idx < q.length; i++) {
+                if (name[i] === q[idx]) idx++;
+            }
+            if (idx === q.length) { score = 200; }
+            else {
+                // Try fuzzy on English name too
+                idx = 0;
+                for (let i = 0; i < nameEn.length && idx < q.length; i++) {
+                    if (nameEn[i] === q[idx]) idx++;
+                }
+                if (idx === q.length) { score = 150; }
+                else {
+                    // Word fragment match: split name into words and check each
+                    const words = name.split(/[\s·\-—_,，、]+/).concat(nameEn.split(/[\s\-]+/));
+                    for (const w of words) {
+                        if (w.includes(q) || q.includes(w)) { score = Math.max(score, 100); break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return { test: t, score };
+    }).filter(s => s.score > 0);
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.map(s => s.test);
+}
+
+// Get popular/recommended tests (used when search is empty)
+function getPopularTests() {
+    const popularIds = ['mbti', 'big-five', 'eq', 'enneagram', 'love-language', 'anxiety', 'depression', 'attachment-style', 'creativity', 'happiness', 'introversion', 'empathy'];
+    return popularIds.map(id => TEST_REGISTRY.find(t => t.id === id)).filter(Boolean);
 }
