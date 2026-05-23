@@ -192,6 +192,16 @@
             activeCategory = categoryId;
             document.querySelectorAll('.tag').forEach(t => t.classList.toggle('active', t.dataset.category === categoryId));
 
+            // Also clear search when switching category
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput && searchInput.value.trim()) {
+                suppressFocus = true;
+                searchInput.value = '';
+                document.getElementById('searchClear').style.display = 'none';
+                hideDropdown();
+                renderAllCategories();
+            }
+
             if (categoryId === 'all') {
                 document.querySelectorAll('.category-section').forEach(s => s.style.display = '');
             } else {
@@ -203,6 +213,7 @@
 
         // === Fuzzy Autocomplete Search ===
         let searchDebounce = null;
+        let suppressFocus = false;
 
         function onSearchInput() {
             const input = document.getElementById('searchInput');
@@ -224,19 +235,20 @@
         }
 
         function onSearchFocus() {
+            if (suppressFocus) { suppressFocus = false; return; }
             const q = document.getElementById('searchInput').value.trim();
             if (q) showDropdown(q);
             else showPopularDropdown();
         }
 
         function clearSearch() {
+            suppressFocus = true;
             const input = document.getElementById('searchInput');
             input.value = '';
             document.getElementById('searchClear').style.display = 'none';
             hideDropdown();
             renderAllCategories();
             filterByCategory(activeCategory);
-            input.focus();
         }
 
         function showDropdown(query) {
