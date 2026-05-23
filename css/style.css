@@ -312,7 +312,7 @@ body::after {
         0 20px 60px rgba(0, 0, 0, 0.06),
         0 0 0 1px rgba(255, 255, 255, 0.5),
         inset 0 2px 0 rgba(255, 255, 255, 0.9);
-    max-width: 800px; width: 100%; margin: 20px auto;
+    max-width: 800px; width: 100%; margin: 0 auto;
     overflow: hidden; position: relative;
     animation: containerEntrance 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -322,8 +322,8 @@ body::after {
 }
 
 /* ===== Quiz Page ===== */
-.quiz-page { padding: 28px; }
-.progress-container { margin-bottom: 32px; }
+.quiz-page { padding: 20px; }
+.progress-container { margin-bottom: 20px; }
 .progress-bar {
     height: 6px; background: rgba(184,160,138,0.12); border-radius: 3px; overflow: hidden;
 }
@@ -338,7 +338,7 @@ body::after {
 }
 
 .question-card {
-    background: rgba(255,255,255,0.4); border-radius: 20px; padding: 32px; margin-bottom: 24px;
+    background: rgba(255,255,255,0.4); border-radius: 20px; padding: 24px; margin-bottom: 16px;
     border: 1px solid rgba(255,255,255,0.5);
     box-shadow: 0 4px 16px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8);
 }
