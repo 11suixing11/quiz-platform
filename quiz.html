@@ -65,8 +65,10 @@
             // Dynamically load test data
             loadTest(testType, function(err, data) {
                 if (err) {
-                    console.error(err);
-                    window.location.href = 'index.html';
+                    document.getElementById('questionText').textContent = 'Error: ' + err.message;
+                    document.getElementById('questionNumber').textContent = '';
+                    document.getElementById('optionsContainer').innerHTML = '';
+                    console.error('loadTest error:', err);
                     return;
                 }
 
@@ -91,23 +93,30 @@
 
         function updateLanguage() {
             const text = engine.getUIText();
-            document.getElementById('prevBtn').textContent = text.prevBtn;
-            document.getElementById('nextBtn').textContent = engine.currentQuestion === engine.shuffledQuestions.length - 1 ? text.submitBtn : text.nextBtn;
-            document.getElementById('loadingText').textContent = text.loading;
-            document.title = `${text.title} | Quiz Platform`;
+            document.getElementById('prevBtn').textContent = text.prevBtn || 'Previous';
+            document.getElementById('nextBtn').textContent = engine.currentQuestion === engine.shuffledQuestions.length - 1 ? (text.submitBtn || 'Submit') : (text.nextBtn || 'Next');
+            document.getElementById('loadingText').textContent = text.loading || 'Loading...';
+            document.title = `${text.title || 'Quiz'} | Quiz Platform`;
         }
 
         function showQuestion(index) {
             const question = engine.getCurrentQuestion();
             const text = engine.getUIText();
+            const lang = engine.currentLang;
 
-            document.getElementById('questionNumber').textContent = `${text.question} ${index + 1}`;
-            document.getElementById('questionText').textContent = question[engine.currentLang];
+            if (!question) {
+                document.getElementById('questionText').textContent = 'Error: question not found';
+                return;
+            }
+
+            document.getElementById('questionNumber').textContent = (text.question || 'Question') + ' ' + (index + 1);
+            document.getElementById('questionText').textContent = question[lang] || question.zh || JSON.stringify(question);
 
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
 
-            question.options[engine.currentLang].forEach((option, i) => {
+            const options = (question.options && question.options[lang]) || (question.options && question.options.zh) || [];
+            options.forEach((option, i) => {
                 const btn = document.createElement('button');
                 btn.className = `option-btn ${engine.answers[index] === i ? 'selected' : ''}`;
                 btn.textContent = option;
@@ -117,10 +126,10 @@
 
             const progress = engine.getProgress();
             document.getElementById('progressFill').style.width = `${progress.percentage}%`;
-            document.getElementById('progressText').textContent = `${text.progress}: ${progress.current} ${text.of} ${progress.total}`;
+            document.getElementById('progressText').textContent = `${text.progress || 'Progress'}: ${progress.current} ${text.of || '/'} ${progress.total}`;
 
             document.getElementById('prevBtn').disabled = index === 0;
-            document.getElementById('nextBtn').textContent = index === engine.shuffledQuestions.length - 1 ? text.submitBtn : text.nextBtn;
+            document.getElementById('nextBtn').textContent = index === engine.shuffledQuestions.length - 1 ? (text.submitBtn || 'Submit') : (text.nextBtn || 'Next');
 
             document.getElementById('questionCard').classList.remove('fade-in');
             void document.getElementById('questionCard').offsetWidth;
