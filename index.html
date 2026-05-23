@@ -80,14 +80,23 @@
 
         // Initialize
         function init() {
+            const debugEl = document.getElementById('categoriesContainer');
             const savedLang = localStorage.getItem('quiz-platform-lang');
             if (savedLang) currentLang = savedLang;
 
-            try { renderCategoryTags(); } catch(e) { console.error('renderCategoryTags error:', e); }
-            try { renderAllCategories(); } catch(e) { console.error('renderAllCategories error:', e); }
-            try { updateLanguage(); } catch(e) { console.error('updateLanguage error:', e); }
-            try { initHeroParticles(); } catch(e) { console.error('initHeroParticles error:', e); }
-            try { initScrollEffects(); } catch(e) { console.error('initScrollEffects error:', e); }
+            try {
+                renderCategoryTags();
+                debugEl.innerHTML += '<div style="color:#0f0;background:#000;padding:10px;">renderCategoryTags OK. TEST_CATEGORIES=' + (typeof TEST_CATEGORIES !== 'undefined' ? TEST_CATEGORIES.length : 'undefined') + ' TEST_REGISTRY=' + (typeof TEST_REGISTRY !== 'undefined' ? TEST_REGISTRY.length : 'undefined') + '</div>';
+            } catch(e) { debugEl.innerHTML += '<div style="color:#f00;background:#000;padding:10px;">renderCategoryTags ERROR: ' + e.message + '</div>'; }
+
+            try {
+                renderAllCategories();
+                debugEl.innerHTML += '<div style="color:#0f0;background:#000;padding:10px;">renderAllCategories OK. Container children: ' + debugEl.children.length + '</div>';
+            } catch(e) { debugEl.innerHTML += '<div style="color:#f00;background:#000;padding:10px;">renderAllCategories ERROR: ' + e.message + ' | ' + e.stack + '</div>'; }
+
+            try { updateLanguage(); } catch(e) { debugEl.innerHTML += '<div style="color:#f00;background:#000;padding:10px;">updateLanguage ERROR: ' + e.message + '</div>'; }
+            try { initHeroParticles(); } catch(e) { debugEl.innerHTML += '<div style="color:#f00;background:#000;padding:10px;">initHeroParticles ERROR: ' + e.message + '</div>'; }
+            try { initScrollEffects(); } catch(e) { debugEl.innerHTML += '<div style="color:#f00;background:#000;padding:10px;">initScrollEffects ERROR: ' + e.message + '</div>'; }
         }
 
         // Toggle language
