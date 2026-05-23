@@ -23,7 +23,7 @@ function renderGenericResults(testType, results, testData, currentLang) {
 // Pattern A: Percentage-based dimension bars
 function renderDimensionsResult(results, testData, currentLang, entry) {
     const text = testData.uiText[currentLang];
-    const color = testData.color || '#667eea';
+    const color = testData.color || '#8B7355';
 
     document.getElementById('resultIcon').textContent = testData.icon || '📊';
     document.getElementById('resultTitle').textContent = text.resultTitle || entry[currentLang].name;
@@ -80,7 +80,7 @@ function renderDimensionsResult(results, testData, currentLang, entry) {
 // Pattern B: Type determination with description
 function renderTypeResult(results, testData, currentLang, entry) {
     const text = testData.uiText[currentLang];
-    const color = testData.color || '#6C63FF';
+    const color = testData.color || '#8B7355';
 
     document.getElementById('resultIcon').textContent = testData.icon || '📊';
     document.getElementById('resultTitle').style.color = color;
@@ -160,7 +160,7 @@ function renderTypeResult(results, testData, currentLang, entry) {
 // Pattern C: Single score with optional category breakdown
 function renderScoreResult(results, testData, currentLang, entry) {
     const text = testData.uiText[currentLang];
-    const color = testData.color || '#667eea';
+    const color = testData.color || '#8B7355';
 
     document.getElementById('resultIcon').textContent = testData.icon || '📊';
     document.getElementById('resultTitle').textContent = text.resultTitle || entry[currentLang].name;
@@ -179,7 +179,7 @@ function renderScoreResult(results, testData, currentLang, entry) {
 
     setTimeout(() => {
         document.getElementById('scoreFill').style.width = `${score}%`;
-        document.getElementById('scoreFill').style.background = `linear-gradient(90deg, #667eea, ${color})`;
+        document.getElementById('scoreFill').style.background = `linear-gradient(90deg, #D4A8B8, ${color})`;
     }, 100);
 
     // Show result description based on score level
