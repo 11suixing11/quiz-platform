@@ -11,6 +11,9 @@ body {
     overflow-x: hidden;
     color: #3D3428;
 }
+body:has(.container) {
+    display: flex; align-items: center; justify-content: center;
+}
 
 a { text-decoration: none; color: inherit; }
 
