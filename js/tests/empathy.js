@@ -3,7 +3,7 @@
  * Empathy Test
  */
 
-const EMPATHY_TEST = {
+var EMPATHY_TEST = {
     type: 'empathy',
     icon: '🫂',
     color: '#4CAF50',
@@ -12,10 +12,10 @@ const EMPATHY_TEST = {
         {
             id: 1,
             dimension: 'CE',
-            zh: "我能够理解他人行为背后的动机。",
+            zh: "我能够理解他人行为背后的动机�?,
             en: "I can understand the motivations behind others' behavior.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -23,10 +23,10 @@ const EMPATHY_TEST = {
         {
             id: 2,
             dimension: 'CE',
-            zh: "我善于从他人的角度看问题。",
+            zh: "我善于从他人的角度看问题�?,
             en: "I am good at seeing problems from others' perspectives.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -34,10 +34,10 @@ const EMPATHY_TEST = {
         {
             id: 3,
             dimension: 'CE',
-            zh: "我能够预测他人在特定情境中的反应。",
+            zh: "我能够预测他人在特定情境中的反应�?,
             en: "I can predict others' reactions in specific situations.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -45,10 +45,10 @@ const EMPATHY_TEST = {
         {
             id: 4,
             dimension: 'CE',
-            zh: "我能够理解他人的非语言信号（如表情、肢体语言）。",
+            zh: "我能够理解他人的非语言信号（如表情、肢体语言）�?,
             en: "I can understand others' non-verbal signals (e.g., expressions, body language).",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -56,10 +56,10 @@ const EMPATHY_TEST = {
         {
             id: 5,
             dimension: 'CE',
-            zh: "我能够理解与我不同背景的人的想法。",
+            zh: "我能够理解与我不同背景的人的想法�?,
             en: "I can understand the thoughts of people from different backgrounds than mine.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -67,10 +67,10 @@ const EMPATHY_TEST = {
         {
             id: 6,
             dimension: 'CE',
-            zh: "我能够准确地理解他人话语中的真实含义。",
+            zh: "我能够准确地理解他人话语中的真实含义�?,
             en: "I can accurately understand the true meaning behind others' words.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -78,10 +78,10 @@ const EMPATHY_TEST = {
         {
             id: 7,
             dimension: 'CE',
-            zh: "我能够在争论中理解对方的立场。",
+            zh: "我能够在争论中理解对方的立场�?,
             en: "I can understand the other party's position in an argument.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -91,10 +91,10 @@ const EMPATHY_TEST = {
         {
             id: 8,
             dimension: 'AE',
-            zh: "当他人感到悲伤时，我也会感到难过。",
+            zh: "当他人感到悲伤时，我也会感到难过�?,
             en: "When others feel sad, I also feel sad.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -102,10 +102,10 @@ const EMPATHY_TEST = {
         {
             id: 9,
             dimension: 'AE',
-            zh: "看到他人受苦时，我会感到心疼。",
+            zh: "看到他人受苦时，我会感到心疼�?,
             en: "When I see others suffering, I feel their pain.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -113,10 +113,10 @@ const EMPATHY_TEST = {
         {
             id: 10,
             dimension: 'AE',
-            zh: "他人的情绪很容易影响到我。",
+            zh: "他人的情绪很容易影响到我�?,
             en: "Others' emotions easily affect me.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -124,10 +124,10 @@ const EMPATHY_TEST = {
         {
             id: 11,
             dimension: 'AE',
-            zh: "看到他人开心时，我也会感到快乐。",
+            zh: "看到他人开心时，我也会感到快乐�?,
             en: "When I see others happy, I also feel happy.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -135,10 +135,10 @@ const EMPATHY_TEST = {
         {
             id: 12,
             dimension: 'AE',
-            zh: "我在观看感人电影时容易流泪。",
+            zh: "我在观看感人电影时容易流泪�?,
             en: "I easily cry when watching touching movies.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -146,10 +146,10 @@ const EMPATHY_TEST = {
         {
             id: 13,
             dimension: 'AE',
-            zh: "我能够感受到他人的焦虑和紧张。",
+            zh: "我能够感受到他人的焦虑和紧张�?,
             en: "I can feel others' anxiety and tension.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -157,10 +157,10 @@ const EMPATHY_TEST = {
         {
             id: 14,
             dimension: 'AE',
-            zh: "他人的痛苦会让我感到不安。",
+            zh: "他人的痛苦会让我感到不安�?,
             en: "Others' pain makes me feel uneasy.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -170,10 +170,10 @@ const EMPATHY_TEST = {
         {
             id: 15,
             dimension: 'BE',
-            zh: "当我看到他人需要帮助时，我会主动伸出援手。",
+            zh: "当我看到他人需要帮助时，我会主动伸出援手�?,
             en: "When I see others need help, I proactively offer assistance.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -181,10 +181,10 @@ const EMPATHY_TEST = {
         {
             id: 16,
             dimension: 'BE',
-            zh: "我会主动安慰情绪低落的朋友。",
+            zh: "我会主动安慰情绪低落的朋友�?,
             en: "I proactively comfort friends who are feeling down.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -192,10 +192,10 @@ const EMPATHY_TEST = {
         {
             id: 17,
             dimension: 'BE',
-            zh: "我会花时间倾听他人的烦恼。",
+            zh: "我会花时间倾听他人的烦恼�?,
             en: "I spend time listening to others' troubles.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -203,10 +203,10 @@ const EMPATHY_TEST = {
         {
             id: 18,
             dimension: 'BE',
-            zh: "我会参与慈善活动或志愿服务。",
+            zh: "我会参与慈善活动或志愿服务�?,
             en: "I participate in charitable activities or volunteer service.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -214,10 +214,10 @@ const EMPATHY_TEST = {
         {
             id: 19,
             dimension: 'BE',
-            zh: "我会为他人感到高兴而表达祝贺。",
+            zh: "我会为他人感到高兴而表达祝贺�?,
             en: "I express congratulations when I feel happy for others.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -225,10 +225,10 @@ const EMPATHY_TEST = {
         {
             id: 20,
             dimension: 'BE',
-            zh: "我会在他人遇到困难时提供实际的支持。",
+            zh: "我会在他人遇到困难时提供实际的支持�?,
             en: "I provide practical support when others encounter difficulties.",
             options: {
-                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
+                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
                 en: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -276,9 +276,9 @@ const EMPATHY_TEST = {
         zh: {
             title: "共情能力测试",
             subtitle: "评估你的共情能力水平",
-            startBtn: "开始测试",
-            nextBtn: "下一题",
-            prevBtn: "上一题",
+            startBtn: "开始测�?,
+            nextBtn: "下一�?,
+            prevBtn: "上一�?,
             submitBtn: "查看结果",
             restartBtn: "重新测试",
             shareBtn: "分享结果",
@@ -287,7 +287,7 @@ const EMPATHY_TEST = {
             question: "问题",
             of: "/",
             resultTitle: "测试结果",
-            disclaimer: "本测试仅供娱乐参考，不具有科学权威性。共情能力是可以通过学习和实践提高的，如需专业帮助，请咨询心理咨询师。",
+            disclaimer: "本测试仅供娱乐参考，不具有科学权威性。共情能力是可以通过学习和实践提高的，如需专业帮助，请咨询心理咨询师�?,
             loading: "正在分析你的共情能力...",
             yourEmpathyScore: "你的共情能力分数",
             dimensions: "维度分析",

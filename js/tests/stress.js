@@ -3,7 +3,7 @@
  * Stress Index Test
  */
 
-const STRESS_TEST = {
+var STRESS_TEST = {
     type: 'stress',
     icon: '\u{1F624}',
     color: '#F44336',
@@ -11,7 +11,7 @@ const STRESS_TEST = {
         {
             id: 1,
             dimension: 'ST',
-            zh: "我觉得自己的任务和责任压得我喘不过气。",
+            zh: "我觉得自己的任务和责任压得我喘不过气�?,
             en: "I feel overwhelmed by my tasks and responsibilities.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -22,7 +22,7 @@ const STRESS_TEST = {
         {
             id: 2,
             dimension: 'ST',
-            zh: "我感到时间不够用，总是忙碌不堪。",
+            zh: "我感到时间不够用，总是忙碌不堪�?,
             en: "I feel there is not enough time and I am always busy.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -33,7 +33,7 @@ const STRESS_TEST = {
         {
             id: 3,
             dimension: 'ST',
-            zh: "我难以放松，即使在休息时也是如此。",
+            zh: "我难以放松，即使在休息时也是如此�?,
             en: "I find it difficult to relax, even during rest.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -44,7 +44,7 @@ const STRESS_TEST = {
         {
             id: 4,
             dimension: 'ST',
-            zh: "我的工作或学习效率明显下降。",
+            zh: "我的工作或学习效率明显下降�?,
             en: "My work or study efficiency has noticeably declined.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -55,7 +55,7 @@ const STRESS_TEST = {
         {
             id: 5,
             dimension: 'ST',
-            zh: "我经常因为压力而头痛或身体不适。",
+            zh: "我经常因为压力而头痛或身体不适�?,
             en: "I frequently get headaches or physical discomfort due to stress.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -66,7 +66,7 @@ const STRESS_TEST = {
         {
             id: 6,
             dimension: 'ST',
-            zh: "我感到精力耗尽，不想做任何事。",
+            zh: "我感到精力耗尽，不想做任何事�?,
             en: "I feel exhausted and do not want to do anything.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -77,7 +77,7 @@ const STRESS_TEST = {
         {
             id: 7,
             dimension: 'ST',
-            zh: "我容易因小事而发脾气。",
+            zh: "我容易因小事而发脾气�?,
             en: "I easily lose my temper over small things.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -88,7 +88,7 @@ const STRESS_TEST = {
         {
             id: 8,
             dimension: 'ST',
-            zh: "我的睡眠质量受到影响，很难入睡或早醒。",
+            zh: "我的睡眠质量受到影响，很难入睡或早醒�?,
             en: "My sleep quality is affected; I have trouble falling asleep or wake up early.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -99,7 +99,7 @@ const STRESS_TEST = {
         {
             id: 9,
             dimension: 'ST',
-            zh: "我感到对工作或学习失去了热情。",
+            zh: "我感到对工作或学习失去了热情�?,
             en: "I have lost enthusiasm for work or study.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -110,7 +110,7 @@ const STRESS_TEST = {
         {
             id: 10,
             dimension: 'ST',
-            zh: "我的食欲发生了明显变化。",
+            zh: "我的食欲发生了明显变化�?,
             en: "My appetite has noticeably changed.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -121,7 +121,7 @@ const STRESS_TEST = {
         {
             id: 11,
             dimension: 'ST',
-            zh: "我感到与他人的关系变得紧张。",
+            zh: "我感到与他人的关系变得紧张�?,
             en: "I feel my relationships with others have become tense.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -132,7 +132,7 @@ const STRESS_TEST = {
         {
             id: 12,
             dimension: 'ST',
-            zh: "我很难做决定，因为怓虑太多。",
+            zh: "我很难做决定，因为怓虑太多�?,
             en: "I find it hard to make decisions because I overthink.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -143,7 +143,7 @@ const STRESS_TEST = {
         {
             id: 13,
             dimension: 'ST',
-            zh: "我觉得自己的健康状况在下降。",
+            zh: "我觉得自己的健康状况在下降�?,
             en: "I feel my health condition is declining.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -154,7 +154,7 @@ const STRESS_TEST = {
         {
             id: 14,
             dimension: 'ST',
-            zh: "我经常担心自己无法完成任务。",
+            zh: "我经常担心自己无法完成任务�?,
             en: "I frequently worry about being unable to complete tasks.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -165,7 +165,7 @@ const STRESS_TEST = {
         {
             id: 15,
             dimension: 'ST',
-            zh: "我感到自己趋于消沉，不想与人交流。",
+            zh: "我感到自己趋于消沉，不想与人交流�?,
             en: "I tend to withdraw and do not want to interact with others.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -176,7 +176,7 @@ const STRESS_TEST = {
         {
             id: 16,
             dimension: 'ST',
-            zh: "我感到自己的情绪很难控制。",
+            zh: "我感到自己的情绪很难控制�?,
             en: "I feel my emotions are hard to control.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -187,7 +187,7 @@ const STRESS_TEST = {
         {
             id: 17,
             dimension: 'ST',
-            zh: "我觉得自己已经失去了对生活的掌控感。",
+            zh: "我觉得自己已经失去了对生活的掌控感�?,
             en: "I feel I have lost control over my life.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -198,7 +198,7 @@ const STRESS_TEST = {
         {
             id: 18,
             dimension: 'ST',
-            zh: "我依赖咖啡、酒精或其他物质来应对压力。",
+            zh: "我依赖咖啡、酒精或其他物质来应对压力�?,
             en: "I rely on coffee, alcohol, or other substances to cope with stress.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -209,7 +209,7 @@ const STRESS_TEST = {
         {
             id: 19,
             dimension: 'ST',
-            zh: "我觉得自己应付不了生活中的各种挑战。",
+            zh: "我觉得自己应付不了生活中的各种挑战�?,
             en: "I feel I cannot handle the various challenges in life.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -220,7 +220,7 @@ const STRESS_TEST = {
         {
             id: 20,
             dimension: 'ST',
-            zh: "我经常感到焦虑不安或心继不宁。",
+            zh: "我经常感到焦虑不安或心继不宁�?,
             en: "I frequently feel anxious or restless.",
             options: {
                 zh: ["从不", "偶尔", "有时", "经常", "总是"],
@@ -233,10 +233,10 @@ const STRESS_TEST = {
     resultTypes: {
         low: {
             zh: {
-                title: "低压力水平",
-                name: "低压力",
-                description: "你的压力水平较低，能够较好地应对日常生活中的挑战。请继续保持健康的生活方式。",
-                suggestions: ["继续保持健康的生活习惯", "定期进行放松活动"]
+                title: "低压力水�?,
+                name: "低压�?,
+                description: "你的压力水平较低，能够较好地应对日常生活中的挑战。请继续保持健康的生活方式�?,
+                suggestions: ["继续保持健康的生活习�?, "定期进行放松活动"]
             },
             en: {
                 title: "Low Stress Level",
@@ -250,8 +250,8 @@ const STRESS_TEST = {
             zh: {
                 title: "中等压力水平",
                 name: "中等压力",
-                description: "你正在经历中等程度的压力。建议学习有效的压力管理技巧。",
-                suggestions: ["学习时间管理技巧", "增加运动", "练习冥想"]
+                description: "你正在经历中等程度的压力。建议学习有效的压力管理技巧�?,
+                suggestions: ["学习时间管理技�?, "增加运动", "练习冥想"]
             },
             en: {
                 title: "Moderate Stress Level",
@@ -263,9 +263,9 @@ const STRESS_TEST = {
         },
         high: {
             zh: {
-                title: "高压力水平",
-                name: "高压力",
-                description: "你的压力水平较高，可能已经影响到你的身心健康。建议重新审视自己的生活节奏。",
+                title: "高压力水�?,
+                name: "高压�?,
+                description: "你的压力水平较高，可能已经影响到你的身心健康。建议重新审视自己的生活节奏�?,
                 suggestions: ["重新审视自己的优先级", "寻求社会支持", "考虑寻求专业帮助"]
             },
             en: {
@@ -280,8 +280,8 @@ const STRESS_TEST = {
             zh: {
                 title: "极高压力水平",
                 name: "极高压力",
-                description: "你的压力水平极高，已经严重影响了你的生活质量。强烈建议寻求专业帮助。",
-                suggestions: ["立即寻求专业帮助", "考虑调整工作或生活环境"]
+                description: "你的压力水平极高，已经严重影响了你的生活质量。强烈建议寻求专业帮助�?,
+                suggestions: ["立即寻求专业帮助", "考虑调整工作或生活环�?]
             },
             en: {
                 title: "Extremely High Stress Level",
@@ -328,9 +328,9 @@ const STRESS_TEST = {
         zh: {
             title: "压力指数测试",
             subtitle: "评估你的压力水平",
-            startBtn: "开始测试",
-            nextBtn: "下一题",
-            prevBtn: "上一题",
+            startBtn: "开始测�?,
+            nextBtn: "下一�?,
+            prevBtn: "上一�?,
             submitBtn: "查看结果",
             restartBtn: "重新测试",
             shareBtn: "分享结果",
@@ -339,7 +339,7 @@ const STRESS_TEST = {
             question: "问题",
             of: "/",
             resultTitle: "测试结果",
-            disclaimer: "本测试仅供参考，不能代替专业诊断。如果压力严重影响了你的生活，请寻求专业心理健康服务。",
+            disclaimer: "本测试仅供参考，不能代替专业诊断。如果压力严重影响了你的生活，请寻求专业心理健康服务�?,
             loading: "正在分析你的压力水平...",
             yourStressScore: "你的压力指数",
             scoreRange: "分数范围",
