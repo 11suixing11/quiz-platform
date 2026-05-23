@@ -83,11 +83,11 @@
             const savedLang = localStorage.getItem('quiz-platform-lang');
             if (savedLang) currentLang = savedLang;
 
-            renderCategoryTags();
-            renderAllCategories();
-            updateLanguage();
-            initHeroParticles();
-            initScrollEffects();
+            try { renderCategoryTags(); } catch(e) { console.error('renderCategoryTags error:', e); }
+            try { renderAllCategories(); } catch(e) { console.error('renderAllCategories error:', e); }
+            try { updateLanguage(); } catch(e) { console.error('updateLanguage error:', e); }
+            try { initHeroParticles(); } catch(e) { console.error('initHeroParticles error:', e); }
+            try { initScrollEffects(); } catch(e) { console.error('initScrollEffects error:', e); }
         }
 
         // Toggle language
@@ -278,7 +278,13 @@
             });
         }
 
-        window.onload = init;
+        window.onload = function() {
+            try {
+                init();
+            } catch(e) {
+                document.getElementById('categoriesContainer').innerHTML = '<div class="no-results" style="color:#ff6b6b">Error: ' + e.message + ' | Stack: ' + e.stack + '</div>';
+            }
+        };
     </script>
 </body>
 </html>
