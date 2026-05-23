@@ -32,7 +32,7 @@ var BOOK_PERSONALITY_TEST = {
         'QU': { zh: { title: '轻松阅读型', name: '轻松阅读型', description: '你是轻松阅读型。你喜欢轻松的读物、短篇文章，碎片化阅读。' }, en: { title: 'Casual Reader', name: 'Casual Reader', description: 'You are a casual reader. You like light reading, short articles, and fragmented reading.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的书籍性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的书籍性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Book Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

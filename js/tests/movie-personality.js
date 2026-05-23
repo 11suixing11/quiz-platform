@@ -32,7 +32,7 @@ var MOVIE_PERSONALITY_TEST = {
         'SF': { zh: { title: '科幻探索型', name: '科幻探索型', description: '你是科幻探索型。你喜欢科幻片，想象力丰富的电影和未来主题。' }, en: { title: 'Sci-Fi Explorer', name: 'Sci-Fi Explorer', description: 'You are a sci-fi explorer. You like science fiction, imaginative movies, and future themes.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的电影性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的电影性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Movie Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

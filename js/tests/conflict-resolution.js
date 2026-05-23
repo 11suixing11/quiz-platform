@@ -34,7 +34,7 @@ var CONFLICT_RESOLUTION_TEST = {
         'AV': { zh: { title: '回避型', name: '回避型', description: '你是回避型冲突解决者。你倾向于避免冲突，可能让问题积累。建议学习更积极的冲突解决方式。' }, en: { title: 'Avoidant', name: 'Avoidant', description: 'You are an avoidant conflict resolver. You tend to avoid conflict, which may let problems accumulate. Consider learning more active conflict resolution styles.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的冲突处理风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的冲突处理风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Conflict Resolution Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

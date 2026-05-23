@@ -31,7 +31,7 @@ var LEARNING_STYLE_TEST = {
         'KI': { zh: { title: '动觉型学习者', name: '动觉型学习者', description: '你是动觉型学习者。你通过做来学习效果最好，喜欢动手实践和运动。' }, en: { title: 'Kinesthetic Learner', name: 'Kinesthetic Learner', description: 'You are a kinesthetic learner. You learn best by doing and prefer hands-on practice and movement.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的学习风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的学习风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Learning Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

@@ -32,7 +32,7 @@ var TRAVEL_STYLE_TEST = {
         'SO': { zh: { title: '社交互动型', name: '社交互动型', description: '你是社交互动型旅行者。你喜欢和朋友一起旅行，结识新朋友，参加旅行团。' }, en: { title: 'Social Traveler', name: 'Social Traveler', description: 'You are a social traveler. You like traveling with friends, meeting new friends, and joining tour groups.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的旅行风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的旅行风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Travel Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

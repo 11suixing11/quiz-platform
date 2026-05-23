@@ -32,7 +32,7 @@ var CHARISMA_TEST = {
         'IN': { zh: { title: '激励魅力型', name: '激励魅力型', description: '你是激励魅力型。你能激励他人，有远见，传递正能量。' }, en: { title: 'Inspirational Charisma', name: 'Inspirational Charisma', description: 'You have inspirational charisma. You can inspire others, have vision, andconvey positive energy.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的魅力指数', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的魅力指数', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Charisma Index', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

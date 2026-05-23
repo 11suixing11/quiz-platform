@@ -31,7 +31,7 @@ var LEADERSHIP_STYLE_TEST = {
         'SL': { zh: { title: '服务型领导', name: '服务型领导', description: '你是服务型领导者。你关心团队成员的福祉，支持他们的个人发展。你创造积极的工作环境，帮助团队成长。' }, en: { title: 'Servant Leader', name: 'Servant Leader', description: 'You are a servant leader. You care about team members\' well-being and support their personal development. You create a positive work environment and help the team grow.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的领导风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的领导风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Leadership Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

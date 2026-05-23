@@ -31,7 +31,7 @@ var MOTIVATION_TYPE_TEST = {
         'AM': { zh: { title: '回避动机型', name: '回避动机型', description: '你是回避动机型。你被恐惧、义务和比较所驱动。建议寻找更积极的动机来源。' }, en: { title: 'Avoidance Motivation', name: 'Avoidance Motivation', description: 'You are avoidance-motivated. You are driven by fear, obligation, and comparison. Consider finding more positive sources of motivation.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的动机类型', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的动机类型', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Motivation Type', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

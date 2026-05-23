@@ -32,7 +32,7 @@ var MATHEMATICAL_TEST = {
         'SA': { zh: { title: '空间分析型', name: '空间分析型', description: '你是空间分析型。你对数字敏感，擅长概率、几何和空间思维。' }, en: { title: 'Spatial Analyst', name: 'Spatial Analyst', description: 'You are a spatial analyst. You are sensitive to numbers and excel at probability, geometry, and spatial thinking.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的数学思维类型', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的数学思维类型', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Mathematical Thinking Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

@@ -32,7 +32,7 @@ var COFFEE_PERSONALITY_TEST = {
         'SP': { zh: { title: '特调咖啡型', name: '特调咖啡型', description: '你是特调咖啡型。你喜欢探索新事物，创新，不喜欢单调。' }, en: { title: 'Special Brew', name: 'Special Brew', description: 'You are a special brew type. You like exploring new things, innovation, and don\'t like monotony.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的咖啡性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的咖啡性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Coffee Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

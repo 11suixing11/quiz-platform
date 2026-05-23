@@ -31,7 +31,7 @@ var ORGANIZATIONAL_COMMITMENT_TEST = {
         'CC': { zh: { title: '规范承诺型', name: '规范承诺型', description: '你对组织有规范承诺。你留下来是因为道德责任和忠诚感。建议思考这是否是你真正想要的。' }, en: { title: 'Normative Commitment', name: 'Normative Commitment', description: 'You have normative commitment. You stay because of moral responsibility and loyalty. Consider whether this is what you truly want.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的组织承诺', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的组织承诺', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Organizational Commitment', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

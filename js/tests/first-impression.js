@@ -32,7 +32,7 @@ var FIRST_IMPRESSION_TEST = {
         'AW': { zh: { title: '感知优先型', name: '感知优先型', description: '你是感知优先型。你能敏锐感知他人看法，灵活调整表现。' }, en: { title: 'Awareness-Focused', name: 'Awareness-Focused', description: 'You are awareness-focused. You can sensitively perceive others\' views and flexibly adjust your performance.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的第一印象风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的第一印象风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your First Impression Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

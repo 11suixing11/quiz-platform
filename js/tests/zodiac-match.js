@@ -32,7 +32,7 @@ var ZODIAC_MATCH_TEST = {
         'EA': { zh: { title: '火象星座型', name: '火象星座型', description: '你是火象星座型。你热情洋溢，喜欢冒险，有领导力，充满自信。' }, en: { title: 'Fire Sign', name: 'Fire Sign', description: 'You are a fire sign type. You are enthusiastic, adventurous, have leadership, and full of confidence.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的星座元素', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的星座元素', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Zodiac Element', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

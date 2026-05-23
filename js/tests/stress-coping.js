@@ -32,7 +32,7 @@ var STRESS_COPING_TEST = {
         'RC': { zh: { title: '自我调节型', name: '自我调节型', description: '你是自我调节型。面对压力时，你会运动、冥想、保持健康习惯来调节。' }, en: { title: 'Self-Regulator', name: 'Self-Regulator', description: 'You are a self-regulator. When facing stress, you exercise, meditate, and maintain healthy habits to cope.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的压力应对方式', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的压力应对方式', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Stress Coping Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

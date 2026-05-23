@@ -32,7 +32,7 @@ var COLOR_PERSONALITY_TEST = {
         'YE': { zh: { title: '黄色性格', name: '黄色性格', description: '你是黄色性格。你乐观、开朗、充满创意，喜欢创新和变化。' }, en: { title: 'Yellow Personality', name: 'Yellow Personality', description: 'You are a yellow personality. You are optimistic, cheerful, creative, and like innovation and change.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的颜色性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的颜色性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Color Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

@@ -34,7 +34,7 @@ var BURNOUT_TEST = {
         ]};
     },
     uiText: {
-        zh: { resultTitle: '你的职业倦怠程度', disclaimer: '本测试仅供参考。如感到严重倦怠，请咨询专业人士。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的职业倦怠程度', disclaimer: '本测试仅供参考。如感到严重倦怠，请咨询专业人士。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Burnout Level', disclaimer: 'This test is for reference only. If you feel severely burned out, consult a professional.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };
