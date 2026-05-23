@@ -14,8 +14,6 @@
     <div class="orb orb-4"></div>
     <div class="orb orb-5"></div>
 
-    <div id="debugPanel" style="position:fixed;top:60px;right:10px;background:rgba(0,0,0,0.8);color:#0f0;padding:12px;border-radius:8px;font-size:11px;z-index:9999;max-width:300px;font-family:monospace;white-space:pre-wrap;"></div>
-
     <div class="container">
         <button class="lang-switch" onclick="toggleLanguage()">EN/中</button>
 
@@ -58,39 +56,26 @@
         let engine = null;
         let testData = null;
 
-        function debug(msg) {
-            var el = document.getElementById('debugPanel');
-            if (el) el.textContent += msg + '\n';
-        }
-
         function init() {
-            debug('init() called, testType=' + testType);
-
             if (!testType) {
-                debug('No testType, redirecting...');
                 window.location.href = 'index.html';
                 return;
             }
 
-            debug('Calling loadTest...');
             // Dynamically load test data
             loadTest(testType, function(err, data) {
                 if (err) {
-                    debug('loadTest ERROR: ' + err.message);
                     document.getElementById('questionText').textContent = 'Error: ' + err.message;
                     document.getElementById('questionNumber').textContent = '';
                     document.getElementById('optionsContainer').innerHTML = '';
+                    console.error('loadTest error:', err);
                     return;
                 }
 
-                debug('loadTest OK, data type=' + typeof data + ', questions=' + (data && data.questions ? data.questions.length : 'null'));
                 testData = data;
                 engine = new QuizEngine(testType, testData);
-                debug('Engine created, questions=' + engine.shuffledQuestions.length + ', current=' + engine.currentQuestion);
-
                 showQuestion(engine.currentQuestion);
                 updateLanguage();
-                debug('Ready!');
             });
         }
 
@@ -109,12 +94,9 @@
         }
 
         function showQuestion(index) {
-            debug('showQuestion(' + index + ')');
             const question = engine.getCurrentQuestion();
             const text = engine.getUIText();
             const lang = engine.currentLang;
-
-            debug('question=' + (question ? 'OK' : 'NULL') + ', lang=' + lang + ', text.question=' + (text ? text.question : 'NULL'));
 
             if (!question) {
                 document.getElementById('questionText').textContent = 'Error: question not found';
@@ -258,15 +240,7 @@
             animate();
         }
 
-        window.onload = function() {
-            initNeuralCanvas();
-            try {
-                init();
-            } catch(e) {
-                document.getElementById('questionText').textContent = 'Init error: ' + e.message;
-                document.getElementById('questionNumber').textContent = '';
-            }
-        };
+        window.onload = function() { initNeuralCanvas(); init(); };
     </script>
 </body>
 </html>
