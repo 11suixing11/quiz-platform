@@ -32,7 +32,7 @@ var MUSIC_PERSONALITY_TEST = {
         'EC': { zh: { title: '电子前卫型', name: '电子前卫型', description: '你是电子前卫型。你喜欢电子、创新、前卫的音乐，音乐让你思考。' }, en: { title: 'Electronic Avant-Garde', name: 'Electronic Avant-Garde', description: 'You are an electronic avant-garde. You like electronic, innovative, avant-garde music that makes you think.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的音乐性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的音乐性格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Music Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

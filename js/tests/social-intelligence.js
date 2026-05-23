@@ -32,7 +32,7 @@ var SOCIAL_INTELLIGENCE_TEST = {
         'SC': { zh: { title: '社交控制型', name: '社交控制型', description: '你是社交控制型。你能控制情绪、适应规则、妥善处理社交尴尬。' }, en: { title: 'Social Controller', name: 'Social Controller', description: 'You are a social controller. You can control emotions, adapt to rules, and handle social awkwardness well.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的社交智力', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的社交智力', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Social Intelligence', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

@@ -42,7 +42,7 @@ var PHOBIA_TEST = {
         ]
     },
     uiText: {
-        zh: { resultTitle: '你的恐惧指数', disclaimer: '本测试仅供参考。如恐惧严重影响生活，请咨询专业人士。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...', scoreLow: '低', scoreHigh: '高' },
+        zh: { resultTitle: '你的恐惧指数', disclaimer: '本测试仅供参考。如恐惧严重影响生活，请咨询专业人士。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...', scoreLow: '低', scoreHigh: '高' },
         en: { resultTitle: 'Your Fear Index', disclaimer: 'This test is for reference only. If fear seriously affects your life, consult a professional.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...', scoreLow: 'Low', scoreHigh: 'High' }
     }
 };

@@ -32,7 +32,7 @@ var PUBLIC_SPEAKING_TEST = {
         'NP': { zh: { title: '精进演讲型', name: '精进演讲型', description: '你是精进演讲型。你认真准备、不断练习，持续提升演讲能力。' }, en: { title: 'Practice-Oriented Speaker', name: 'Practice-Oriented Speaker', description: 'You are a practice-oriented speaker. You preparediligently, practice continuously, and improve your speaking skills.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的公众演讲风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的公众演讲风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Public Speaking Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

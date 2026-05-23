@@ -36,7 +36,7 @@ var SLEEP_QUALITY_TEST = {
         ]
     },
     uiText: {
-        zh: { resultTitle: '你的睡眠质量', disclaimer: '本测试仅供参考。如有严重睡眠问题，请咨询医生。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...', scoreLow: '差', scoreHigh: '好' },
+        zh: { resultTitle: '你的睡眠质量', disclaimer: '本测试仅供参考。如有严重睡眠问题，请咨询医生。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...', scoreLow: '差', scoreHigh: '好' },
         en: { resultTitle: 'Your Sleep Quality', disclaimer: 'This test is for reference only. If you have serious sleep problems, consult a doctor.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...', scoreLow: 'Poor', scoreHigh: 'Good' }
     }
 };

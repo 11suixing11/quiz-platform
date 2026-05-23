@@ -32,7 +32,7 @@ var DIET_ATTITUDE_TEST = {
         'EN': { zh: { title: '享受美食型', name: '享受美食型', description: '你是享受美食型。你享受美食，喜欢尝试新食物，喜欢与朋友一起吃饭。' }, en: { title: 'Food Enjoyer', name: 'Food Enjoyer', description: 'You are a food enjoyer. You enjoy good food, like trying new foods, and like eating with friends.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的饮食态度', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的饮食态度', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Diet Attitude', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

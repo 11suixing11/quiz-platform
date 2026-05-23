@@ -32,7 +32,7 @@ var EMOTIONAL_CONTAGION_TEST = {
         'AW': { zh: { title: '情绪觉察型', name: '情绪觉察型', description: '你是情绪觉察型。你能察觉群体情绪变化，理解情绪传染机制。' }, en: { title: 'Emotionally Aware', name: 'Emotionally Aware', description: 'You are emotionally aware. You can detect group emotional changes and understand the mechanism of emotional contagion.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的情绪传染模式', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的情绪传染模式', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Emotional Contagion Pattern', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

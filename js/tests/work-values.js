@@ -40,7 +40,7 @@ var WORK_VALUES_TEST = {
         'Creative': { zh: { title: '创造导向型', name: '创造导向型', description: '你最看重工作中的创造力和挑战。你喜欢解决复杂问题，发挥创意。' }, en: { title: 'Creative-Oriented', name: 'Creative-Oriented', description: 'You value creativity and challenges at work most. You enjoy solving complex problems and using your creativity.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的工作价值观', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的工作价值观', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Work Values', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

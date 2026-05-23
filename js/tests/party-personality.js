@@ -32,7 +32,7 @@ var PARTY_PERSONALITY_TEST = {
         'HP': { zh: { title: '居家型', name: '居家型', description: '你是居家型。你更喜欢在家休息，不太喜欢参加派对。' }, en: { title: 'Homebody', name: 'Homebody', description: 'You are a homebody. You prefer resting at home and don\'t like attending parties much.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的派对人格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的派对人格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Party Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

@@ -31,7 +31,7 @@ var TAROT_PERSONALITY_TEST = {
         'ST': { zh: { title: '力量', name: '力量', description: '你是力量型。你有很强的意志力和执行力，追求力量，善于给予。' }, en: { title: 'Strength', name: 'Strength', description: 'You are Strength. You have strong willpower and execution ability, pursue power, and are good at giving.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的塔罗人格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的塔罗人格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Tarot Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

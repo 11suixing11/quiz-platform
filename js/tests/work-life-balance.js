@@ -32,7 +32,7 @@ var WORK_LIFE_BALANCE_TEST = {
         'SR': { zh: { title: '恢复力强型', name: '恢复力强型', description: '你是恢复力强型。你能有效从工作压力中恢复，保持身心健康。' }, en: { title: 'Resilient', name: 'Resilient', description: 'You are resilient. You can effectively recover from work stress and maintain physical and mental health.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的工作生活平衡', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的工作生活平衡', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Work-Life Balance', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

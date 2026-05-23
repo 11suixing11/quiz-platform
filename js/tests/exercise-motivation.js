@@ -32,7 +32,7 @@ var EXERCISE_MOTIVATION_TEST = {
         'IM': { zh: { title: '内在驱动型', name: '内在驱动型', description: '你是内在驱动型运动者。你运动是因为享受运动本身，喜欢挑战和学习新技能。' }, en: { title: 'Intrinsically-Motivated', name: 'Intrinsically-Motivated', description: 'You are an intrinsically-motivated exerciser. You exercise because you enjoy it and like challenges and learning new skills.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的运动动机', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的运动动机', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Exercise Motivation', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

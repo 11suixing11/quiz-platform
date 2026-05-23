@@ -32,7 +32,7 @@ var FOOD_PERSONALITY_TEST = {
         'SO': { zh: { title: '社交美食型', name: '社交美食型', description: '你是社交美食型。你喜欢和朋友一起吃饭，分享食物，享受聚餐氛围。' }, en: { title: 'Social Eater', name: 'Social Eater', description: 'You are a social eater. You like eating with friends, sharing food, and enjoying dinner party atmosphere.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的食物人格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的食物人格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Food Personality', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

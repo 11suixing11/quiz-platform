@@ -32,7 +32,7 @@ var HUMOR_STYLE_TEST = {
         'IH': { zh: { title: '智慧幽默型', name: '智慧幽默型', description: '你是智慧幽默型。你喜欢冷笑话、文字游戏和含蓄的幽默。' }, en: { title: 'Intellectual Humorist', name: 'Intellectual Humorist', description: 'You are an intellectual humorist. You like dry jokes, wordplay, and subtle humor.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的幽默风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的幽默风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Humor Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

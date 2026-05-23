@@ -32,7 +32,7 @@ var ONLINE_SOCIAL_TEST = {
         'IN': { zh: { title: '网络探索型', name: '网络探索型', description: '你是网络探索型。你能通过网络找到志同道合的人，拓展视野。' }, en: { title: 'Online Explorer', name: 'Online Explorer', description: 'You are an online explorer. You can find like-minded people and broaden your horizons through the internet.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的网络社交风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的网络社交风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Online Social Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };

@@ -36,7 +36,7 @@ var COMMUNICATION_STYLE_TEST = {
         'AN': { zh: { title: '被动攻击型', name: '被动攻击型', description: '你是被动攻击型沟通者。你很少直接表达想法，但内心可能有不满。你需要学习更直接的沟通方式。' }, en: { title: 'Passive-Aggressive', name: 'Passive-Aggressive', description: 'You are a passive-aggressive communicator. You rarely express thoughts directly but may have inner dissatisfaction. Learn more direct communication styles.' } }
     },
     uiText: {
-        zh: { resultTitle: '你的沟通风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '第', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
+        zh: { resultTitle: '你的沟通风格', disclaimer: '本测试仅供参考。', restartBtn: '重新测试', homeBtn: '返回首页', shareBtn: '分享结果', progress: '进度', question: '问题', of: '题 / 共', nextBtn: '下一题', prevBtn: '上一题', submitBtn: '提交', loading: '正在分析...' },
         en: { resultTitle: 'Your Communication Style', disclaimer: 'This test is for reference only.', restartBtn: 'Retake', homeBtn: 'Home', shareBtn: 'Share', progress: 'Progress', question: 'Question', of: 'of', nextBtn: 'Next', prevBtn: 'Previous', submitBtn: 'Submit', loading: 'Analyzing...' }
     }
 };
