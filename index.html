@@ -192,11 +192,11 @@
             activeCategory = categoryId;
             document.querySelectorAll('.tag').forEach(t => t.classList.toggle('active', t.dataset.category === categoryId));
 
-            // Also clear search when switching category
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput && searchInput.value.trim()) {
-                suppressFocus = true;
-                searchInput.value = '';
+            // Clear search and restore categories if needed
+            var si = document.getElementById('searchInput');
+            var hadSearch = si && si.value.trim();
+            if (hadSearch) {
+                si.value = '';
                 document.getElementById('searchClear').style.display = 'none';
                 hideDropdown();
                 renderAllCategories();
@@ -206,89 +206,95 @@
                 document.querySelectorAll('.category-section').forEach(s => s.style.display = '');
             } else {
                 document.querySelectorAll('.category-section').forEach(s => {
-                    s.style.display = s.id === `cat-${categoryId}` ? '' : 'none';
+                    s.style.display = s.id === 'cat-' + categoryId ? '' : 'none';
                 });
             }
         }
 
-        // === Fuzzy Autocomplete Search ===
-        let searchDebounce = null;
-        let suppressFocus = false;
+        // === Search ===
+        var _searchTimer = null;
+        var _justCleared = false;
 
         function onSearchInput() {
-            const input = document.getElementById('searchInput');
-            const clearBtn = document.getElementById('searchClear');
-            const q = input.value.trim();
-            clearBtn.style.display = q ? 'flex' : 'none';
-
-            clearTimeout(searchDebounce);
-            searchDebounce = setTimeout(() => {
+            var q = document.getElementById('searchInput').value.trim();
+            document.getElementById('searchClear').style.display = q ? 'flex' : 'none';
+            clearTimeout(_searchTimer);
+            _searchTimer = setTimeout(function() {
                 if (q) {
-                    showDropdown(q);
-                    renderSearchResults(q);
+                    doSearch(q);
                 } else {
                     hideDropdown();
-                    renderAllCategories();
-                    filterByCategory(activeCategory);
+                    showAllCategories();
                 }
-            }, 150);
+            }, 200);
         }
 
         function onSearchFocus() {
-            if (suppressFocus) { suppressFocus = false; return; }
-            const q = document.getElementById('searchInput').value.trim();
-            if (q) showDropdown(q);
-            else showPopularDropdown();
+            if (_justCleared) { _justCleared = false; return; }
+            var q = document.getElementById('searchInput').value.trim();
+            if (q) {
+                doSearch(q);
+            }
         }
 
         function clearSearch() {
-            suppressFocus = true;
-            const input = document.getElementById('searchInput');
-            input.value = '';
+            _justCleared = true;
+            document.getElementById('searchInput').value = '';
             document.getElementById('searchClear').style.display = 'none';
             hideDropdown();
+            showAllCategories();
+        }
+
+        function doSearch(query) {
+            try {
+                var results = searchTests(query, currentLang);
+                var isZh = currentLang === 'zh';
+                var container = document.getElementById('categoriesContainer');
+
+                // Show dropdown with top results
+                var dropdown = document.getElementById('searchDropdown');
+                if (results.length === 0) {
+                    dropdown.innerHTML = '<div class="dropdown-empty">' + (isZh ? '未找到匹配结果' : 'No matches found') + '</div>';
+                } else {
+                    var items = results.slice(0, 8);
+                    dropdown.innerHTML = items.map(function(t) {
+                        return '<a class="dropdown-item" href="quiz.html?type=' + t.id + '">' +
+                            '<span class="dropdown-icon">' + t.icon + '</span>' +
+                            '<div class="dropdown-info"><div class="dropdown-name">' + (isZh ? t.zh.name : t.en.name) + '</div>' +
+                            '<div class="dropdown-desc">' + (isZh ? t.zh.description : t.en.description) + '</div></div>' +
+                            '<span class="dropdown-cat">' + getCategoryLabel(t.category, isZh) + '</span></a>';
+                    }).join('');
+                }
+                dropdown.classList.add('show');
+
+                // Also update main content area
+                container.innerHTML = '';
+                if (results.length === 0) {
+                    container.innerHTML = '<div class="no-results">' + (isZh ? '未找到相关测试' : 'No tests found') + '</div>';
+                } else {
+                    var section = document.createElement('section');
+                    section.className = 'category-section visible';
+                    section.innerHTML = '<div class="category-header"><span class="category-icon">🔍</span><div>' +
+                        '<h2 class="category-title">' + (isZh ? '搜索结果' : 'Search Results') + '</h2>' +
+                        '<p class="category-desc">' + (isZh ? '找到 ' + results.length + ' 个测试' : 'Found ' + results.length + ' tests') + '</p></div></div>' +
+                        '<div class="test-grid">' + results.map(function(t) {
+                            return '<a class="test-card" href="quiz.html?type=' + t.id + '">' +
+                                '<div class="card-icon">' + t.icon + '</div>' +
+                                '<h3>' + (isZh ? t.zh.name : t.en.name) + '</h3>' +
+                                '<p>' + (isZh ? t.zh.description : t.en.description) + '</p>' +
+                                '<div class="meta"><span class="questions">' + t.questions + (isZh ? ' 题' : ' Q') + '</span>' +
+                                '<span>' + t.time + (isZh ? ' 分钟' : ' min') + '</span></div></a>';
+                        }).join('') + '</div>';
+                    container.appendChild(section);
+                }
+            } catch (e) {
+                console.error('Search error:', e);
+            }
+        }
+
+        function showAllCategories() {
             renderAllCategories();
             filterByCategory(activeCategory);
-        }
-
-        function showDropdown(query) {
-            const results = searchTests(query, currentLang);
-            const dropdown = document.getElementById('searchDropdown');
-            const isZh = currentLang === 'zh';
-            if (results.length === 0) {
-                dropdown.innerHTML = `<div class="dropdown-empty">${isZh ? '未找到匹配结果，试试其他关键词' : 'No matches, try other keywords'}</div>`;
-                dropdown.classList.add('show');
-                return;
-            }
-            const items = results.slice(0, 8);
-            dropdown.innerHTML = items.map(t => `
-                <a class="dropdown-item" href="quiz.html?type=${t.id}">
-                    <span class="dropdown-icon">${t.icon}</span>
-                    <div class="dropdown-info">
-                        <div class="dropdown-name">${isZh ? t.zh.name : t.en.name}</div>
-                        <div class="dropdown-desc">${isZh ? t.zh.description : t.en.description}</div>
-                    </div>
-                    <span class="dropdown-cat">${getCategoryLabel(t.category, isZh)}</span>
-                </a>
-            `).join('');
-            dropdown.classList.add('show');
-        }
-
-        function showPopularDropdown() {
-            const popular = getPopularTests();
-            const dropdown = document.getElementById('searchDropdown');
-            const isZh = currentLang === 'zh';
-            dropdown.innerHTML = `<div class="dropdown-label">${isZh ? '热门测试' : 'Popular Tests'}</div>` +
-                popular.map(t => `
-                <a class="dropdown-item" href="quiz.html?type=${t.id}">
-                    <span class="dropdown-icon">${t.icon}</span>
-                    <div class="dropdown-info">
-                        <div class="dropdown-name">${isZh ? t.zh.name : t.en.name}</div>
-                        <div class="dropdown-desc">${isZh ? t.zh.description : t.en.description}</div>
-                    </div>
-                </a>
-            `).join('');
-            dropdown.classList.add('show');
         }
 
         function hideDropdown() {
@@ -296,51 +302,13 @@
         }
 
         function getCategoryLabel(catId, isZh) {
-            const cat = TEST_CATEGORIES.find(c => c.id === catId);
+            var cat = TEST_CATEGORIES.find(function(c) { return c.id === catId; });
             return cat ? (isZh ? cat.zh : cat.en) : '';
-        }
-
-        function renderSearchResults(query) {
-            const results = searchTests(query, currentLang);
-            const container = document.getElementById('categoriesContainer');
-            const isZh = currentLang === 'zh';
-            container.innerHTML = '';
-
-            if (results.length === 0) {
-                container.innerHTML = `<div class="no-results">${isZh ? '未找到相关测试，试试其他关键词' : 'No tests found, try other keywords'}</div>`;
-                return;
-            }
-
-            const section = document.createElement('section');
-            section.className = 'category-section visible';
-            section.innerHTML = `
-                <div class="category-header">
-                    <span class="category-icon">🔍</span>
-                    <div>
-                        <h2 class="category-title">${isZh ? '搜索结果' : 'Search Results'}</h2>
-                        <p class="category-desc">${isZh ? `找到 ${results.length} 个测试` : `Found ${results.length} tests`}</p>
-                    </div>
-                </div>
-                <div class="test-grid">
-                    ${results.map(t => `
-                        <a class="test-card" href="quiz.html?type=${t.id}">
-                            <div class="card-icon">${t.icon}</div>
-                            <h3>${isZh ? t.zh.name : t.en.name}</h3>
-                            <p>${isZh ? t.zh.description : t.en.description}</p>
-                            <div class="meta">
-                                <span class="questions">${t.questions} ${isZh ? '题' : 'Q'}</span>
-                                <span>${t.time} ${isZh ? '分钟' : 'min'}</span>
-                            </div>
-                        </a>
-                    `).join('')}
-                </div>
-            `;
-            container.appendChild(section);
         }
 
         // Close dropdown on outside click
         document.addEventListener('click', function(e) {
-            const wrap = document.querySelector('.search-input-wrap');
+            var wrap = document.querySelector('.search-input-wrap');
             if (wrap && !wrap.contains(e.target)) hideDropdown();
         });
 
