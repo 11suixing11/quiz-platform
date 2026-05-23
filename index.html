@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>心理测试平台 | Psychology Quiz Platform</title>
-    <link rel="stylesheet" href="css/style.css?v=4">
+    <link rel="stylesheet" href="css/style.css?v=5">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 </head>
 <body>
@@ -17,36 +17,12 @@
 
     <!-- Hero Section -->
     <section class="hero" id="hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-particles" id="heroParticles"></div>
         <div class="hero-content">
-            <div class="hero-icon">
-                <svg viewBox="0 0 100 100" width="100" height="100">
-                    <defs>
-                        <linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#D4A8B8;stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:#C9B8D8;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#A8C5D8;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M50 10 C30 10 15 25 15 45 C15 55 20 65 30 70 C25 75 25 85 35 90 C40 92 45 90 50 85 C55 90 60 92 65 90 C75 85 75 75 70 70 C80 65 85 55 85 45 C85 25 70 10 50 10Z"
-                          fill="url(#brainGradient)" stroke="none"/>
-                    <path d="M50 20 C50 20 40 35 40 50 C40 65 50 75 50 75" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M50 20 C50 20 60 35 60 50 C60 65 50 75 50 75" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
-                    <circle cx="35" cy="40" r="3" fill="rgba(255,255,255,0.6)"/>
-                    <circle cx="65" cy="40" r="3" fill="rgba(255,255,255,0.6)"/>
-                    <circle cx="50" cy="55" r="3" fill="rgba(255,255,255,0.6)"/>
-                </svg>
-            </div>
+            <p class="hero-greeting" id="heroGreeting"></p>
             <h1 class="hero-title" id="heroTitle">心理测试平台</h1>
             <p class="hero-subtitle" id="heroSubtitle"></p>
-            <div class="hero-stats">
-                <div class="stat"><span class="stat-num">114</span><span class="stat-label" id="statTests">种测试</span></div>
-                <div class="stat"><span class="stat-num">9</span><span class="stat-label" id="statCategories">大分类</span></div>
-                <div class="stat"><span class="stat-num">100%</span><span class="stat-label" id="statFree">免费</span></div>
-            </div>
             <div class="scroll-indicator" id="scrollIndicator">
-                <span id="scrollText">向下滚动探索测试</span>
+                <span id="scrollText">往下看看</span>
                 <div class="scroll-arrow"></div>
             </div>
         </div>
@@ -82,7 +58,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="js/test-registry.js?v=4"></script>
+    <script src="js/test-registry.js?v=5"></script>
     <script>
         let currentLang = 'zh';
         let typed = null;
@@ -96,7 +72,6 @@
             renderCategoryTags();
             renderAllCategories();
             updateLanguage();
-            initHeroParticles();
             initScrollEffects();
         }
 
@@ -112,28 +87,38 @@
         // Update language
         function updateLanguage() {
             const isZh = currentLang === 'zh';
-            document.getElementById('heroTitle').textContent = isZh ? '心理测试平台' : 'Psychology Quiz Platform';
-            document.title = isZh ? '心理测试平台 | Psychology Quiz Platform' : 'Psychology Quiz Platform';
-
-            document.getElementById('statTests').textContent = isZh ? '种测试' : 'Tests';
-            document.getElementById('statCategories').textContent = isZh ? '大分类' : 'Categories';
-            document.getElementById('statFree').textContent = isZh ? '免费' : 'Free';
-            document.getElementById('scrollText').textContent = isZh ? '向下滚动探索测试' : 'Scroll down to explore';
-            document.getElementById('searchInput').placeholder = isZh ? '搜索测试...' : 'Search tests...';
+            const hour = new Date().getHours();
+            let greeting = '';
+            if (isZh) {
+                if (hour < 6) greeting = '夜深了，照顾好自己';
+                else if (hour < 12) greeting = '早上好，今天想了解什么？';
+                else if (hour < 18) greeting = '下午好，来探索一下自己吧';
+                else greeting = '晚上好，放松一下吧';
+            } else {
+                if (hour < 6) greeting = 'Take care of yourself';
+                else if (hour < 12) greeting = 'Good morning, ready to explore?';
+                else if (hour < 18) greeting = 'Good afternoon, discover yourself';
+                else greeting = 'Good evening, take a moment';
+            }
+            document.getElementById('heroGreeting').textContent = greeting;
+            document.getElementById('heroTitle').textContent = isZh ? '认识你自己' : 'Know Yourself';
+            document.title = isZh ? '心理测试平台' : 'Psychology Quiz Platform';
+            document.getElementById('scrollText').textContent = isZh ? '往下看看' : 'Scroll down';
+            document.getElementById('searchInput').placeholder = isZh ? '搜一搜感兴趣的测试...' : 'Search for tests...';
             document.getElementById('footerText').textContent = isZh
-                ? '本平台所有测试仅供参考，不构成专业心理诊断。'
-                : 'All tests on this platform are for reference only and do not constitute professional psychological diagnosis.';
+                ? '所有测试仅供放松娱乐，不构成专业心理诊断。'
+                : 'All tests are for fun and self-reflection only.';
 
             // Typing effect
             if (typed) typed.destroy();
             const subtitles = isZh
-                ? ['探索你的内心世界', '发现真实的自己', '了解你的性格特点', '114种专业心理测试', '认识更好的你']
-                : ['Explore Your Inner World', 'Discover Your True Self', 'Understand Your Personality', '114 Professional Psychology Tests', 'Know Yourself Better'];
+                ? ['探索你的内心世界', '发现真实的自己', '轻松了解你的性格', '114种趣味测试', '做更好的自己']
+                : ['Explore Your Inner World', 'Discover Your True Self', 'Understand Your Personality', '114 Fun Tests', 'Be Your Best Self'];
             typed = new Typed('#heroSubtitle', {
                 strings: subtitles,
-                typeSpeed: 50,
+                typeSpeed: 60,
                 backSpeed: 30,
-                backDelay: 2000,
+                backDelay: 2500,
                 loop: true
             });
         }
@@ -311,24 +296,6 @@
             var wrap = document.querySelector('.search-input-wrap');
             if (wrap && !wrap.contains(e.target)) hideDropdown();
         });
-
-        // Hero particles
-        function initHeroParticles() {
-            const container = document.getElementById('heroParticles');
-            for (let i = 0; i < 30; i++) {
-                const p = document.createElement('div');
-                p.className = 'hero-particle';
-                const size = Math.random() * 4 + 2;
-                p.style.cssText = `
-                    width: ${size}px; height: ${size}px;
-                    left: ${Math.random() * 100}%;
-                    top: ${Math.random() * 100}%;
-                    animation-delay: ${Math.random() * 6}s;
-                    animation-duration: ${Math.random() * 4 + 4}s;
-                `;
-                container.appendChild(p);
-            }
-        }
 
         // Scroll effects
         function initScrollEffects() {
