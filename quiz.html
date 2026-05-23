@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试中 | Quiz in Progress</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <canvas id="neuralCanvas"></canvas>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+
+    <div class="container">
+        <button class="lang-switch" onclick="toggleLanguage()">EN/中</button>
+
+        <!-- Quiz Page -->
+        <div class="quiz-page" id="quizPage">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText"></div>
+            </div>
+
+            <div class="question-card fade-in" id="questionCard">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options-container" id="optionsContainer"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn prev" id="prevBtn" onclick="prevQuestion()" disabled></button>
+                <button class="nav-btn home" id="homeBtn" onclick="goHome()">🏠</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()"></button>
+            </div>
+        </div>
+
+        <!-- Loading Page -->
+        <div class="loading-page" id="loadingPage">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/test-registry.js"></script>
+    <script src="js/quiz-engine.js"></script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const testType = urlParams.get('type');
+        let engine = null;
+        let testData = null;
+
+        function init() {
+            if (!testType) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Dynamically load test data
+            loadTest(testType, function(err, data) {
+                if (err) {
+                    console.error(err);
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                testData = data;
+                engine = new QuizEngine(testType, testData);
+
+                if (engine.currentQuestion > 0 || engine.answers.some(a => a !== -1)) {
+                    showQuestion(engine.currentQuestion);
+                } else {
+                    showQuestion(0);
+                }
+
+                updateLanguage();
+            });
+        }
+
+        function toggleLanguage() {
+            engine.toggleLanguage();
+            updateLanguage();
+            showQuestion(engine.currentQuestion);
+        }
+
+        function updateLanguage() {
+            const text = engine.getUIText();
+            document.getElementById('prevBtn').textContent = text.prevBtn;
+            document.getElementById('nextBtn').textContent = engine.currentQuestion === engine.shuffledQuestions.length - 1 ? text.submitBtn : text.nextBtn;
+            document.getElementById('loadingText').textContent = text.loading;
+            document.title = `${text.title} | Quiz Platform`;
+        }
+
+        function showQuestion(index) {
+            const question = engine.getCurrentQuestion();
+            const text = engine.getUIText();
+
+            document.getElementById('questionNumber').textContent = `${text.question} ${index + 1}`;
+            document.getElementById('questionText').textContent = question[engine.currentLang];
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options[engine.currentLang].forEach((option, i) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn ${engine.answers[index] === i ? 'selected' : ''}`;
+                btn.textContent = option;
+                btn.onclick = () => selectOption(index, i);
+                optionsContainer.appendChild(btn);
+            });
+
+            const progress = engine.getProgress();
+            document.getElementById('progressFill').style.width = `${progress.percentage}%`;
+            document.getElementById('progressText').textContent = `${text.progress}: ${progress.current} ${text.of} ${progress.total}`;
+
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').textContent = index === engine.shuffledQuestions.length - 1 ? text.submitBtn : text.nextBtn;
+
+            document.getElementById('questionCard').classList.remove('fade-in');
+            void document.getElementById('questionCard').offsetWidth;
+            document.getElementById('questionCard').classList.add('fade-in');
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            engine.selectAnswer(questionIndex, optionIndex);
+            const options = document.querySelectorAll('.option-btn');
+            options.forEach((btn, i) => {
+                btn.classList.toggle('selected', i === optionIndex);
+                btn.disabled = true;
+            });
+
+            setTimeout(() => {
+                if (engine.currentQuestion === engine.shuffledQuestions.length - 1) {
+                    showLoading();
+                } else {
+                    engine.nextQuestion();
+                    showQuestion(engine.currentQuestion);
+                }
+            }, 200);
+        }
+
+        function nextQuestion() {
+            if (engine.answers[engine.currentQuestion] === -1) {
+                alert(engine.currentLang === 'zh' ? '请选择一个选项' : 'Please select an option');
+                return;
+            }
+            if (engine.currentQuestion === engine.shuffledQuestions.length - 1) {
+                showLoading();
+                return;
+            }
+            engine.nextQuestion();
+            showQuestion(engine.currentQuestion);
+        }
+
+        function prevQuestion() {
+            if (engine.prevQuestion()) {
+                showQuestion(engine.currentQuestion);
+            }
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        function showLoading() {
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('loadingPage').style.display = 'flex';
+            document.getElementById('loadingPage').classList.add('fade-in');
+
+            setTimeout(() => {
+                const results = engine.calculateResults();
+                localStorage.setItem(`quiz-results-${testType}`, JSON.stringify(results));
+                window.location.href = `result.html?type=${testType}`;
+            }, 2000);
+        }
+
+        // Neural Network Canvas
+        function initNeuralCanvas() {
+            const canvas = document.getElementById('neuralCanvas');
+            const ctx = canvas.getContext('2d');
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            class Node {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.radius = Math.random() * 2 + 1;
+                    this.pulseRadius = this.radius;
+                    this.pulseSpeed = Math.random() * 0.02 + 0.01;
+                    this.pulseDirection = 1;
+                }
+                update() {
+                    this.x += this.vx; this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                    this.pulseRadius += this.pulseSpeed * this.pulseDirection;
+                    if (this.pulseRadius > this.radius + 1) this.pulseDirection = -1;
+                    if (this.pulseRadius < this.radius - 0.5) this.pulseDirection = 1;
+                }
+                draw() {
+                    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.pulseRadius * 4);
+                    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
+                    gradient.addColorStop(1, 'rgba(102, 126, 234, 0)');
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.pulseRadius * 4, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient; ctx.fill();
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.pulseRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(139, 92, 246, 0.9)'; ctx.fill();
+                }
+            }
+
+            const nodes = [];
+            const nodeCount = Math.min(50, Math.floor(canvas.width * canvas.height / 20000));
+            for (let i = 0; i < nodeCount; i++) nodes.push(new Node());
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                nodes.forEach(n => { n.update(); n.draw(); });
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 200) {
+                            ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.strokeStyle = `rgba(102, 126, 234, ${(1 - dist / 200) * 0.3})`;
+                            ctx.lineWidth = 1; ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        window.onload = function() { initNeuralCanvas(); init(); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试结果 | Quiz Results</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <canvas id="neuralCanvas"></canvas>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+
+    <div class="container">
+        <button class="lang-switch" onclick="toggleLanguage()">EN/中</button>
+
+        <div class="result-page" id="resultPage">
+            <div class="result-header">
+                <div class="result-icon" id="resultIcon"></div>
+                <h2 id="resultTitle"></h2>
+                <div class="result-score" id="resultScore"></div>
+            </div>
+
+            <div class="score-bar" id="scoreBarContainer">
+                <div class="score-fill" id="scoreFill"></div>
+            </div>
+            <div class="score-labels" id="scoreLabels">
+                <span id="scoreLabelLeft"></span>
+                <span id="scoreLabelRight"></span>
+            </div>
+
+            <div class="result-description" id="resultDescription"></div>
+            <div class="category-scores" id="categoryScores"></div>
+            <div class="disclaimer" id="disclaimer"></div>
+
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="restartQuiz()" id="restartBtn"></button>
+                <button class="action-btn secondary" onclick="goHome()" id="homeBtn"></button>
+                <button class="action-btn secondary" onclick="shareResult()" id="shareBtn"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/test-registry.js"></script>
+    <script src="js/result-renderers.js"></script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const testType = urlParams.get('type');
+        let currentLang = 'zh';
+        let testData = null;
+        let results = null;
+
+        function init() {
+            if (!testType) { window.location.href = 'index.html'; return; }
+
+            const savedLang = localStorage.getItem('quiz-platform-lang');
+            if (savedLang) currentLang = savedLang;
+
+            const savedResults = localStorage.getItem(`quiz-results-${testType}`);
+            if (!savedResults) { window.location.href = `quiz.html?type=${testType}`; return; }
+            results = JSON.parse(savedResults);
+
+            // Dynamically load test data
+            loadTest(testType, function(err, data) {
+                if (err) { window.location.href = 'index.html'; return; }
+                testData = data;
+                renderResults();
+                updateLanguage();
+                triggerConfetti();
+            });
+        }
+
+        function triggerConfetti() {
+            confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ['#667eea', '#764ba2', '#FF6B6B', '#FFB347', '#9B59B6'] });
+            confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ['#667eea', '#764ba2', '#FF6B6B', '#FFB347', '#9B59B6'] });
+            setTimeout(() => { confetti({ particleCount: 100, spread: 100, origin: { y: 0.5 }, colors: ['#667eea', '#764ba2', '#FF6B6B', '#FFB347', '#9B59B6'] }); }, 300);
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('quiz-platform-lang', currentLang);
+            renderResults();
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const text = testData.uiText[currentLang];
+            document.getElementById('restartBtn').textContent = text.restartBtn;
+            document.getElementById('homeBtn').textContent = text.homeBtn;
+            document.getElementById('shareBtn').textContent = text.shareBtn;
+            document.getElementById('disclaimer').textContent = text.disclaimer;
+            document.title = `${text.resultTitle} | Quiz Platform`;
+        }
+
+        function renderResults() {
+            renderGenericResults(testType, results, testData, currentLang);
+        }
+
+        function restartQuiz() {
+            localStorage.removeItem(`quiz-results-${testType}`);
+            window.location.href = `quiz.html?type=${testType}`;
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        function shareResult() {
+            const text = generateShareText(testType, results, testData, currentLang);
+            if (navigator.share) {
+                navigator.share({ title: currentLang === 'zh' ? '测试结果' : 'Quiz Results', text: text }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert(currentLang === 'zh' ? '结果已复制到剪贴板' : 'Result copied to clipboard');
+                }).catch(() => { alert(text); });
+            }
+        }
+
+        // Neural Network Canvas
+        function initNeuralCanvas() {
+            const canvas = document.getElementById('neuralCanvas');
+            const ctx = canvas.getContext('2d');
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            class Node {
+                constructor() {
+                    this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.5; this.vy = (Math.random() - 0.5) * 0.5;
+                    this.radius = Math.random() * 2 + 1; this.pulseRadius = this.radius;
+                    this.pulseSpeed = Math.random() * 0.02 + 0.01; this.pulseDirection = 1;
+                }
+                update() {
+                    this.x += this.vx; this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                    this.pulseRadius += this.pulseSpeed * this.pulseDirection;
+                    if (this.pulseRadius > this.radius + 1) this.pulseDirection = -1;
+                    if (this.pulseRadius < this.radius - 0.5) this.pulseDirection = 1;
+                }
+                draw() {
+                    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.pulseRadius * 4);
+                    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)'); gradient.addColorStop(1, 'rgba(102, 126, 234, 0)');
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.pulseRadius * 4, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient; ctx.fill();
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.pulseRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(139, 92, 246, 0.9)'; ctx.fill();
+                }
+            }
+
+            const nodes = [];
+            const nodeCount = Math.min(50, Math.floor(canvas.width * canvas.height / 20000));
+            for (let i = 0; i < nodeCount; i++) nodes.push(new Node());
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                nodes.forEach(n => { n.update(); n.draw(); });
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 200) {
+                            ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.strokeStyle = `rgba(102, 126, 234, ${(1 - dist / 200) * 0.3})`;
+                            ctx.lineWidth = 1; ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        window.onload = function() { initNeuralCanvas(); init(); };
+    </script>
+</body>
+</html>
