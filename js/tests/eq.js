@@ -12,10 +12,10 @@ var EQ_TEST = {
         {
             id: 1,
             dimension: 'SA',
-            zh: "我能够准确识别自己的情绪�?,
+            zh: "我能够准确识别自己的情绪。",
             en: "I can accurately identify my emotions.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -23,10 +23,10 @@ var EQ_TEST = {
         {
             id: 2,
             dimension: 'SA',
-            zh: "我了解自己的优点和缺点�?,
+            zh: "我了解自己的优点和缺点。",
             en: "I understand my strengths and weaknesses.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -34,10 +34,10 @@ var EQ_TEST = {
         {
             id: 3,
             dimension: 'SA',
-            zh: "我知道什么会触发我的情绪反应�?,
+            zh: "我知道什么会触发我的情绪反应。",
             en: "I know what triggers my emotional reactions.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -45,10 +45,10 @@ var EQ_TEST = {
         {
             id: 4,
             dimension: 'SA',
-            zh: "我能够客观地评价自己的行为�?,
+            zh: "我能够客观地评价自己的行为。",
             en: "I can objectively evaluate my own behavior.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -56,10 +56,10 @@ var EQ_TEST = {
         {
             id: 5,
             dimension: 'SA',
-            zh: "我了解自己的价值观和信念�?,
+            zh: "我了解自己的价值观和信念。",
             en: "I understand my values and beliefs.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -67,10 +67,10 @@ var EQ_TEST = {
         {
             id: 6,
             dimension: 'SA',
-            zh: "我能够识别自己的情绪变化�?,
+            zh: "我能够识别自己的情绪变化。",
             en: "I can identify changes in my emotions.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -78,10 +78,10 @@ var EQ_TEST = {
         {
             id: 7,
             dimension: 'SA',
-            zh: "我知道自己在压力下的表现�?,
+            zh: "我知道自己在压力下的表现。",
             en: "I know how I perform under pressure.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -89,10 +89,10 @@ var EQ_TEST = {
         {
             id: 8,
             dimension: 'SA',
-            zh: "我能够接受自己的不完美�?,
+            zh: "我能够接受自己的不完美。",
             en: "I can accept my imperfections.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -100,10 +100,10 @@ var EQ_TEST = {
         {
             id: 9,
             dimension: 'SA',
-            zh: "我了解自己的情绪模式�?,
+            zh: "我了解自己的情绪模式。",
             en: "I understand my emotional patterns.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -111,10 +111,10 @@ var EQ_TEST = {
         {
             id: 10,
             dimension: 'SA',
-            zh: "我能够诚实地面对自己的感受�?,
+            zh: "我能够诚实地面对自己的感受。",
             en: "I can honestly face my feelings.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -124,10 +124,10 @@ var EQ_TEST = {
         {
             id: 11,
             dimension: 'SM',
-            zh: "我能够控制自己的冲动�?,
+            zh: "我能够控制自己的冲动。",
             en: "I can control my impulses.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -135,10 +135,10 @@ var EQ_TEST = {
         {
             id: 12,
             dimension: 'SM',
-            zh: "我能够有效地管理压力�?,
+            zh: "我能够有效地管理压力。",
             en: "I can effectively manage stress.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -146,10 +146,10 @@ var EQ_TEST = {
         {
             id: 13,
             dimension: 'SM',
-            zh: "我能够保持积极的心态�?,
+            zh: "我能够保持积极的心态。",
             en: "I can maintain a positive mindset.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -157,10 +157,10 @@ var EQ_TEST = {
         {
             id: 14,
             dimension: 'SM',
-            zh: "我能够从挫折中快速恢复�?,
+            zh: "我能够从挫折中快速恢复。",
             en: "I can recover quickly from setbacks.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -168,10 +168,10 @@ var EQ_TEST = {
         {
             id: 15,
             dimension: 'SM',
-            zh: "我能够适应变化的环境�?,
+            zh: "我能够适应变化的环境。",
             en: "I can adapt to changing environments.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -179,10 +179,10 @@ var EQ_TEST = {
         {
             id: 16,
             dimension: 'SM',
-            zh: "我能够控制自己的愤怒�?,
+            zh: "我能够控制自己的愤怒。",
             en: "I can control my anger.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -190,10 +190,10 @@ var EQ_TEST = {
         {
             id: 17,
             dimension: 'SM',
-            zh: "我能够延迟满足�?,
+            zh: "我能够延迟满足。",
             en: "I can delay gratification.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -201,10 +201,10 @@ var EQ_TEST = {
         {
             id: 18,
             dimension: 'SM',
-            zh: "我能够保持冷静，即使在困难情况下�?,
+            zh: "我能够保持冷静，即使在困难情况下。",
             en: "I can stay calm, even in difficult situations.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -212,10 +212,10 @@ var EQ_TEST = {
         {
             id: 19,
             dimension: 'SM',
-            zh: "我能够有效地管理自己的时间�?,
+            zh: "我能够有效地管理自己的时间。",
             en: "I can effectively manage my time.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -223,10 +223,10 @@ var EQ_TEST = {
         {
             id: 20,
             dimension: 'SM',
-            zh: "我能够保持自律�?,
+            zh: "我能够保持自律。",
             en: "I can maintain self-discipline.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -236,10 +236,10 @@ var EQ_TEST = {
         {
             id: 21,
             dimension: 'SO',
-            zh: "我能够理解他人的情绪�?,
+            zh: "我能够理解他人的情绪。",
             en: "I can understand others' emotions.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -247,10 +247,10 @@ var EQ_TEST = {
         {
             id: 22,
             dimension: 'SO',
-            zh: "我能够察觉他人的非语言信号�?,
+            zh: "我能够察觉他人的非语言信号。",
             en: "I can detect others' non-verbal cues.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -258,10 +258,10 @@ var EQ_TEST = {
         {
             id: 23,
             dimension: 'SO',
-            zh: "我能够理解他人的观点和感受�?,
+            zh: "我能够理解他人的观点和感受。",
             en: "I can understand others' perspectives and feelings.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -269,10 +269,10 @@ var EQ_TEST = {
         {
             id: 24,
             dimension: 'SO',
-            zh: "我能够感知团队的情绪氛围�?,
+            zh: "我能够感知团队的情绪氛围。",
             en: "I can sense the emotional atmosphere of a team.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -280,10 +280,10 @@ var EQ_TEST = {
         {
             id: 25,
             dimension: 'SO',
-            zh: "我能够理解社会规范和期望�?,
+            zh: "我能够理解社会规范和期望。",
             en: "I can understand social norms and expectations.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -291,10 +291,10 @@ var EQ_TEST = {
         {
             id: 26,
             dimension: 'SO',
-            zh: "我能够体察他人的需求�?,
+            zh: "我能够体察他人的需求。",
             en: "I can sense others' needs.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -302,10 +302,10 @@ var EQ_TEST = {
         {
             id: 27,
             dimension: 'SO',
-            zh: "我能够理解他人的行为动机�?,
+            zh: "我能够理解他人的行为动机。",
             en: "I can understand others' behavioral motivations.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -313,10 +313,10 @@ var EQ_TEST = {
         {
             id: 28,
             dimension: 'SO',
-            zh: "我能够感知他人的痛苦和困扰�?,
+            zh: "我能够感知他人的痛苦和困扰。",
             en: "I can sense others' pain and distress.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -324,10 +324,10 @@ var EQ_TEST = {
         {
             id: 29,
             dimension: 'SO',
-            zh: "我能够理解不同文化背景的人�?,
+            zh: "我能够理解不同文化背景的人。",
             en: "I can understand people from different cultural backgrounds.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -335,10 +335,10 @@ var EQ_TEST = {
         {
             id: 30,
             dimension: 'SO',
-            zh: "我能够察觉他人的谎言或隐藏的情绪�?,
+            zh: "我能够察觉他人的谎言或隐藏的情绪。",
             en: "I can detect others' lies or hidden emotions.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -348,10 +348,10 @@ var EQ_TEST = {
         {
             id: 31,
             dimension: 'RM',
-            zh: "我能够有效地解决人际冲突�?,
+            zh: "我能够有效地解决人际冲突。",
             en: "I can effectively resolve interpersonal conflicts.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -359,10 +359,10 @@ var EQ_TEST = {
         {
             id: 32,
             dimension: 'RM',
-            zh: "我能够激励和鼓舞他人�?,
+            zh: "我能够激励和鼓舞他人。",
             en: "I can motivate and inspire others.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -370,10 +370,10 @@ var EQ_TEST = {
         {
             id: 33,
             dimension: 'RM',
-            zh: "我能够建立和维护良好的人际关系�?,
+            zh: "我能够建立和维护良好的人际关系。",
             en: "I can build and maintain good interpersonal relationships.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -381,10 +381,10 @@ var EQ_TEST = {
         {
             id: 34,
             dimension: 'RM',
-            zh: "我能够有效地沟通和表达自己�?,
+            zh: "我能够有效地沟通和表达自己。",
             en: "I can effectively communicate and express myself.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -392,10 +392,10 @@ var EQ_TEST = {
         {
             id: 35,
             dimension: 'RM',
-            zh: "我能够与他人合作完成任务�?,
+            zh: "我能够与他人合作完成任务。",
             en: "I can work with others to complete tasks.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -403,10 +403,10 @@ var EQ_TEST = {
         {
             id: 36,
             dimension: 'RM',
-            zh: "我能够给予他人建设性的反馈�?,
+            zh: "我能够给予他人建设性的反馈。",
             en: "I can give others constructive feedback.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -414,10 +414,10 @@ var EQ_TEST = {
         {
             id: 37,
             dimension: 'RM',
-            zh: "我能够影响和说服他人�?,
+            zh: "我能够影响和说服他人。",
             en: "I can influence and persuade others.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -425,10 +425,10 @@ var EQ_TEST = {
         {
             id: 38,
             dimension: 'RM',
-            zh: "我能够领导团队并处理团队动态�?,
+            zh: "我能够领导团队并处理团队动态。",
             en: "I can lead a team and handle team dynamics.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -436,10 +436,10 @@ var EQ_TEST = {
         {
             id: 39,
             dimension: 'RM',
-            zh: "我能够帮助他人发展和成长�?,
+            zh: "我能够帮助他人发展和成长。",
             en: "I can help others develop and grow.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -447,10 +447,10 @@ var EQ_TEST = {
         {
             id: 40,
             dimension: 'RM',
-            zh: "我能够在团队中创造积极的氛围�?,
+            zh: "我能够在团队中创造积极的氛围。",
             en: "I can create a positive atmosphere in a team.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -500,9 +500,9 @@ var EQ_TEST = {
         zh: {
             title: "情商测试",
             subtitle: "了解你的情绪智力水平",
-            startBtn: "开始测�?,
-            nextBtn: "下一�?,
-            prevBtn: "上一�?,
+            startBtn: "开始测试",
+            nextBtn: "下一题",
+            prevBtn: "上一题",
             submitBtn: "查看结果",
             restartBtn: "重新测试",
             shareBtn: "分享结果",
@@ -511,7 +511,7 @@ var EQ_TEST = {
             question: "问题",
             of: "/",
             resultTitle: "测试结果",
-            disclaimer: "本测试仅供娱乐参考，不具有科学权威性。情商是可以通过学习和实践提高的能力，如需专业帮助，请咨询心理咨询师�?,
+            disclaimer: "本测试仅供娱乐参考，不具有科学权威性。情商是可以通过学习和实践提高的能力，如需专业帮助，请咨询心理咨询师。",
             loading: "正在分析你的答案...",
             yourEQScore: "你的情商分数",
             dimensions: "维度分析",

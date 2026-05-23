@@ -8,14 +8,14 @@ var BIG_FIVE_TEST = {
     icon: '🌊',
     color: '#00BFA5',
     questions: [
-        // Openness (开放�?
+        // Openness (开放性)
         {
             id: 1,
             dimension: 'O',
-            zh: "我对新事物和新想法充满好奇�?,
+            zh: "我对新事物和新想法充满好奇。",
             en: "I am curious about new things and ideas.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -23,10 +23,10 @@ var BIG_FIVE_TEST = {
         {
             id: 2,
             dimension: 'O',
-            zh: "我喜欢尝试新的体验和活动�?,
+            zh: "我喜欢尝试新的体验和活动。",
             en: "I enjoy trying new experiences and activities.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -34,10 +34,10 @@ var BIG_FIVE_TEST = {
         {
             id: 3,
             dimension: 'O',
-            zh: "我对艺术和美学有浓厚的兴趣�?,
+            zh: "我对艺术和美学有浓厚的兴趣。",
             en: "I have a strong interest in art and aesthetics.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -45,10 +45,10 @@ var BIG_FIVE_TEST = {
         {
             id: 4,
             dimension: 'O',
-            zh: "我喜欢思考抽象的概念和理论�?,
+            zh: "我喜欢思考抽象的概念和理论。",
             en: "I enjoy thinking about abstract concepts and theories.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -56,10 +56,10 @@ var BIG_FIVE_TEST = {
         {
             id: 5,
             dimension: 'O',
-            zh: "我对不同的文化和价值观持开放态度�?,
+            zh: "我对不同的文化和价值观持开放态度。",
             en: "I am open to different cultures and values.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -67,10 +67,10 @@ var BIG_FIVE_TEST = {
         {
             id: 6,
             dimension: 'O',
-            zh: "我喜欢阅读和学习新知识�?,
+            zh: "我喜欢阅读和学习新知识。",
             en: "I enjoy reading and learning new knowledge.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -78,10 +78,10 @@ var BIG_FIVE_TEST = {
         {
             id: 7,
             dimension: 'O',
-            zh: "我喜欢挑战传统观念�?,
+            zh: "我喜欢挑战传统观念。",
             en: "I like to challenge traditional ideas.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -89,10 +89,10 @@ var BIG_FIVE_TEST = {
         {
             id: 8,
             dimension: 'O',
-            zh: "我对哲学和人生意义感兴趣�?,
+            zh: "我对哲学和人生意义感兴趣。",
             en: "I am interested in philosophy and the meaning of life.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -100,10 +100,10 @@ var BIG_FIVE_TEST = {
         {
             id: 9,
             dimension: 'O',
-            zh: "我喜欢探索未知的领域�?,
+            zh: "我喜欢探索未知的领域。",
             en: "I enjoy exploring unknown territories.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -111,23 +111,23 @@ var BIG_FIVE_TEST = {
         {
             id: 10,
             dimension: 'O',
-            zh: "我对新科技和创新充满热情�?,
+            zh: "我对新科技和创新充满热情。",
             en: "I am passionate about new technology and innovation.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
         },
 
-        // Conscientiousness (尽责�?
+        // Conscientiousness (尽责性)
         {
             id: 11,
             dimension: 'C',
-            zh: "我做事有条理，喜欢制定计划�?,
+            zh: "我做事有条理，喜欢制定计划。",
             en: "I am organized and like to make plans.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -135,10 +135,10 @@ var BIG_FIVE_TEST = {
         {
             id: 12,
             dimension: 'C',
-            zh: "我能够坚持完成任务，即使遇到困难�?,
+            zh: "我能够坚持完成任务，即使遇到困难。",
             en: "I can persist in completing tasks, even when faced with difficulties.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -146,10 +146,10 @@ var BIG_FIVE_TEST = {
         {
             id: 13,
             dimension: 'C',
-            zh: "我注重细节，追求完美�?,
+            zh: "我注重细节，追求完美。",
             en: "I pay attention to details and pursue perfection.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -157,10 +157,10 @@ var BIG_FIVE_TEST = {
         {
             id: 14,
             dimension: 'C',
-            zh: "我能够有效管理时间�?,
+            zh: "我能够有效管理时间。",
             en: "I can manage my time effectively.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -168,10 +168,10 @@ var BIG_FIVE_TEST = {
         {
             id: 15,
             dimension: 'C',
-            zh: "我做事有始有终，不轻易放弃�?,
+            zh: "我做事有始有终，不轻易放弃。",
             en: "I finish what I start and don't give up easily.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -179,10 +179,10 @@ var BIG_FIVE_TEST = {
         {
             id: 16,
             dimension: 'C',
-            zh: "我能够控制自己的冲动�?,
+            zh: "我能够控制自己的冲动。",
             en: "I can control my impulses.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -190,10 +190,10 @@ var BIG_FIVE_TEST = {
         {
             id: 17,
             dimension: 'C',
-            zh: "我做事认真负责�?,
+            zh: "我做事认真负责。",
             en: "I am serious and responsible in my work.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -201,10 +201,10 @@ var BIG_FIVE_TEST = {
         {
             id: 18,
             dimension: 'C',
-            zh: "我能够按照计划行事�?,
+            zh: "我能够按照计划行事。",
             en: "I can act according to plan.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -212,10 +212,10 @@ var BIG_FIVE_TEST = {
         {
             id: 19,
             dimension: 'C',
-            zh: "我注重效率，不浪费时间�?,
+            zh: "我注重效率，不浪费时间。",
             en: "I value efficiency and don't waste time.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -223,23 +223,23 @@ var BIG_FIVE_TEST = {
         {
             id: 20,
             dimension: 'C',
-            zh: "我能够遵守规则和承诺�?,
+            zh: "我能够遵守规则和承诺。",
             en: "I can follow rules and keep promises.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
         },
 
-        // Extraversion (外向�?
+        // Extraversion (外向性)
         {
             id: 21,
             dimension: 'E',
-            zh: "我喜欢与人交往，社交让我充满活力�?,
+            zh: "我喜欢与人交往，社交让我充满活力。",
             en: "I enjoy socializing, it energizes me.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -247,10 +247,10 @@ var BIG_FIVE_TEST = {
         {
             id: 22,
             dimension: 'E',
-            zh: "我喜欢成为关注的焦点�?,
+            zh: "我喜欢成为关注的焦点。",
             en: "I like being the center of attention.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -258,10 +258,10 @@ var BIG_FIVE_TEST = {
         {
             id: 23,
             dimension: 'E',
-            zh: "我善于表达自己的想法和感受�?,
+            zh: "我善于表达自己的想法和感受。",
             en: "I am good at expressing my thoughts and feelings.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -269,10 +269,10 @@ var BIG_FIVE_TEST = {
         {
             id: 24,
             dimension: 'E',
-            zh: "我喜欢热闹的环境�?,
+            zh: "我喜欢热闹的环境。",
             en: "I like lively environments.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -280,10 +280,10 @@ var BIG_FIVE_TEST = {
         {
             id: 25,
             dimension: 'E',
-            zh: "我容易交到新朋友�?,
+            zh: "我容易交到新朋友。",
             en: "I make new friends easily.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -291,10 +291,10 @@ var BIG_FIVE_TEST = {
         {
             id: 26,
             dimension: 'E',
-            zh: "我喜欢参加聚会和社交活动�?,
+            zh: "我喜欢参加聚会和社交活动。",
             en: "I enjoy parties and social events.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -302,10 +302,10 @@ var BIG_FIVE_TEST = {
         {
             id: 27,
             dimension: 'E',
-            zh: "我精力充沛，喜欢行动�?,
+            zh: "我精力充沛，喜欢行动。",
             en: "I am energetic and like to take action.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -313,10 +313,10 @@ var BIG_FIVE_TEST = {
         {
             id: 28,
             dimension: 'E',
-            zh: "我喜欢与人合作完成任务�?,
+            zh: "我喜欢与人合作完成任务。",
             en: "I like to work with others to complete tasks.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -324,10 +324,10 @@ var BIG_FIVE_TEST = {
         {
             id: 29,
             dimension: 'E',
-            zh: "我乐观积极，喜欢与人分享快乐�?,
+            zh: "我乐观积极，喜欢与人分享快乐。",
             en: "I am optimistic and like to share happiness with others.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -335,23 +335,23 @@ var BIG_FIVE_TEST = {
         {
             id: 30,
             dimension: 'E',
-            zh: "我喜欢领导和影响他人�?,
+            zh: "我喜欢领导和影响他人。",
             en: "I like to lead and influence others.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
         },
 
-        // Agreeableness (宜人�?
+        // Agreeableness (宜人性)
         {
             id: 31,
             dimension: 'A',
-            zh: "我关心他人的感受和需求�?,
+            zh: "我关心他人的感受和需求。",
             en: "I care about others' feelings and needs.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -359,10 +359,10 @@ var BIG_FIVE_TEST = {
         {
             id: 32,
             dimension: 'A',
-            zh: "我愿意帮助他人，即使会给自己带来不便�?,
+            zh: "我愿意帮助他人，即使会给自己带来不便。",
             en: "I am willing to help others, even if it causes me inconvenience.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -370,10 +370,10 @@ var BIG_FIVE_TEST = {
         {
             id: 33,
             dimension: 'A',
-            zh: "我相信大多数人是善良的�?,
+            zh: "我相信大多数人是善良的。",
             en: "I believe most people are kind.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -381,10 +381,10 @@ var BIG_FIVE_TEST = {
         {
             id: 34,
             dimension: 'A',
-            zh: "我善于与人合作，避免冲突�?,
+            zh: "我善于与人合作，避免冲突。",
             en: "I am good at cooperating with others and avoiding conflict.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -392,10 +392,10 @@ var BIG_FIVE_TEST = {
         {
             id: 35,
             dimension: 'A',
-            zh: "我能够原谅他人的过错�?,
+            zh: "我能够原谅他人的过错。",
             en: "I can forgive others' mistakes.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -403,10 +403,10 @@ var BIG_FIVE_TEST = {
         {
             id: 36,
             dimension: 'A',
-            zh: "我尊重他人的观点和选择�?,
+            zh: "我尊重他人的观点和选择。",
             en: "I respect others' viewpoints and choices.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -414,10 +414,10 @@ var BIG_FIVE_TEST = {
         {
             id: 37,
             dimension: 'A',
-            zh: "我善于倾听他人的意见�?,
+            zh: "我善于倾听他人的意见。",
             en: "I am good at listening to others' opinions.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -425,10 +425,10 @@ var BIG_FIVE_TEST = {
         {
             id: 38,
             dimension: 'A',
-            zh: "我不喜欢与人争论�?,
+            zh: "我不喜欢与人争论。",
             en: "I don't like arguing with others.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -436,10 +436,10 @@ var BIG_FIVE_TEST = {
         {
             id: 39,
             dimension: 'A',
-            zh: "我愿意妥协以维持和谐�?,
+            zh: "我愿意妥协以维持和谐。",
             en: "I am willing to compromise to maintain harmony.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -447,23 +447,23 @@ var BIG_FIVE_TEST = {
         {
             id: 40,
             dimension: 'A',
-            zh: "我对他人有同情心�?,
+            zh: "我对他人有同情心。",
             en: "I have sympathy for others.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
         },
 
-        // Neuroticism (神经�?
+        // Neuroticism (神经质)
         {
             id: 41,
             dimension: 'N',
-            zh: "我容易感到焦虑和紧张�?,
+            zh: "我容易感到焦虑和紧张。",
             en: "I easily feel anxious and nervous.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [5, 4, 3, 2, 1] // 反向计分
@@ -471,10 +471,10 @@ var BIG_FIVE_TEST = {
         {
             id: 42,
             dimension: 'N',
-            zh: "我情绪稳定，不容易波动�?,
+            zh: "我情绪稳定，不容易波动。",
             en: "I am emotionally stable and don't fluctuate easily.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -482,10 +482,10 @@ var BIG_FIVE_TEST = {
         {
             id: 43,
             dimension: 'N',
-            zh: "我能够很好地应对压力�?,
+            zh: "我能够很好地应对压力。",
             en: "I can handle pressure well.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -493,10 +493,10 @@ var BIG_FIVE_TEST = {
         {
             id: 44,
             dimension: 'N',
-            zh: "我容易感到沮丧和失落�?,
+            zh: "我容易感到沮丧和失落。",
             en: "I easily feel depressed and lost.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [5, 4, 3, 2, 1]
@@ -504,10 +504,10 @@ var BIG_FIVE_TEST = {
         {
             id: 45,
             dimension: 'N',
-            zh: "我能够保持冷静，即使在困难情况下�?,
+            zh: "我能够保持冷静，即使在困难情况下。",
             en: "I can stay calm, even in difficult situations.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -515,10 +515,10 @@ var BIG_FIVE_TEST = {
         {
             id: 46,
             dimension: 'N',
-            zh: "我容易担心未来可能发生的问题�?,
+            zh: "我容易担心未来可能发生的问题。",
             en: "I easily worry about potential future problems.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [5, 4, 3, 2, 1]
@@ -526,10 +526,10 @@ var BIG_FIVE_TEST = {
         {
             id: 47,
             dimension: 'N',
-            zh: "我能够从挫折中快速恢复�?,
+            zh: "我能够从挫折中快速恢复。",
             en: "I can recover quickly from setbacks.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -537,10 +537,10 @@ var BIG_FIVE_TEST = {
         {
             id: 48,
             dimension: 'N',
-            zh: "我容易感到不安和烦躁�?,
+            zh: "我容易感到不安和烦躁。",
             en: "I easily feel uneasy and restless.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [5, 4, 3, 2, 1]
@@ -548,10 +548,10 @@ var BIG_FIVE_TEST = {
         {
             id: 49,
             dimension: 'N',
-            zh: "我对自己有信心�?,
+            zh: "我对自己有信心。",
             en: "I have confidence in myself.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -559,10 +559,10 @@ var BIG_FIVE_TEST = {
         {
             id: 50,
             dimension: 'N',
-            zh: "我能够控制自己的情绪�?,
+            zh: "我能够控制自己的情绪。",
             en: "I can control my emotions.",
             options: {
-                zh: ["非常不同�?, "不同�?, "中立", "同意", "非常同意"],
+                zh: ["非常不同意", "不同意", "中立", "同意", "非常同意"],
                 en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
             },
             scores: [1, 2, 3, 4, 5]
@@ -596,11 +596,11 @@ var BIG_FIVE_TEST = {
             scores: scores,
             percentages: percentages,
             dimensions: [
-                { name: 'Openness', zh: '开放�?, score: percentages.O },
-                { name: 'Conscientiousness', zh: '尽责�?, score: percentages.C },
-                { name: 'Extraversion', zh: '外向�?, score: percentages.E },
-                { name: 'Agreeableness', zh: '宜人�?, score: percentages.A },
-                { name: 'Neuroticism', zh: '神经�?, score: percentages.N }
+                { name: 'Openness', zh: '开放性', score: percentages.O },
+                { name: 'Conscientiousness', zh: '尽责性', score: percentages.C },
+                { name: 'Extraversion', zh: '外向性', score: percentages.E },
+                { name: 'Agreeableness', zh: '宜人性', score: percentages.A },
+                { name: 'Neuroticism', zh: '神经质', score: percentages.N }
             ]
         };
     },
@@ -610,9 +610,9 @@ var BIG_FIVE_TEST = {
         zh: {
             title: "大五人格测试",
             subtitle: "了解你的五大人格特质",
-            startBtn: "开始测�?,
-            nextBtn: "下一�?,
-            prevBtn: "上一�?,
+            startBtn: "开始测试",
+            nextBtn: "下一题",
+            prevBtn: "上一题",
             submitBtn: "查看结果",
             restartBtn: "重新测试",
             shareBtn: "分享结果",
@@ -621,7 +621,7 @@ var BIG_FIVE_TEST = {
             question: "问题",
             of: "/",
             resultTitle: "测试结果",
-            disclaimer: "本测试仅供娱乐参考，不具有科学权威性。人格特质是复杂的个人特质，如需专业帮助，请咨询心理咨询师�?,
+            disclaimer: "本测试仅供娱乐参考，不具有科学权威性。人格特质是复杂的个人特质，如需专业帮助，请咨询心理咨询师。",
             loading: "正在分析你的答案...",
             yourProfile: "你的人格档案",
             dimensions: "维度分析"
