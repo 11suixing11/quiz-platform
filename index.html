@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>心理测试平台 | Psychology Quiz Platform</title>
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/style.css?v=4">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 </head>
 <body>
@@ -82,7 +82,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="js/test-registry.js?v=3"></script>
+    <script src="js/test-registry.js?v=4"></script>
     <script>
         let currentLang = 'zh';
         let typed = null;
@@ -159,7 +159,7 @@
                 if (tests.length === 0) return;
 
                 const section = document.createElement('section');
-                section.className = 'category-section';
+                section.className = 'category-section visible';
                 section.id = `cat-${cat.id}`;
                 section.innerHTML = `
                     <div class="category-header">
