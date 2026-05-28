@@ -12,6 +12,7 @@ import { getTestById } from "@/lib/test-registry";
 import { CATEGORY_COLORS } from "@/lib/constants";
 import type { TestData, Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Celebration } from "@/components/celebration";
 
 interface QuizEngineProps {
   testType: string;
@@ -62,6 +63,7 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
   const [direction, setDirection] = useState(1);
 
   const testMeta = getTestById(testType);
@@ -124,6 +126,7 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
   const handleSubmit = useCallback(() => {
     if (!testData) return;
     setSubmitting(true);
+    setCelebrating(true);
     const numericAnswers = answers.map((a) => a ?? 0);
     const result = testData.calculate(numericAnswers, testData.questions as any);
     try {
@@ -206,6 +209,22 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
   }
 
   // ─── Submitting state ───
+  if (celebrating) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#FAFAF8]">
+        <Celebration color={color} />
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-4 text-sm text-muted-foreground"
+        >
+          {t.loading}
+        </motion.p>
+      </div>
+    );
+  }
+
   if (submitting) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#FAFAF8] px-4">
