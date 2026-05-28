@@ -56,7 +56,7 @@ const questionVariants = {
 
 export default function QuizEngine({ testType }: QuizEngineProps) {
   const router = useRouter();
-  const [lang, setLang] = useState<Lang>("zh");
+  const [lang, setLang] = useState<Lang>(() => { try { return (localStorage.getItem("quiz-platform-lang") as Lang) || "zh"; } catch { return "zh"; } });
   const [testData, setTestData] = useState<TestData | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -244,7 +244,7 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
           {displayIcon} {displayName}
         </span>
         <button
-          onClick={() => setLang((l) => (l === "zh" ? "en" : "zh"))}
+          onClick={() => setLang((l) => { const next = l === "zh" ? "en" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; })}
           className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
           {lang === "zh" ? "EN" : "中"}

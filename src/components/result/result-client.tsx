@@ -41,7 +41,7 @@ interface ResultClientProps {
 
 export default function ResultClient({ testType }: ResultClientProps) {
   const router = useRouter();
-  const [lang, setLang] = useState<Lang>("zh");
+  const [lang, setLang] = useState<Lang>(() => { try { return (localStorage.getItem("quiz-platform-lang") as Lang) || "zh"; } catch { return "zh"; } });
   const [result, setResult] = useState<QuizResult | null>(null);
   const [testData, setTestData] = useState<TestData | null>(null);
   const [registryEntry, setRegistryEntry] = useState<TestRegistryEntry | null>(null);
@@ -141,7 +141,7 @@ export default function ResultClient({ testType }: ResultClientProps) {
   }, [testType, lang, registryEntry, heroTitle]);
 
   const toggleLang = useCallback(() => {
-    setLang((l) => (l === "zh" ? "en" : "zh"));
+    setLang((l) => { const next = l === "zh" ? "en" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; });
   }, []);
 
   if (loading) {
