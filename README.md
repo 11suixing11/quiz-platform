@@ -1,4 +1,4 @@
-# 🌙 认识你自己
+﻿# 🌙 认识你自己
 
 > **有些自己，要慢慢被看见。**
 
@@ -149,3 +149,8 @@ quiz-platform/
 ## 📄 License
 
 [MIT](./LICENSE) © [11suixing11](https://github.com/11suixing11)
+---
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=11suixing11/quiz-platform&type=Date)](https://star-history.com/#11suixing11/quiz-platform&Date)
