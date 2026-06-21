@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { TEST_REGISTRY, type TestRegistryEntry } from "@/lib/test-registry";
+import { TEST_REGISTRY } from "@/lib/test-registry";
 import type { Lang } from "@/lib/types";
 
 interface PastResult {

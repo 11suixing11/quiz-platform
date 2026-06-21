@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { DimensionBar } from "./dimension-bar";
-import { RadarChart } from "./radar-chart";
 import type { QuizResult, NarrativeResult, TypeData, DimensionData, ArchetypeData } from "@/lib/types";
 
 const container = {

@@ -3,12 +3,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Globe, BarChart3, ChevronDown } from "lucide-react";
+import { ArrowLeft, BarChart3, ChevronDown } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TEST_REGISTRY, type TestRegistryEntry } from "@/lib/test-registry";
-import { CATEGORY_COLORS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Lang, QuizResult } from "@/lib/types";
 
@@ -21,7 +20,7 @@ interface HistoryEntry {
   timestamp: number;
 }
 
-function getResultLabel(result: QuizResult, lang: Lang): string {
+function getResultLabel(result: QuizResult, _lang: Lang): string {
   const key = (result.type ?? result.dominant ?? result.primary ?? "") as string;
   return key;
 }

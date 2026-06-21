@@ -15,6 +15,7 @@ import { ThemeSelector } from "@/components/theme-selector";
 import { DailyTest } from "@/components/daily-test";
 import type { Lang } from "@/lib/types";
 import { QuickStart } from "@/components/quick-start";
+import { EmailSignup } from "@/components/email-signup";
 
 // Animated counter component
 function AnimatedNumber({ target, label, icon, delay = 0 }: { target: number; label: string; icon: string; delay?: number }) {
@@ -25,7 +26,6 @@ function AnimatedNumber({ target, label, icon, delay = 0 }: { target: number; la
   useEffect(() => {
     if (!isInView) return;
     const timer = setTimeout(() => {
-      let start = 0;
       const duration = 1200;
       const startTime = Date.now();
       const animate = () => {
@@ -242,6 +242,9 @@ export default function Home() {
         lang={lang}
       />
 
+      {/* Email Signup CTA */}
+      <EmailSignup lang={lang} />
+
       <footer className="border-t border-[#2C2C2C]/8 dark:border-white/8 px-4 py-16 text-center">
         <div className="mx-auto max-w-2xl">
           <span className="text-3xl mb-4 block">🌙</span>
@@ -256,6 +259,8 @@ export default function Home() {
             <Link href="/compare/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "对比" : lang === "ja" ? "比較" : "Compare"}</Link>
             <span>·</span>
             <Link href="/stats/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "统计" : lang === "ja" ? "統計" : "Stats"}</Link>
+            <span>·</span>
+            <Link href="/analytics/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "分析" : lang === "ja" ? "分析" : "Analytics"}</Link>
             <span>·</span>
             <Link href="/trends/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "趋势" : lang === "ja" ? "トレンド" : "Trends"}</Link>
             <span>·</span>

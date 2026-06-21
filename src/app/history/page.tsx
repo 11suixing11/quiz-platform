@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Trash2, Clock, Globe, History, BarChart3 } from "lucide-react";
+import { ArrowLeft, Trash2, Clock, Globe, BarChart3 } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,7 +24,7 @@ interface HistoryEntry {
 
 type Lang = "zh" | "en" | "ja";
 
-function getResultLabel(result: Record<string, unknown>, lang: Lang): string {
+function getResultLabel(result: Record<string, unknown>, _lang: Lang): string {
   const key = (result.type ?? result.dominant ?? result.primary ?? "") as string;
   if (!key) return "";
   // Try to get a nice label from archetypes or narrative

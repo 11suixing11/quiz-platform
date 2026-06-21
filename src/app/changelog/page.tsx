@@ -3,8 +3,9 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Globe } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { Lang } from "@/lib/types";
+import { EmailSignup } from "@/components/email-signup";
 
 const VERSIONS = [
   {
@@ -167,6 +168,9 @@ export default function ChangelogPage() {
             </motion.div>
           ))}
         </div>
+
+        {/* Email Signup */}
+        <EmailSignup lang={lang} />
       </main>
     </div>
   );

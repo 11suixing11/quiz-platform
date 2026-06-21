@@ -33,6 +33,7 @@ export function RadarChart({ dimensions, accentColor = "#6B5B95", size = 280 }: 
 
   // Data polygon points
   const dataPoints = dimensions.map((d, i) => getPoint(i, d.score));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const dataPath = dataPoints.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ") + " Z";
 
   // Label positions

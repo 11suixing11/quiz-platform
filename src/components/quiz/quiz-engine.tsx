@@ -55,6 +55,7 @@ interface QuizEngineProps {
   testType: string;
 }
 // Dimension color palette for the mini breakdown bars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DIM_PALETTE = ["#6B5B95","#00BFA5","#FF6B6B","#4ECDC4","#45B7D1","#96CEB4","#FFEAA7","#DDA0DD","#98D8C8","#F7DC6F","#BB8FCE","#85C1E9"];
 
 const UI: Record<string, Record<string, string>> = {
@@ -201,6 +202,7 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
   const effectiveLang = lang === "ja" ? "en" : lang;
   const displayName = testMeta?.[effectiveLang]?.name ?? testData?.[effectiveLang]?.name ?? testType;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const moveToQuestion = useCallback((nextQ: number) => {
     setDirection(nextQ > currentQuestion ? 1 : -1);
     setCurrentQuestion(nextQ);

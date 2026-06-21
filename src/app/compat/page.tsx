@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Heart, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MBTI_TYPES, MBTI_GROUPS, getCompatibility } from "@/lib/compat-data";
+import { MBTI_GROUPS, getCompatibility } from "@/lib/compat-data";
 import type { Lang } from "@/lib/types";
 
 export default function CompatPage() {

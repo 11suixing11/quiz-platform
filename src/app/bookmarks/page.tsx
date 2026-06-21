@@ -3,8 +3,8 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Globe, BookmarkX } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { ArrowLeft, BookmarkX } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { TEST_REGISTRY } from "@/lib/test-registry";
 import { TestCard } from "@/components/TestCard";
 import { cn } from "@/lib/utils";
