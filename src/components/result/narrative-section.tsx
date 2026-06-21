@@ -23,7 +23,7 @@ interface NarrativeSectionProps {
   dimensions?: Record<string, DimensionData>;
   archetypes?: Record<string, ArchetypeData>;
   accentColor?: string;
-  lang?: "zh" | "en";
+  lang?: "zh" | "en" | "ja";
 }
 
 function NarrativeBlock({ title, text }: { title: string; text?: string }) {

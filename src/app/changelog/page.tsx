@@ -110,10 +110,10 @@ const VERSIONS = [
 ];
 
 export default function ChangelogPage() {
-  const [lang, setLang] = useState<Lang>(() => { try { return (localStorage.getItem("quiz-platform-lang") as Lang) || "zh"; } catch { return "zh"; } });
+  const [lang, setLang] = useState<Lang>(() => { try { const saved = localStorage.getItem("quiz-platform-lang") as Lang; return (saved === "zh" || saved === "en" || saved === "ja") ? saved : "zh"; } catch { return "zh"; } });
 
   const toggleLang = useCallback(() => {
-    setLang((l) => { const next = l === "zh" ? "en" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; });
+    setLang((l) => { const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; });
   }, []);
 
   return (
@@ -124,7 +124,7 @@ export default function ChangelogPage() {
           <span>{lang === "zh" ? "认识你自己" : "Know Yourself"}</span>
         </Link>
         <button onClick={toggleLang} className="text-xs font-semibold text-[#2C2C2C]/60 dark:text-white/60 hover:text-[#2C2C2C] dark:hover:text-white">
-          {lang === "zh" ? "EN" : "中"}
+          {lang === "zh" ? "EN" : lang === "en" ? "JA" : "中"}
         </button>
       </motion.header>
 
@@ -155,9 +155,9 @@ export default function ChangelogPage() {
                 <h2 className="text-lg font-bold text-[#2C2C2C] dark:text-white">{v.version}</h2>
                 <span className="text-xs text-[#2C2C2C]/40 dark:text-white/40">{v.date}</span>
               </div>
-              <h3 className="text-sm font-semibold text-[#2C2C2C]/80 dark:text-white/80 mb-3">{v[lang].title}</h3>
+              <h3 className="text-sm font-semibold text-[#2C2C2C]/80 dark:text-white/80 mb-3">{((v as unknown as Record<string, { title: string; features: string[] }>)[lang] ?? v.en).title}</h3>
               <ul className="space-y-1.5">
-                {v[lang].features.map((f, j) => (
+                {((v as unknown as Record<string, { title: string; features: string[] }>)[lang] ?? v.en).features.map((f, j) => (
                   <li key={j} className="text-sm text-[#2C2C2C]/60 dark:text-white/60 flex items-start gap-2">
                     <span className="text-[#2C2C2C]/30 dark:text-white/30 mt-0.5">•</span>
                     {f}

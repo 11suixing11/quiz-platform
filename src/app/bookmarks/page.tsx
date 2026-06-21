@@ -15,13 +15,13 @@ function getBookmarks(): string[] {
 }
 
 export default function BookmarksPage() {
-  const [lang, setLang] = useState<Lang>(() => { try { return (localStorage.getItem("quiz-platform-lang") as Lang) || "zh"; } catch { return "zh"; } });
+  const [lang, setLang] = useState<Lang>(() => { try { const saved = localStorage.getItem("quiz-platform-lang") as Lang; return (saved === "zh" || saved === "en" || saved === "ja") ? saved : "zh"; } catch { return "zh"; } });
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
   useEffect(() => { setBookmarks(getBookmarks()); }, []);
 
   const toggleLang = useCallback(() => {
-    setLang((l) => { const next = l === "zh" ? "en" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; });
+    setLang((l) => { const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; });
   }, []);
 
   const bookmarkedTests = bookmarks.map((id) => TEST_REGISTRY.find((t) => t.id === id)).filter(Boolean);
@@ -34,7 +34,7 @@ export default function BookmarksPage() {
           <span>{lang === "zh" ? "认识你自己" : "Know Yourself"}</span>
         </Link>
         <button onClick={toggleLang} className="text-xs font-semibold text-[#2C2C2C]/60 dark:text-white/60 hover:text-[#2C2C2C] dark:hover:text-white">
-          {lang === "zh" ? "EN" : "中"}
+          {lang === "zh" ? "EN" : lang === "en" ? "JA" : "中"}
         </button>
       </motion.header>
 

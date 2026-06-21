@@ -9,7 +9,7 @@ import { MBTI_TYPES, MBTI_GROUPS, getCompatibility } from "@/lib/compat-data";
 import type { Lang } from "@/lib/types";
 
 export default function CompatPage() {
-  const [lang, setLang] = useState<Lang>(() => { try { return (localStorage.getItem("quiz-platform-lang") as Lang) || "zh"; } catch { return "zh"; } });
+  const [lang, setLang] = useState<Lang>(() => { try { const saved = localStorage.getItem("quiz-platform-lang") as Lang; return (saved === "zh" || saved === "en" || saved === "ja") ? saved : "zh"; } catch { return "zh"; } });
   const [type1, setType1] = useState<string | null>(null);
   const [type2, setType2] = useState<string | null>(null);
 
@@ -46,7 +46,7 @@ export default function CompatPage() {
           <ArrowLeft className="size-4" />
           <span>{lang === "zh" ? "认识你自己" : "Know Yourself"}</span>
         </Link>
-        <Button variant="ghost" size="icon" onClick={() => setLang(l => { const next = l === "zh" ? "en" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; })}>
+        <Button variant="ghost" size="icon" onClick={() => setLang(l => { const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; })}>
           <Globe className="size-4" />
         </Button>
       </motion.header>

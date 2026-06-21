@@ -22,7 +22,7 @@ interface HistoryEntry {
   timestamp: number;
 }
 
-type Lang = "zh" | "en";
+type Lang = "zh" | "en" | "ja";
 
 function getResultLabel(result: Record<string, unknown>, lang: Lang): string {
   const key = (result.type ?? result.dominant ?? result.primary ?? "") as string;
@@ -72,14 +72,14 @@ export default function HistoryPage() {
     setMounted(true);
     try {
       const saved = localStorage.getItem("quiz-platform-lang");
-      if (saved === "en" || saved === "zh") setLang(saved);
+      if (saved === "en" || saved === "zh" || saved === "ja") setLang(saved);
     } catch {}
     loadEntries();
   }, [loadEntries]);
 
   const toggleLang = useCallback(() => {
     setLang((l) => {
-      const next = l === "zh" ? "en" : "zh";
+      const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh";
       try { localStorage.setItem("quiz-platform-lang", next); } catch {}
       return next;
     });

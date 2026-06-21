@@ -233,17 +233,18 @@ export function getWorldForType(mbtiType: string): string {
   return mapping[mbtiType] ?? "analysts";
 }
 
-export function getCompatibility(type1: string, type2: string, lang: "zh" | "en" = "zh") {
+export function getCompatibility(type1: string, type2: string, lang: "zh" | "en" | "ja" = "zh") {
+  const effectiveLang = lang === "ja" ? "en" : lang;
   const pair = PAIRS_COMPAT[`${type1}-${type2}`] ?? PAIRS_COMPAT[`${type2}-${type1}`];
   const world1 = getWorldForType(type1);
   const world2 = getWorldForType(type2);
   const world = WORLDS_COMPAT[`${world1}-${world2}`] ?? WORLDS_COMPAT[`${world2}-${world1}`];
 
-  if (pair && pair[lang]) {
-    return { pair: pair[lang], world: world?.[lang] ?? null, type1, type2 };
+  if (pair && pair[effectiveLang]) {
+    return { pair: pair[effectiveLang], world: world?.[effectiveLang] ?? null, type1, type2 };
   }
-  if (world && world[lang]) {
-    return { pair: { name: world[lang].name, desc: world[lang].desc, quote: "" }, world: world[lang], type1, type2 };
+  if (world && world[effectiveLang]) {
+    return { pair: { name: world[effectiveLang].name, desc: world[effectiveLang].desc, quote: "" }, world: world[effectiveLang], type1, type2 };
   }
   return null;
 }

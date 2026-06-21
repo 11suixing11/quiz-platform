@@ -19,7 +19,7 @@ interface QuizResult {
   answers: number[];
 }
 
-type Lang = "zh" | "en";
+type Lang = "zh" | "en" | "ja";
 
 function loadResults(): QuizResult[] {
   const results: QuizResult[] = [];
@@ -75,14 +75,14 @@ export default function StatsPage() {
     setMounted(true);
     try {
       const saved = localStorage.getItem("quiz-platform-lang");
-      if (saved === "en" || saved === "zh") setLang(saved);
+      if (saved === "en" || saved === "zh" || saved === "ja") setLang(saved);
     } catch {}
     loadData();
   }, [loadData]);
 
   const toggleLang = useCallback(() => {
     setLang((l) => {
-      const next = l === "zh" ? "en" : "zh";
+      const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh";
       try { localStorage.setItem("quiz-platform-lang", next); } catch {}
       return next;
     });

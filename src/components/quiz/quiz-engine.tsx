@@ -154,7 +154,8 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
   const isLast = currentQuestion === totalQuestions - 1;
   const currentAnswer = answers[currentQuestion];
   const displayIcon = testMeta?.icon ?? testData?.icon ?? "📝";
-  const displayName = testMeta?.[lang]?.name ?? testData?.[lang]?.name ?? testType;
+  const effectiveLang = lang === "ja" ? "en" : lang;
+  const displayName = testMeta?.[effectiveLang]?.name ?? testData?.[effectiveLang]?.name ?? testType;
 
   const moveToQuestion = useCallback((nextQ: number) => {
     setDirection(nextQ > currentQuestion ? 1 : -1);
@@ -466,11 +467,11 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
                   </div>
 
                   <h2 className="mb-6 text-lg font-medium leading-relaxed text-[#2C2C2C] dark:text-white">
-                    {question?.[lang] || question?.zh || ""}
+                    {question?.[effectiveLang] || question?.zh || ""}
                   </h2>
 
                   <div className="flex flex-col gap-2.5" role="radiogroup">
-                    {((question?.options?.[lang] || question?.options?.zh) || []).map((opt: string, idx: number) => {
+                    {((question?.options?.[effectiveLang] || question?.options?.zh) || []).map((opt: string, idx: number) => {
                       const isSelected = currentAnswer === idx;
                       return (
                         <motion.button

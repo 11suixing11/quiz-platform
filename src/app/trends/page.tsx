@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { TEST_REGISTRY } from "@/lib/test-registry";
 import { CATEGORY_COLORS } from "@/lib/constants";
 
-type Lang = "zh" | "en";
+type Lang = "zh" | "en" | "ja";
 
 interface TestAttempt {
   timestamp: number;
@@ -53,7 +53,7 @@ export default function TrendsPage() {
     setMounted(true);
     try {
       const saved = localStorage.getItem("quiz-platform-lang");
-      if (saved === "en" || saved === "zh") setLang(saved);
+      if (saved === "en" || saved === "zh" || saved === "ja") setLang(saved);
     } catch {}
 
     try {
@@ -101,7 +101,7 @@ export default function TrendsPage() {
 
   const toggleLang = useCallback(() => {
     setLang((l) => {
-      const next = l === "zh" ? "en" : "zh";
+      const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh";
       try { localStorage.setItem("quiz-platform-lang", next); } catch {}
       return next;
     });

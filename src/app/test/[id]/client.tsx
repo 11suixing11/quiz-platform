@@ -140,10 +140,10 @@ export default function TestDetailClient({ testId }: { testId: string }) {
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold text-white mr-2" style={{ backgroundColor: color }}>
                       {i + 1}
                     </span>
-                    {q[lang] || q.zh}
+                    {q[lang === "ja" ? "en" : lang] || q.zh}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {(q.options[lang] || q.options.zh).map((opt: string, j: number) => (
+                    {(q.options[lang === "ja" ? "en" : lang] || q.options.zh).map((opt: string, j: number) => (
                       <span key={j} className="text-xs px-2 py-1 rounded-full bg-[#2C2C2C]/5 dark:bg-white/10 text-[#2C2C2C]/60 dark:text-white/60">{opt}</span>
                     ))}
                   </div>

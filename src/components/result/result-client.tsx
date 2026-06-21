@@ -22,7 +22,7 @@ function pickNarrative(
 ): NarrativeResult | undefined {
   if (!map) return undefined;
   const entry = map[key] ?? map[Object.keys(map)[0]];
-  return entry?.[lang];
+  return entry?.[lang === "ja" ? "en" : lang];
 }
 
 function pickTypeData(
@@ -32,7 +32,7 @@ function pickTypeData(
 ): TypeData | undefined {
   if (!map) return undefined;
   const entry = map[key] ?? map[Object.keys(map)[0]];
-  return entry?.[lang];
+  return entry?.[lang === "ja" ? "en" : lang];
 }
 
 interface ResultClientProps {
@@ -41,7 +41,7 @@ interface ResultClientProps {
 
 export default function ResultClient({ testType }: ResultClientProps) {
   const router = useRouter();
-  const [lang, setLang] = useState<Lang>(() => { try { return (localStorage.getItem("quiz-platform-lang") as Lang) || "zh"; } catch { return "zh"; } });
+  const [lang, setLang] = useState<Lang>(() => { try { const saved = localStorage.getItem("quiz-platform-lang") as Lang; return (saved === "zh" || saved === "en" || saved === "ja") ? saved : "zh"; } catch { return "zh"; } });
   const [result, setResult] = useState<QuizResult | null>(null);
   const [testData, setTestData] = useState<TestData | null>(null);
   const [registryEntry, setRegistryEntry] = useState<TestRegistryEntry | null>(null);

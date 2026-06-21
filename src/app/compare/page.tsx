@@ -52,6 +52,13 @@ const COMPARISON_TEXTS: Record<string, { zh: string; en: string }> = {
   },
 };
 
+function getComparisonText(key: string, lang: Lang): string {
+  const texts = COMPARISON_TEXTS[key];
+  if (!texts) return "";
+  const effectiveLang = lang === "ja" ? "en" : lang;
+  return texts[effectiveLang as keyof typeof texts] ?? texts.en;
+}
+
 function generateComparison(
   entry1: HistoryEntry,
   entry2: HistoryEntry,
@@ -73,11 +80,11 @@ function generateComparison(
   const diff = Math.abs(avg1 - avg2);
 
   if (diff < 10) {
-    return COMPARISON_TEXTS.similar[lang];
+    return getComparisonText("similar", lang);
   } else if (avg1 > avg2) {
-    return COMPARISON_TEXTS.high_vs_low[lang];
+    return getComparisonText("high_vs_low", lang);
   } else {
-    return COMPARISON_TEXTS.different_profile[lang];
+    return getComparisonText("different_profile", lang);
   }
 }
 
@@ -217,7 +224,7 @@ export default function ComparePage() {
     setMounted(true);
     try {
       const saved = localStorage.getItem("quiz-platform-lang");
-      if (saved === "en" || saved === "zh") setLang(saved);
+      if (saved === "en" || saved === "zh" || saved === "ja") setLang(saved);
     } catch {}
 
     try {
@@ -256,7 +263,7 @@ export default function ComparePage() {
 
   const toggleLang = useCallback(() => {
     setLang((l) => {
-      const next = l === "zh" ? "en" : "zh";
+      const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh";
       try { localStorage.setItem("quiz-platform-lang", next); } catch {}
       return next;
     });

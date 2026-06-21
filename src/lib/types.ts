@@ -126,4 +126,4 @@ export interface WorldDefinition {
   atmoColor: string;
 }
 
-export type Lang = "zh" | "en";
+export type Lang = "zh" | "en" | "ja";

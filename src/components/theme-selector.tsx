@@ -6,7 +6,7 @@ import { Palette } from "lucide-react";
 import { THEMES, getStoredThemeId, storeThemeId, applyTheme, getThemeById } from "@/store/theme-store";
 
 interface ThemeSelectorProps {
-  lang?: "zh" | "en";
+  lang?: "zh" | "en" | "ja";
 }
 
 export function ThemeSelector({ lang = "zh" }: ThemeSelectorProps) {

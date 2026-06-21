@@ -135,7 +135,7 @@ export function TestInsights({ category, lang }: TestInsightsProps) {
   const toggle = useCallback(() => setIsOpen((p) => !p), []);
 
   const insight = INSIGHTS[category] || DEFAULT_INSIGHT;
-  const text = insight[lang];
+  const text = insight[lang === "ja" ? "en" : lang];
 
   return (
     <div className="mb-8">

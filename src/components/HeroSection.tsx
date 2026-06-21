@@ -35,7 +35,7 @@ export function HeroSection({ lang = "zh" }: HeroSectionProps) {
         </motion.div>
 
         <h1 className="text-4xl font-bold leading-tight tracking-tight text-[#2C2C2C] sm:text-5xl md:text-6xl lg:text-7xl dark:text-white">
-          {lang === "zh" ? "有些自己，要慢慢被看见。" : "Some parts of you take time to be seen."}
+          {lang === "zh" ? "有些自己，要慢慢被看见。" : lang === "ja" ? "自分の中の一部は、ゆっくりと見つけていくもの。" : "Some parts of you take time to be seen."}
         </h1>
 
         <motion.p
@@ -49,6 +49,12 @@ export function HeroSection({ lang = "zh" }: HeroSectionProps) {
               通过人格、情绪与关系叙事，重新理解你的内在模式。
               <br />
               <span className="text-[#2C2C2C]/50 dark:text-white/50">这里不是诊断，而是一面帮助你靠近自己的镜子。</span>
+            </>
+          ) : lang === "ja" ? (
+            <>
+              パーソナリティ、感情、関係性の物語を通じて、内なるパターンを再認識する。
+              <br />
+              <span className="text-[#2C2C2C]/50 dark:text-white/50">これは診断ではなく、自分に近づくための鏡です。</span>
             </>
           ) : (
             <>
@@ -69,13 +75,13 @@ export function HeroSection({ lang = "zh" }: HeroSectionProps) {
             href="#worlds"
             className="inline-flex h-12 items-center justify-center rounded-full bg-[#2C2C2C] px-8 text-sm font-medium text-white transition-all hover:bg-[#2C2C2C]/80 hover:shadow-lg hover:shadow-[#2C2C2C]/10 active:scale-[0.98] dark:bg-white dark:text-[#2C2C2C] dark:hover:bg-white/80"
           >
-            {lang === "zh" ? "进入内在世界" : "Enter Your Inner World"}
+            {lang === "zh" ? "进入内在世界" : lang === "ja" ? "内なる世界へ" : "Enter Your Inner World"}
           </a>
           <Link
             href="/quiz/big-five"
             className="inline-flex h-12 items-center justify-center rounded-full border border-[#2C2C2C]/20 px-8 text-sm font-medium text-[#2C2C2C] transition-all hover:bg-[#2C2C2C]/5 hover:border-[#2C2C2C]/30 active:scale-[0.98] dark:border-white/20 dark:text-white dark:hover:bg-white/5"
           >
-            {lang === "zh" ? "开始大五人格测试" : "Take the Big Five Test"}
+            {lang === "zh" ? "开始大五人格测试" : lang === "ja" ? "ビッグファイブテストを始める" : "Take the Big Five Test"}
           </Link>
         </motion.div>
       </motion.div>
@@ -92,7 +98,7 @@ export function HeroSection({ lang = "zh" }: HeroSectionProps) {
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
           className="flex flex-col items-center gap-2 text-[#2C2C2C]/40 dark:text-white/40"
         >
-          <span className="text-xs">{lang === "zh" ? "向下探索" : "Scroll to explore"}</span>
+          <span className="text-xs">{lang === "zh" ? "向下探索" : lang === "ja" ? "スクロールして探索" : "Scroll to explore"}</span>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M4 6l4 4 4-4" />
           </svg>
