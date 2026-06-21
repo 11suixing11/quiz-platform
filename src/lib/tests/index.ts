@@ -1,6 +1,6 @@
 ﻿import type { TestData } from "../types";
 
-// Test data registry — all 128 tests
+// Test data registry — all 138 tests
 const registry: Record<string, () => Promise<{ default: any }>> = {
   "ab-personality": () => import("./ab-personality"),
   "animal-personality": () => import("./animal-personality"),
@@ -135,6 +135,16 @@ const registry: Record<string, () => Promise<{ default: any }>> = {
   "creativity-style": () => import("./creativity-style"),
   "attachment-healing": () => import("./attachment-healing"),
   "grief-processing": () => import("./grief-processing"),
+  "humor-type": () => import("./humor-type"),
+  "learning-optimizer": () => import("./learning-optimizer"),
+  "stress-signature": () => import("./stress-signature"),
+  "love-style": () => import("./love-style"),
+  "creativity-block": () => import("./creativity-block"),
+  "emotional-depth": () => import("./emotional-depth"),
+  "career-compass": () => import("./career-compass"),
+  "relationship-health": () => import("./relationship-health"),
+  "self-sabotage": () => import("./self-sabotage"),
+  "mindfulness-depth": () => import("./mindfulness-depth"),
 };
 
 export async function loadTestData(type: string): Promise<TestData | null> {

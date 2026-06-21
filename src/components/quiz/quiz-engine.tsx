@@ -14,6 +14,43 @@ import type { TestData, Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Celebration } from "@/components/celebration";
 
+const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function getSessionKey(testType: string) {
+  return `quiz-session-${testType}`;
+}
+
+function loadSession(testType: string): { answers: (number | null)[]; currentQuestion: number; timestamp: number } | null {
+  try {
+    const raw = localStorage.getItem(getSessionKey(testType));
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (Date.now() - data.timestamp > SESSION_EXPIRY_MS) {
+      localStorage.removeItem(getSessionKey(testType));
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function saveSession(testType: string, answers: (number | null)[], currentQuestion: number) {
+  try {
+    localStorage.setItem(getSessionKey(testType), JSON.stringify({
+      answers,
+      currentQuestion,
+      timestamp: Date.now(),
+    }));
+  } catch {}
+}
+
+function clearSession(testType: string) {
+  try {
+    localStorage.removeItem(getSessionKey(testType));
+  } catch {}
+}
+
 interface QuizEngineProps {
   testType: string;
 }
@@ -119,6 +156,7 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
   const [submitting, setSubmitting] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [sessionPrompt, setSessionPrompt] = useState<{ answers: (number | null)[]; currentQuestion: number } | null>(null);
 
   /* ─── Swipe gesture state ─── */
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -136,7 +174,13 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
       if (cancelled) return;
       if (data) {
         setTestData(data);
-        setAnswers(new Array(data.questions.length).fill(null));
+        // Check for existing session
+        const session = loadSession(testType);
+        if (session && session.answers.length === data.questions.length) {
+          setSessionPrompt({ answers: session.answers, currentQuestion: session.currentQuestion });
+        } else {
+          setAnswers(new Array(data.questions.length).fill(null));
+        }
       } else {
         setLoadError(true);
       }
@@ -166,6 +210,8 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
     setAnswers((prev) => {
       const next = [...prev];
       next[currentQuestion] = idx;
+      // Save session on every answer change
+      saveSession(testType, next, currentQuestion);
       return next;
     });
     // Haptic feedback on mobile
@@ -192,6 +238,7 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
     if (!testData) return;
     setSubmitting(true);
     setCelebrating(true);
+    clearSession(testType);
     const numericAnswers = answers.map((a) => a ?? 0);
     const result = testData.calculate(numericAnswers, testData.questions as any);
     try {
@@ -382,6 +429,61 @@ export default function QuizEngine({ testType }: QuizEngineProps) {
   // ─── Main quiz UI ───
   return (
     <div className="flex min-h-screen flex-col bg-[#FAFAF8] dark:bg-[#0a0a0a]">
+      {/* Session resume prompt */}
+      <AnimatePresence>
+        {sessionPrompt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#1a1a1a] p-6 shadow-2xl text-center"
+            >
+              <div className="text-4xl mb-4">⏸️</div>
+              <h3 className="text-lg font-bold text-[#2C2C2C] dark:text-white mb-2">
+                {lang === "zh" ? "你有一个未完成的测试" : "You have an incomplete test"}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                {lang === "zh"
+                  ? `已完成 ${sessionPrompt.answers.filter(a => a !== null).length} 题，要继续吗？`
+                  : `${sessionPrompt.answers.filter(a => a !== null).length} questions answered. Resume?`}
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    clearSession(testType);
+                    setSessionPrompt(null);
+                    setAnswers(new Array(totalQuestions).fill(null));
+                    setCurrentQuestion(0);
+                  }}
+                >
+                  {lang === "zh" ? "重新开始" : "Start Fresh"}
+                </Button>
+                <Button
+                  className="flex-1"
+                  style={{ backgroundColor: color }}
+                  onClick={() => {
+                    setAnswers(sessionPrompt.answers);
+                    setCurrentQuestion(sessionPrompt.currentQuestion);
+                    setSessionPrompt(null);
+                  }}
+                >
+                  {lang === "zh" ? "继续" : "Resume"}
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Milestone confetti overlay */}
       <AnimatePresence>
         {milestoneConfetti && (

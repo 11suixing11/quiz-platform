@@ -2,12 +2,40 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { TestCard } from "@/components/TestCard";
 import { TEST_REGISTRY } from "@/lib/test-registry";
 import { TEST_CATEGORIES } from "@/lib/constants";
 import type { TestEntry, Lang } from "@/lib/types";
+
+/* ---------- Region detection & recommendations ---------- */
+function getRegionFromTimezone(): "asia" | "europe" | "americas" | "other" {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (/^(Asia|Australia|Pacific\/Auckland|Pacific\/Fiji)/i.test(tz)) return "asia";
+    if (/^(Europe|Africa)/i.test(tz)) return "europe";
+    if (/^(America)/i.test(tz)) return "americas";
+  } catch {
+    /* fallback */
+  }
+  return "other";
+}
+
+const REGIONAL_TESTS: Record<string, string[]> = {
+  asia: ["zodiac-match", "enneagram", "color-personality", "mbti", "charisma"],
+  europe: ["big-five", "enneagram", "mbti", "disc", "leadership"],
+  americas: ["big-five", "mbti", "disc", "charisma", "leadership"],
+  other: ["mbti", "enneagram", "big-five", "charisma", "color-personality"],
+};
+
+const REGION_LABELS: Record<string, { zh: string; en: string }> = {
+  asia: { zh: "你所在地区热门", en: "Popular in your region" },
+  europe: { zh: "你所在地区热门", en: "Popular in your region" },
+  americas: { zh: "你所在地区热门", en: "Popular in your region" },
+  other: { zh: "热门推荐", en: "Popular picks" },
+};
 
 /* ---------- Levenshtein distance for fuzzy matching ---------- */
 function levenshtein(a: string, b: string): number {
@@ -92,6 +120,7 @@ export function ExploreSection({
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>(null);
+  const [region] = useState(() => getRegionFromTimezone());
 
   // When a world is selected, reset category filter
   useEffect(() => {
@@ -99,6 +128,13 @@ export function ExploreSection({
       setActiveCategory(null);
     }
   }, [selectedWorld, worldCategories]);
+
+  const regionTests = useMemo(() => {
+    const ids = REGIONAL_TESTS[region] || REGIONAL_TESTS.other;
+    return ids
+      .map((id) => TEST_REGISTRY.find((t) => t.id === id))
+      .filter(Boolean) as typeof TEST_REGISTRY;
+  }, [region]);
 
   const totalCount = TEST_REGISTRY.length;
 
@@ -170,6 +206,34 @@ export function ExploreSection({
           className="h-11 rounded-xl border-[#2C2C2C]/10 dark:border-white/10 bg-white dark:bg-[#1a1a1a] text-base"
         />
       </div>
+
+      {/* Regional Recommendations */}
+      {regionTests.length > 0 && !searchQuery.trim() && !activeCategory && !difficultyFilter && (
+        <div className="mt-6">
+          <p className="mb-3 text-xs font-medium text-[#2C2C2C]/50 dark:text-white/50">
+            🌍 {lang === "zh" ? REGION_LABELS[region].zh : REGION_LABELS[region].en}
+          </p>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+            {regionTests.map((test) => (
+              <Link
+                key={test.id}
+                href={`/test/${test.id}`}
+                className="flex min-w-[140px] shrink-0 items-center gap-2 rounded-xl border border-[#2C2C2C]/8 bg-white px-3 py-2.5 transition-all hover:border-[#2C2C2C]/20 hover:shadow-md dark:border-white/10 dark:bg-[#1a1a1a] dark:hover:border-white/20"
+              >
+                <span className="text-xl">{test.icon}</span>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-[#2C2C2C] dark:text-white">
+                    {lang === "en" ? test.en.name : test.zh.name}
+                  </p>
+                  <p className="text-[10px] text-[#2C2C2C]/40 dark:text-white/40">
+                    {test.questions} {lang === "en" ? "Q" : "题"}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Category Tags */}
       <div className="mt-5 flex flex-wrap gap-2">

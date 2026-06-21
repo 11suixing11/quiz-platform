@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -19,6 +19,14 @@ export function TestCard({ test, index = 0, lang = "zh" }: TestCardProps) {
   const name = lang === "en" ? test.en.name : test.zh.name;
   const description = lang === "en" ? test.en.description : test.zh.description;
   const [bookmarked, setBookmarked] = useState(false);
+
+  // Difficulty badge
+  const difficultyBadge = useMemo(() => {
+    const q = test.questions;
+    if (q <= 16) return { emoji: "⚡", label: lang === "en" ? "Quick" : "快速", color: "bg-emerald-500" };
+    if (q <= 25) return { emoji: "📋", label: lang === "en" ? "Standard" : "标准", color: "bg-blue-500" };
+    return { emoji: "🔬", label: lang === "en" ? "Deep" : "深度", color: "bg-purple-500" };
+  }, [test.questions, lang]);
 
   useEffect(() => {
     setBookmarked(isBookmarked(test.id));
@@ -52,6 +60,9 @@ export function TestCard({ test, index = 0, lang = "zh" }: TestCardProps) {
                     NEW
                   </span>
                 )}
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow-sm ${difficultyBadge.color}`}>
+                  {difficultyBadge.emoji} {difficultyBadge.label}
+                </span>
                 <span
                   className="rounded-full px-2.5 py-0.5 text-xs font-medium text-white transition-all duration-300 group-hover:shadow-sm"
                   style={{ backgroundColor: categoryColor }}

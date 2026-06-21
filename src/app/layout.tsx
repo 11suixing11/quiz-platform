@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Analytics from "@/components/analytics";
 import BottomNav from "@/components/bottom-nav";
+import { AccessibilityControls } from "@/components/accessibility-controls";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -100,6 +101,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <BottomNav />
+        <AccessibilityControls />
         <Analytics />
       </body>
     </html>

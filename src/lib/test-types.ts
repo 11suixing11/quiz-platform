@@ -135,6 +135,16 @@ export const TEST_TYPES: string[] = [
   "creativity-style",
   "attachment-healing",
   "grief-processing",
+  "humor-type",
+  "learning-optimizer",
+  "stress-signature",
+  "love-style",
+  "creativity-block",
+  "emotional-depth",
+  "career-compass",
+  "relationship-health",
+  "self-sabotage",
+  "mindfulness-depth",
 ];
 
 export default TEST_TYPES;

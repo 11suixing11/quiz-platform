@@ -14,6 +14,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThemeSelector } from "@/components/theme-selector";
 import { DailyTest } from "@/components/daily-test";
 import type { Lang } from "@/lib/types";
+import { QuickStart } from "@/components/quick-start";
 
 // Animated counter component
 function AnimatedNumber({ target, label, icon, delay = 0 }: { target: number; label: string; icon: string; delay?: number }) {
@@ -113,6 +114,7 @@ export default function Home() {
       >
         {lang === "zh" ? "EN" : lang === "en" ? "JA" : "中"}
       </button>
+      <QuickStart lang={lang} />
       <HeroSection lang={lang} />
 
       {/* Stats Banner */}
