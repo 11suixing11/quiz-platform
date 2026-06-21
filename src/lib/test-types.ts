@@ -145,6 +145,11 @@ export const TEST_TYPES: string[] = [
   "relationship-health",
   "self-sabotage",
   "mindfulness-depth",
+  "procrastination-type",
+  "communication-pattern",
+  "emotional-intelligence-advanced",
+  "work-style",
+  "personality-archetype",
 ];
 
 export default TEST_TYPES;
