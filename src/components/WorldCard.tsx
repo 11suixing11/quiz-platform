@@ -1,14 +1,27 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import type { WorldDefinition } from "@/lib/types";
+import { useEffect, useState } from "react";
+import type { WorldDefinition, Lang } from "@/lib/types";
 
 interface WorldCardProps {
   world: WorldDefinition;
   onSelect: (worldId: string) => void;
+  lang?: Lang;
 }
 
-export function WorldCard({ world, onSelect }: WorldCardProps) {
+export function WorldCard({ world, onSelect, lang = "zh" }: WorldCardProps) {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const text = lang === "en" ? world.en : world.zh;
+
   return (
     <motion.button
       whileHover={{ y: -6, boxShadow: "0 16px 40px rgba(0,0,0,0.08)" }}
@@ -17,8 +30,8 @@ export function WorldCard({ world, onSelect }: WorldCardProps) {
       onClick={() => onSelect(world.id)}
       className="group relative flex flex-col items-start gap-3 rounded-2xl border p-6 text-left transition-all sm:p-8 overflow-hidden"
       style={{
-        backgroundColor: world.bgLight,
-        borderColor: world.borderColor,
+        backgroundColor: isDark ? world.bgDark : world.bgLight,
+        borderColor: isDark ? world.borderDark : world.borderColor,
       }}
     >
       {/* Decorative gradient overlay on hover */}
@@ -35,18 +48,18 @@ export function WorldCard({ world, onSelect }: WorldCardProps) {
           <motion.span
             initial={{ opacity: 0, x: 10 }}
             whileInView={{ opacity: 1, x: 0 }}
-            className="text-xs text-[#2C2C2C]/30 font-medium"
+            className="text-xs text-[#2C2C2C]/30 dark:text-white/30 font-medium"
           >
-            {world.categories.length} 个测试
+            {world.categories.length} {lang === "en" ? "tests" : "个测试"}
           </motion.span>
         </div>
 
         <h3 className="text-xl font-semibold sm:text-2xl" style={{ color: world.color }}>
-          {world.zh.title}
+          {text.title}
         </h3>
 
-        <p className="text-sm leading-relaxed text-[#2C2C2C]/70">
-          {world.zh.desc}
+        <p className="text-sm leading-relaxed text-[#2C2C2C]/70 dark:text-white/70">
+          {text.desc}
         </p>
 
         <span
@@ -56,7 +69,7 @@ export function WorldCard({ world, onSelect }: WorldCardProps) {
             color: world.color,
           }}
         >
-          {world.zh.hint}
+          {text.hint}
           <svg
             width="12"
             height="12"

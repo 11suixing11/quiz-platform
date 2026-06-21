@@ -13,8 +13,8 @@
   <img src="https://img.shields.io/github/repo-size/11suixing11/quiz-platform?style=flat-square&color=6DD5FA" alt="Repo Size">
 </p>
 
-**一个温暖的内心探索平台，集成了 113 个心理测试与 MBTI 配对功能。**
-A warm inner exploration platform with 113 psychological tests and MBTI relationship matching.
+**一个温暖的内心探索平台，集成了 118 个心理测试与 MBTI 配对功能。**
+A warm inner exploration platform with 118 psychological tests and MBTI relationship matching.
 
 ✨ **在线体验 Demo → [11suixing11.github.io/quiz-platform](https://11suixing11.github.io/quiz-platform/)** ✨
 
@@ -31,15 +31,15 @@ A warm inner exploration platform with 113 psychological tests and MBTI relation
 
 Everyone is a planet waiting to be explored. This platform was born from a simple belief: **understanding yourself is the starting point of all growth.**
 
-我们精心打造了 **113 个心理测试**，覆盖 9 大维度，从性格到情绪，从关系到职业，帮助你用温和的方式，一点一点靠近真实的自己。
+我们精心打造了 **118 个心理测试**，覆盖 9 大维度，从性格到情绪，从关系到职业，帮助你用温和的方式，一点一点靠近真实的自己。
 
-We've carefully crafted **113 psychological tests** across 9 major dimensions — from personality to emotions, relationships to careers — helping you gently move closer to your true self, one step at a time.
+We've carefully crafted **118 psychological tests** across 9 major dimensions — from personality to emotions, relationships to careers — helping you gently move closer to your true self, one step at a time.
 
 ---
 
 ## ✨ 功能亮点 | Features
 
-### 🧭 9 大测试维度 · 9 Test Dimensions · 113 Tests
+### 🧭 9 大测试维度 · 9 Test Dimensions · 118 Tests
 
 | 维度 Dimension | 主题 Theme | 包含测试（部分） Tests Included |
 |:---:|:---|:---|
@@ -68,6 +68,23 @@ It's not just about finding your type — we help you find your perfect match.
   - 🌊 **关系连接者** — 为感受关系温度的你（依恋 · 爱语 · 人际边界）
   - 🔥 **行动探索者** — 为走出去认识自己的你（职业 · 生活方式 · 冒险）
 
+### 🚀 更多亮点 | What's New
+
+我们一直在用心打磨，希望每一个小细节都能让你感到温暖：
+
+We've been polishing every detail with care, hoping each little touch brings you warmth:
+
+| 功能 Feature | 说明 Description |
+|:---:|:---|
+| 🕐 **测试历史** Test History | 浏览你所有的历史测试结果 — Browse all your past results |
+| 📱 **滑动导航** Swipe Navigation | 移动端友好的题目切换 — Mobile-friendly question navigation |
+| 🎊 **进度庆祝** Progress Confetti | 在 25%、50%、75% 里程碑撒花庆祝 — Celebrate milestones with confetti |
+| 🔗 **原生分享** Web Share | 在手机上一键分享结果 — Share results natively on mobile |
+| 🎯 **智能推荐** Smart Recommendations | 结果页的「你可能还喜欢」— 'You might also like' on results |
+| 🌐 **完整国际化** Full i18n | 完整的中英文支持 — Complete English and Chinese support |
+| 🌙 **深色模式** Dark Mode | 全站深色模式 — Full dark mode support |
+| 📊 **数据看板** Stats Dashboard | 首页动态数字统计 — Animated counters on homepage |
+
 ---
 
 ## 📸 展示 | Screenshots
@@ -76,16 +93,17 @@ It's not just about finding your type — we help you find your perfect match.
 >
 > **TODO** — PRs welcome to add screenshots or GIF demos!
 
+<!-- screenshots: homepage-hero, quiz-in-progress, result-page, dark-mode -->
 ```
 ┌─────────────────────────────────────────────┐
 │                                             │
-│         🖼️  首页 / Home Page                │
+│  🖼️  首页英雄区 / Homepage Hero             │
 │                                             │
-│         🖼️  测试详情 / Test Detail           │
+│  🖼️  测试进行中 / Quiz in Progress          │
 │                                             │
-│         🖼️  结果展示 / Result Page           │
+│  🖼️  结果页面 / Result Page                 │
 │                                             │
-│         🖼️  MBTI 配对 / MBTI Matching       │
+│  🖼️  深色模式 / Dark Mode                   │
 │                                             │
 └─────────────────────────────────────────────┘
 ```
@@ -103,6 +121,8 @@ It's not just about finding your type — we help you find your perfect match.
 | 🧩 组件 | **Shadcn UI** | 精美可定制的组件库 |
 | ✨ 动效 | **Framer Motion** | 流畅的页面转场与交互动画 |
 | 🚀 部署 | **GitHub Pages** | GitHub Actions CI/CD 自动部署 |
+| 📱 PWA | **manifest.json** | 渐进式 Web 应用，可添加到主屏幕 — Installable PWA |
+| 🔍 SEO | **JSON-LD + Sitemap** | 结构化数据与站点地图，搜索引擎友好 — Structured data & sitemap |
 
 ---
 
@@ -144,18 +164,26 @@ Open [http://localhost:3333](http://localhost:3333) and start exploring yourself
 ```
 quiz-platform/
 ├── .github/              # GitHub Actions 自动部署 CI/CD
-├── public/               # 静态资源 Static assets
+├── public/
+│   ├── manifest.json     # PWA 清单 PWA manifest
+│   ├── sitemap.xml       # SEO 站点地图 Sitemap
+│   └── ...               # 静态资源 Static assets
 ├── src/
-│   ├── app/              # Next.js App Router 路由
+│   ├── app/
 │   │   ├── quiz/         # 测试页面 Quiz pages
 │   │   ├── result/       # 结果页面 Result pages
-│   │   └── compat/       # MBTI 配对 MBTI compatibility
-│   ├── components/       # UI 组件
+│   │   ├── compat/       # MBTI 配对 MBTI compatibility
+│   │   └── history/      # 🆕 测试历史 Test history
+│   ├── components/
 │   │   ├── quiz/         # 测试相关组件 Quiz components
 │   │   ├── result/       # 结果相关组件 Result components
-│   │   └── ui/           # Shadcn 基础组件
+│   │   ├── ui/           # Shadcn 基础组件
+│   │   ├── confetti/     # 🆕 进度庆祝 Progress confetti
+│   │   ├── share/        # 🆕 原生分享 Web share
+│   │   └── recommendations/ # 🆕 智能推荐 Smart recommendations
+│   ├── i18n/             # 🆕 国际化 English & Chinese
 │   └── lib/              # 核心逻辑 Core logic
-│       ├── tests/        # 113 个心理测试定义
+│       ├── tests/        # 118 个心理测试定义
 │       ├── constants.ts  # 分类与配色常量
 │       ├── types.ts      # TypeScript 类型定义
 │       └── utils.ts      # 工具函数

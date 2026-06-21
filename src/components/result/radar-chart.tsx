@@ -127,7 +127,7 @@ export function RadarChart({ dimensions, accentColor = "#6B5B95", size = 280 }: 
                 x={lp.x}
                 y={lp.y - 6}
                 textAnchor={textAnchor}
-                className="fill-[#2C2C2C] text-xs font-medium"
+                className="fill-[#2C2C2C] dark:fill-white text-xs font-medium"
               >
                 {lp.name}
               </text>

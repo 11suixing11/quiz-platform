@@ -29,6 +29,7 @@ export interface TestEntry {
   pattern: "type" | "dimensions" | "score";
   questions: number;
   time: string;
+  new?: boolean;
   zh: { name: string; description: string };
   en: { name: string; description: string };
 }
@@ -119,7 +120,9 @@ export interface WorldDefinition {
   en: { title: string; desc: string; hint: string };
   color: string;
   bgLight: string;
+  bgDark: string;
   borderColor: string;
+  borderDark: string;
   atmoColor: string;
 }
 

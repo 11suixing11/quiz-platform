@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #FAFAF8 0%, #F0E8DC 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Subtle radial glow behind the moon */
+  body::before {
+    content: "";
+    position: absolute;
+    left: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,180,150,0.18) 0%, transparent 70%);
+  }
+
+  .container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 60px 80px;
+    position: relative;
+  }
+
+  /* Left: Moon */
+  .moon {
+    font-size: 140px;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 4px 24px rgba(180,160,120,0.25));
+    margin-right: 50px;
+  }
+
+  /* Center content */
+  .center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .title {
+    font-size: 64px;
+    font-weight: 800;
+    color: #2D2A26;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 26px;
+    font-weight: 500;
+    color: #8A8078;
+    letter-spacing: 0.06em;
+  }
+
+  .brand {
+    position: absolute;
+    bottom: 40px;
+    left: 80px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #B8AFA5;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Right: emoji grid */
+  .emojis {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    opacity: 0.35;
+  }
+
+  .emojis span {
+    font-size: 44px;
+    line-height: 1;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="moon">🌙</div>
+
+    <div class="center">
+      <div class="title">认识你自己</div>
+      <div class="subtitle">118 心理测试 · 9 维度 · 4 内在世界</div>
+    </div>
+
+    <div class="brand">quiz-platform</div>
+
+    <div class="emojis">
+      <span>🧬</span><span>💕</span><span>🧘</span>
+      <span>🤝</span><span>💼</span><span>🧪</span>
+      <span>🌿</span><span>🎭</span><span>🎪</span>
+    </div>
+  </div>
+</body>
+</html>

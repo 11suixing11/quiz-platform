@@ -91,7 +91,7 @@ export function Celebration({ color = "#6B5B95", onComplete }: CelebrationProps)
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="text-lg font-semibold text-[#2C2C2C]"
+            className="text-lg font-semibold text-[#2C2C2C] dark:text-white"
           >
             测试完成！
           </motion.p>
@@ -99,7 +99,7 @@ export function Celebration({ color = "#6B5B95", onComplete }: CelebrationProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9 }}
-            className="text-sm text-[#2C2C2C]/60 mt-1"
+            className="text-sm text-[#2C2C2C]/60 dark:text-white/60 mt-1"
           >
             正在解读你的答案……
           </motion.p>

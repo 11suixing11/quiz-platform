@@ -21,7 +21,9 @@ export const WORLDS: WorldDefinition[] = [
     en: { title: "Dreamers", desc: "For those who feel too deeply, who replay a single sentence late into the night.", hint: "Emotion, empathy, sensitivity" },
     color: "#6B5B95",
     bgLight: "#F3F0F8",
+    bgDark: "#1a1520",
     borderColor: "#E0DAF0",
+    borderDark: "#2a2535",
     atmoColor: "#EDE8F5",
   },
   {
@@ -32,7 +34,9 @@ export const WORLDS: WorldDefinition[] = [
     en: { title: "Analysts", desc: "For those who find structure in chaos, who take the world apart to understand it.", hint: "Personality, cognition, systems" },
     color: "#4A6FA5",
     bgLight: "#EEF3F8",
+    bgDark: "#121a24",
     borderColor: "#D8E2F0",
+    borderDark: "#1a2535",
     atmoColor: "#E8EFF7",
   },
   {
@@ -43,7 +47,9 @@ export const WORLDS: WorldDefinition[] = [
     en: { title: "Connectors", desc: "For those who sense every temperature shift in a relationship — the warmth, the silence, the pull.", hint: "Attachment, love, boundaries" },
     color: "#4A8B5A",
     bgLight: "#EEF5EF",
+    bgDark: "#121a15",
     borderColor: "#D0E8D5",
+    borderDark: "#1a2a1e",
     atmoColor: "#E8F2EA",
   },
   {
@@ -54,7 +60,9 @@ export const WORLDS: WorldDefinition[] = [
     en: { title: "Explorers", desc: "For those who need to walk out into the world to discover who they are.", hint: "Career, lifestyle, adventure" },
     color: "#C4783C",
     bgLight: "#FAF3EC",
+    bgDark: "#1a1510",
     borderColor: "#F0DCC8",
+    borderDark: "#2a2018",
     atmoColor: "#F8EFE5",
   },
 ];

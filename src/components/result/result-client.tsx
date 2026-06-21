@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Globe, RefreshCw, Copy, Check } from "lucide-react";
+import { ArrowLeft, Globe, RefreshCw, Share2, Check, BarChart3 } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ResultHero } from "@/components/result/result-hero";
@@ -47,6 +47,8 @@ export default function ResultClient({ testType }: ResultClientProps) {
   const [registryEntry, setRegistryEntry] = useState<TestRegistryEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [shareDismissed, setShareDismissed] = useState(false);
+  const shareTouchRef = useRef<{ x: number; y: number } | null>(null);
   const shareRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -132,7 +134,7 @@ export default function ResultClient({ testType }: ResultClientProps) {
   const handleCopy = useCallback(async () => {
     const text = lang === "zh"
       ? `我在「认识你自己」完成了${registryEntry?.zh.name ?? testType}测试，结果是：${heroTitle}。来试试吧！`
-      : `I completed the ${registryEntry?.en.name ?? testType} test on "Know Yourself" and got: ${heroTitle}. Try it!`;
+      : `I just took the ${registryEntry?.en.name ?? testType} on "Know Yourself" and got: ${heroTitle}. Give it a try!`;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -146,7 +148,7 @@ export default function ResultClient({ testType }: ResultClientProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-[#FAFAF8]">
+      <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-[#FAFAF8] dark:bg-[#0a0a0a]">
         <motion.div
           className="h-12 w-12 rounded-full border-3 border-muted border-t-transparent"
           animate={{ rotate: 360 }}
@@ -159,7 +161,7 @@ export default function ResultClient({ testType }: ResultClientProps) {
           transition={{ delay: 0.3 }}
           className="mt-4 text-sm text-muted-foreground"
         >
-          {lang === "zh" ? "正在解读你的结果……" : "Interpreting your results..."}
+          {lang === "zh" ? "正在解读你的结果……" : "Reading your story..."}
         </motion.p>
       </div>
     );
@@ -167,11 +169,11 @@ export default function ResultClient({ testType }: ResultClientProps) {
 
   if (!result || !registryEntry) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 min-h-screen px-6 text-center bg-[#FAFAF8]">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 min-h-screen px-6 text-center bg-[#FAFAF8] dark:bg-[#0a0a0a]">
         <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }} className="text-5xl">🔍</motion.span>
-        <h1 className="text-xl font-semibold">{lang === "zh" ? "未找到测试结果" : "No results found"}</h1>
+        <h1 className="text-xl font-semibold">{lang === "zh" ? "未找到测试结果" : "No Results Yet"}</h1>
         <p className="text-sm text-muted-foreground max-w-sm">
-          {lang === "zh" ? "你可能还没有完成这个测试，或者结果数据已被清除。" : "You may not have completed this test yet, or result data has been cleared."}
+          {lang === "zh" ? "你可能还没有完成这个测试，或者结果数据已被清除。" : "It looks like you haven't taken this test yet, or your results may have been cleared."}
         </p>
         <div className="flex gap-3">
           <Link href={`/quiz/${testType}/`} className={cn(buttonVariants({ variant: "default" }), "rounded-xl")}>
@@ -188,12 +190,12 @@ export default function ResultClient({ testType }: ResultClientProps) {
   const testName = lang === "zh" ? registryEntry.zh.name : registryEntry.en.name;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAF8]">
+    <div className="flex flex-col min-h-screen bg-[#FAFAF8] dark:bg-[#0a0a0a]">
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="sticky top-0 z-30 flex items-center justify-between bg-[#FAFAF8]/80 backdrop-blur-md px-6 py-4 border-b border-border/40"
+        className="sticky top-0 z-30 flex items-center justify-between bg-[#FAFAF8]/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-border/40"
       >
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-foreground hover:opacity-80 transition-opacity">
           <ArrowLeft className="size-4" />
@@ -207,7 +209,7 @@ export default function ResultClient({ testType }: ResultClientProps) {
         </div>
       </motion.header>
 
-      <main className="flex flex-1 flex-col items-center gap-10 px-6 py-12 w-full max-w-2xl mx-auto">
+      <main className="flex flex-1 flex-col items-center gap-8 sm:gap-10 px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12 w-full max-w-2xl mx-auto">
         <ResultHero icon={heroIcon} title={heroTitle} subtitle={heroSubtitle} description={heroDescription} accentColor={accentColor} />
 
         <section className="w-full">
@@ -229,7 +231,21 @@ export default function ResultClient({ testType }: ResultClientProps) {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="w-full flex justify-center"
         >
-          <ShareCard ref={shareRef} icon={heroIcon} title={heroTitle} subtitle={heroSubtitle} description={heroDescription} accentColor={accentColor} />
+          {!shareDismissed && (
+            <motion.div
+              ref={shareRef}
+              className="w-full"
+              onTouchStart={(e) => { shareTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
+              onTouchEnd={(e) => {
+                if (!shareTouchRef.current) return;
+                const dy = e.changedTouches[0].clientY - shareTouchRef.current.y;
+                shareTouchRef.current = null;
+                if (dy < -60) setShareDismissed(true);
+              }}
+            >
+              <ShareCard icon={heroIcon} title={heroTitle} subtitle={heroSubtitle} description={heroDescription} accentColor={accentColor} />
+            </motion.div>
+          )}
         </motion.section>
 
         <motion.section
@@ -243,8 +259,8 @@ export default function ResultClient({ testType }: ResultClientProps) {
             {lang === "zh" ? "重新测试" : "Retake Test"}
           </Button>
           <Button className="flex-1 h-12 rounded-xl gap-2" style={{ backgroundColor: accentColor }} onClick={handleCopy}>
-            {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-            {copied ? (lang === "zh" ? "已复制" : "Copied") : (lang === "zh" ? "分享结果" : "Share Result")}
+            {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
+            {copied ? (lang === "zh" ? "已复制" : "Copied!") : (lang === "zh" ? "分享结果" : "Share Result")}
           </Button>
         </motion.section>
 
@@ -255,7 +271,11 @@ export default function ResultClient({ testType }: ResultClientProps) {
           className="w-full flex flex-col sm:flex-row gap-3"
         >
           <Link href="/" className={cn(buttonVariants({ variant: "outline" }), "flex-1 h-12 rounded-xl justify-center")}>
-            {lang === "zh" ? "探索更多测试" : "Explore More Tests"}
+            {lang === "zh" ? "探索更多测试" : "Discover More Tests"}
+          </Link>
+          <Link href="/compare/" className={cn(buttonVariants({ variant: "outline" }), "flex-1 h-12 rounded-xl justify-center gap-2")}>
+            <BarChart3 className="size-4" />
+            {lang === "zh" ? "对比测试结果" : "Compare Results"}
           </Link>
         </motion.section>
 
@@ -265,7 +285,7 @@ export default function ResultClient({ testType }: ResultClientProps) {
           transition={{ delay: 1, duration: 0.5 }}
           className="text-xs text-muted-foreground/60 text-center pb-8"
         >
-          {lang === "zh" ? "本测试仅供参考，不构成专业心理评估。" : "This test is for reference only and does not constitute a professional psychological assessment."}
+          {lang === "zh" ? "本测试仅供参考，不构成专业心理评估。" : "This is a self-reflection tool, not a clinical assessment. Take what resonates, leave what doesn't."}
         </motion.p>
       </main>
     </div>
