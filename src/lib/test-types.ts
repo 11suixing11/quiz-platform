@@ -130,6 +130,11 @@ export const TEST_TYPES: string[] = [
   "money-mindset",
   "procrastination-depth",
   "social-battery",
+  "sleep-hygiene",
+  "nutrition-awareness",
+  "creativity-style",
+  "attachment-healing",
+  "grief-processing",
 ];
 
 export default TEST_TYPES;

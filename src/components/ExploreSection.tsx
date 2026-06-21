@@ -9,22 +9,74 @@ import { TEST_REGISTRY } from "@/lib/test-registry";
 import { TEST_CATEGORIES } from "@/lib/constants";
 import type { TestEntry, Lang } from "@/lib/types";
 
+/* ---------- Levenshtein distance for fuzzy matching ---------- */
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
+function fuzzyMatch(query: string, target: string): boolean {
+  const q = query.toLowerCase();
+  const t = target.toLowerCase();
+  // Exact substring match
+  if (t.includes(q)) return true;
+  // startsWith match
+  if (t.startsWith(q) || q.startsWith(t)) return true;
+  // Word-prefix match: each query word starts some word in target
+  const qWords = q.split(/\s+/);
+  const tWords = t.split(/\s+/);
+  if (qWords.every((qw) => tWords.some((tw) => tw.startsWith(qw)))) return true;
+  // Levenshtein for short queries (≤5 chars) — typo tolerance
+  if (q.length <= 5) {
+    for (const tw of tWords) {
+      if (levenshtein(q, tw) <= Math.max(1, Math.floor(q.length / 3))) return true;
+    }
+  }
+  return false;
+}
+
 function fuzzySearch(query: string, tests: TestEntry[]): TestEntry[] {
   if (!query.trim()) return tests;
   const q = query.toLowerCase().trim();
   return tests.filter((t) => {
-    const name = t.zh.name.toLowerCase();
-    const desc = t.zh.description.toLowerCase();
-    const nameEn = t.en.name.toLowerCase();
-    const descEn = t.en.description.toLowerCase();
-    return (
-      name.includes(q) ||
-      desc.includes(q) ||
-      nameEn.includes(q) ||
-      descEn.includes(q)
-    );
+    const fields = [
+      t.zh.name, t.zh.description,
+      t.en.name, t.en.description,
+    ];
+    return fields.some((f) => fuzzyMatch(q, f));
   });
 }
+
+/* ---------- Difficulty filter helpers ---------- */
+type DifficultyFilter = "quick" | "standard" | "deep" | null;
+
+function matchesDifficulty(test: TestEntry, filter: DifficultyFilter): boolean {
+  if (!filter) return true;
+  const q = test.questions;
+  switch (filter) {
+    case "quick": return q <= 16;
+    case "standard": return q >= 17 && q <= 25;
+    case "deep": return q >= 26;
+  }
+}
+
+const DIFFICULTY_OPTIONS: { key: DifficultyFilter; zh: string; en: string }[] = [
+  { key: "quick", zh: "快速 (≤16题)", en: "Quick (≤16Q)" },
+  { key: "standard", zh: "标准 (17-25题)", en: "Standard (17-25Q)" },
+  { key: "deep", zh: "深度 (26+题)", en: "Deep (26+Q)" },
+];
+
+/* ---------- Component ---------- */
 
 interface ExploreSectionProps {
   selectedWorld?: string;
@@ -39,13 +91,16 @@ export function ExploreSection({
 }: ExploreSectionProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>(null);
 
-  // When a world is selected, filter by its categories
+  // When a world is selected, reset category filter
   useEffect(() => {
     if (selectedWorld && worldCategories && worldCategories.length > 0) {
-      setActiveCategory(null); // reset category filter, world filter takes precedence
+      setActiveCategory(null);
     }
   }, [selectedWorld, worldCategories]);
+
+  const totalCount = TEST_REGISTRY.length;
 
   const filteredTests = useMemo(() => {
     let tests = TEST_REGISTRY;
@@ -60,16 +115,33 @@ export function ExploreSection({
       tests = tests.filter((t) => t.category === activeCategory);
     }
 
+    // Filter by difficulty
+    if (difficultyFilter) {
+      tests = tests.filter((t) => matchesDifficulty(t, difficultyFilter));
+    }
+
     // Apply search
     if (searchQuery.trim()) {
       tests = fuzzySearch(searchQuery, tests);
     }
 
     return tests;
-  }, [searchQuery, activeCategory, selectedWorld, worldCategories]);
+  }, [searchQuery, activeCategory, difficultyFilter, selectedWorld, worldCategories]);
 
   const handleCategoryClick = useCallback((categoryId: string) => {
     setActiveCategory((prev) => (prev === categoryId ? null : categoryId));
+  }, []);
+
+  const handleDifficultyClick = useCallback((key: DifficultyFilter) => {
+    setDifficultyFilter((prev) => (prev === key ? null : key));
+  }, []);
+
+  const hasActiveFilters = searchQuery.trim() || activeCategory || difficultyFilter;
+
+  const clearAllFilters = useCallback(() => {
+    setSearchQuery("");
+    setActiveCategory(null);
+    setDifficultyFilter(null);
   }, []);
 
   return (
@@ -92,7 +164,7 @@ export function ExploreSection({
       <div className="mt-8">
         <Input
           type="text"
-          placeholder={lang === "zh" ? "搜索测试..." : "Search tests..."}
+          placeholder={lang === "zh" ? "搜索测试（支持模糊匹配）..." : "Search tests (fuzzy matching)…"}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="h-11 rounded-xl border-[#2C2C2C]/10 dark:border-white/10 bg-white dark:bg-[#1a1a1a] text-base"
@@ -120,8 +192,42 @@ export function ExploreSection({
         ))}
       </div>
 
+      {/* Difficulty Filter */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="text-xs text-[#2C2C2C]/40 dark:text-white/40">
+          {lang === "zh" ? "题量：" : "Length:"}
+        </span>
+        {DIFFICULTY_OPTIONS.map((opt) => (
+          <Badge
+            key={opt.key}
+            variant={difficultyFilter === opt.key ? "default" : "outline"}
+            className="cursor-pointer rounded-full px-3 py-1 text-xs transition-colors"
+            onClick={() => handleDifficultyClick(opt.key)}
+          >
+            {lang === "zh" ? opt.zh : opt.en}
+          </Badge>
+        ))}
+      </div>
+
+      {/* Result count + Clear filters */}
+      <div className="mt-4 flex items-center justify-between">
+        <p className="text-xs text-[#2C2C2C]/50 dark:text-white/50">
+          {lang === "zh"
+            ? `显示 ${filteredTests.length} / ${totalCount} 个测试`
+            : `Showing ${filteredTests.length} of ${totalCount} tests`}
+        </p>
+        {hasActiveFilters && (
+          <button
+            onClick={clearAllFilters}
+            className="text-xs text-[#2C2C2C]/50 dark:text-white/50 hover:text-[#2C2C2C] dark:hover:text-white underline transition-colors"
+          >
+            {lang === "zh" ? "清除筛选" : "Clear filters"}
+          </button>
+        )}
+      </div>
+
       {/* Test Grid */}
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {filteredTests.map((test, i) => (
             <TestCard key={test.id} test={test} index={i} lang={lang} />
@@ -133,6 +239,12 @@ export function ExploreSection({
         <div className="mt-16 flex flex-col items-center gap-2 text-[#2C2C2C]/40 dark:text-white/40">
           <span className="text-4xl">🔍</span>
           <p className="text-sm">{lang === "zh" ? "没有找到匹配的测试" : "No matching tests found"}</p>
+          <button
+            onClick={clearAllFilters}
+            className="text-xs underline hover:text-[#2C2C2C] dark:hover:text-white transition-colors"
+          >
+            {lang === "zh" ? "清除所有筛选" : "Clear all filters"}
+          </button>
         </div>
       )}
     </section>

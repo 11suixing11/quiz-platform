@@ -17,6 +17,8 @@ import { Celebration } from "@/components/celebration";
 interface QuizEngineProps {
   testType: string;
 }
+// Dimension color palette for the mini breakdown bars
+const DIM_PALETTE = ["#6B5B95","#00BFA5","#FF6B6B","#4ECDC4","#45B7D1","#96CEB4","#FFEAA7","#DDA0DD","#98D8C8","#F7DC6F","#BB8FCE","#85C1E9"];
 
 const UI: Record<string, Record<string, string>> = {
   zh: {

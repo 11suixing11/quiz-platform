@@ -14,6 +14,7 @@ import { loadTestData } from "@/lib/tests";
 import { TestCard } from "@/components/TestCard";
 import { cn } from "@/lib/utils";
 import type { Lang, TestData } from "@/lib/types";
+import { TestInsights } from "@/components/test-insights";
 
 function getBookmarks(): string[] {
   try { return JSON.parse(localStorage.getItem("quiz-platform-bookmarks") || "[]"); } catch { return []; }
@@ -122,6 +123,9 @@ export default function TestDetailClient({ testId }: { testId: string }) {
             </p>
           </motion.div>
         )}
+
+        {/* Test Insights */}
+        <TestInsights category={entry.category} lang={lang} />
 
         {/* Sample Questions */}
         {sampleQuestions.length > 0 && (

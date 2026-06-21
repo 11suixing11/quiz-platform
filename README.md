@@ -13,8 +13,8 @@
   <img src="https://img.shields.io/github/repo-size/11suixing11/quiz-platform?style=flat-square&color=6DD5FA" alt="Repo Size">
 </p>
 
-**一个温暖的内心探索平台，集成了 118 个心理测试与 MBTI 配对功能。**
-A warm inner exploration platform with 118 psychological tests and MBTI relationship matching.
+**一个温暖的内心探索平台，集成了 128 个心理测试与 MBTI 配对功能。**
+A warm inner exploration platform with 128 psychological tests and MBTI relationship matching.
 
 ✨ **在线体验 Demo → [11suixing11.github.io/quiz-platform](https://11suixing11.github.io/quiz-platform/)** ✨
 
@@ -31,15 +31,15 @@ A warm inner exploration platform with 118 psychological tests and MBTI relation
 
 Everyone is a planet waiting to be explored. This platform was born from a simple belief: **understanding yourself is the starting point of all growth.**
 
-我们精心打造了 **118 个心理测试**，覆盖 9 大维度，从性格到情绪，从关系到职业，帮助你用温和的方式，一点一点靠近真实的自己。
+我们精心打造了 **128 个心理测试**，覆盖 9 大维度，从性格到情绪，从关系到职业，帮助你用温和的方式，一点一点靠近真实的自己。
 
-We've carefully crafted **118 psychological tests** across 9 major dimensions — from personality to emotions, relationships to careers — helping you gently move closer to your true self, one step at a time.
+We've carefully crafted **128 psychological tests** across 9 major dimensions — from personality to emotions, relationships to careers — helping you gently move closer to your true self, one step at a time.
 
 ---
 
 ## ✨ 功能亮点 | Features
 
-### 🧭 9 大测试维度 · 9 Test Dimensions · 118 Tests
+### 🧭 9 大测试维度 · 9 Test Dimensions · 128 Tests
 
 | 维度 Dimension | 主题 Theme | 包含测试（部分） Tests Included |
 |:---:|:---|:---|
@@ -183,7 +183,7 @@ quiz-platform/
 │   │   └── recommendations/ # 🆕 智能推荐 Smart recommendations
 │   ├── i18n/             # 🆕 国际化 English & Chinese
 │   └── lib/              # 核心逻辑 Core logic
-│       ├── tests/        # 118 个心理测试定义
+│       ├── tests/        # 128 个心理测试定义
 │       ├── constants.ts  # 分类与配色常量
 │       ├── types.ts      # TypeScript 类型定义
 │       └── utils.ts      # 工具函数
