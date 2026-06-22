@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Compass, History, Heart, MoreHorizontal } from "lucide-react";
+import { Home, Compass, History, Heart, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -11,7 +11,7 @@ const navItems = [
   { href: "/explore/", icon: Compass, label: "探索", labelEn: "Explore" },
   { href: "/history/", icon: History, label: "记录", labelEn: "History" },
   { href: "/bookmarks/", icon: Heart, label: "收藏", labelEn: "Bookmarks" },
-  { href: "/more/", icon: MoreHorizontal, label: "更多", labelEn: "More" },
+  { href: "/dashboard/", icon: BarChart3, label: "仪表", labelEn: "Dashboard" },
 ];
 
 export default function BottomNav() {

@@ -1,6 +1,6 @@
 ﻿import type { TestData } from "../types";
 
-// Test data registry — all 153 tests
+// Test data registry — all 168 tests
 const registry: Record<string, () => Promise<{ default: any }>> = {
   "ab-personality": () => import("./ab-personality"),
   "animal-personality": () => import("./animal-personality"),
@@ -150,6 +150,31 @@ const registry: Record<string, () => Promise<{ default: any }>> = {
   "emotional-intelligence-advanced": () => import("./emotional-intelligence-advanced"),
   "work-style": () => import("./work-style"),
   "personality-archetype": () => import("./personality-archetype"),
+  "resilience-pattern": () => import("./resilience-pattern"),
+  "intimacy-style": () => import("./intimacy-style"),
+  "motivation-profile": () => import("./motivation-profile"),
+  "cognitive-style": () => import("./cognitive-style"),
+  "life-stage": () => import("./life-stage"),
+  "personality-flexibility": () => import("./personality-flexibility"),
+  "intelligence-preference": () => import("./intelligence-preference"),
+  "lifestyle-alignment": () => import("./lifestyle-alignment"),
+  "social-media-personality": () => import("./social-media-personality"),
+  "mental-load": () => import("./mental-load"),
+  "personality-shadows": () => import("./personality-shadows"),
+  "creativity-manifestation": () => import("./creativity-manifestation"),
+  "stress-resilience": () => import("./stress-resilience"),
+  "relationship-boundaries": () => import("./relationship-boundaries"),
+  "fun-personality": () => import("./fun-personality"),
+  "forgiveness-style": () => import("./forgiveness-style"),
+  "anger-management": () => import("./anger-management"),
+  "career-satisfaction": () => import("./career-satisfaction"),
+  "parenting-style": () => import("./parenting-style"),
+  "financial-personality": () => import("./financial-personality"),
+  "leadership-style": () => import("./leadership-style"),
+  "body-image": () => import("./body-image"),
+  "relationship-expectations": () => import("./relationship-expectations"),
+  "emotional-expression": () => import("./emotional-expression"),
+  "career-values": () => import("./career-values"),
 };
 
 export async function loadTestData(type: string): Promise<TestData | null> {

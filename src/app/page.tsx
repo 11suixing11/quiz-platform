@@ -266,6 +266,14 @@ export default function Home() {
             <span>·</span>
             <Link href="/changelog/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "更新日志" : lang === "ja" ? "更新履歴" : "Changelog"}</Link>
             <span>·</span>
+            <Link href="/dashboard/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "仪表板" : lang === "ja" ? "ダッシュボード" : "Dashboard"}</Link>
+            <span>·</span>
+            <Link href="/about/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "关于" : lang === "ja" ? "概要" : "About"}</Link>
+            <span>·</span>
+            <Link href="/faq/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "常见问题" : lang === "ja" ? "FAQ" : "FAQ"}</Link>
+            <span>·</span>
+            <Link href="/privacy/" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">{lang === "zh" ? "隐私政策" : lang === "ja" ? "プライバシー" : "Privacy"}</Link>
+            <span>·</span>
             <a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noopener noreferrer" className="hover:text-[#2C2C2C]/60 dark:hover:text-white/60 transition-colors">GitHub ⭐</a>
           </div>
           <p className="mt-6 text-[10px] text-[#2C2C2C]/20 dark:text-white/20">Made with 💛 by 11suixing11</p>
