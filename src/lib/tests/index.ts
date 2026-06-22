@@ -1,6 +1,6 @@
 ﻿import type { TestData } from "../types";
 
-// Test data registry — all 168 tests
+// Test data registry — all 183 tests
 const registry: Record<string, () => Promise<{ default: any }>> = {
   "ab-personality": () => import("./ab-personality"),
   "animal-personality": () => import("./animal-personality"),
@@ -175,6 +175,26 @@ const registry: Record<string, () => Promise<{ default: any }>> = {
   "relationship-expectations": () => import("./relationship-expectations"),
   "emotional-expression": () => import("./emotional-expression"),
   "career-values": () => import("./career-values"),
+  "career-adaptability": () => import("./career-adaptability"),
+  "emotion-regulation-advanced": () => import("./emotion-regulation-advanced"),
+  "fun-creativity": () => import("./fun-creativity"),
+  "intelligence-flexibility": () => import("./intelligence-flexibility"),
+  "lifestyle-vitality": () => import("./lifestyle-vitality"),
+  "mental-wellness": () => import("./mental-wellness"),
+  "personality-depth": () => import("./personality-depth"),
+  "personality-essence": () => import("./personality-essence"),
+  "relationship-dynamics": () => import("./relationship-dynamics"),
+  "social-authenticity": () => import("./social-authenticity"),
+  "attachment-healing-advanced": () => import("./attachment-healing-advanced"),
+  "emotional-vocabulary": () => import("./emotional-vocabulary"),
+  "career-identity": () => import("./career-identity"),
+  "personality-adaptation": () => import("./personality-adaptation"),
+  "intelligence-application": () => import("./intelligence-application"),
+  "lifestyle-harmony": () => import("./lifestyle-harmony"),
+  "social-competence": () => import("./social-competence"),
+  "mental-clarity": () => import("./mental-clarity"),
+  "fun-engagement": () => import("./fun-engagement"),
+  "personality-integration": () => import("./personality-integration"),
 };
 
 export async function loadTestData(type: string): Promise<TestData | null> {
