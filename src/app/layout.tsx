@@ -21,13 +21,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "认识你自己 — 内在探索平台",
   description:
-    "通过人格、情绪与关系叙事，重新理解你的内在模式。118 个心理测试，覆盖自我认知、情绪图谱、关系动力等 9 大维度。这里不是诊断，而是一面帮助你靠近自己的镜子。",
+    "通过人格、情绪与关系叙事，重新理解你的内在模式。100+ 个自我探索测试，覆盖自我认知、情绪图谱、关系动力等 9 大维度。这里不是诊断，而是一面帮助你靠近自己的镜子。",
   keywords: ["心理测试", "人格测试", "MBTI", "大五人格", "九型人格", "自我认知", "情绪管理", "关系"],
   authors: [{ name: "认识你自己" }],
   manifest: "/quiz-platform/manifest.json",
   openGraph: {
     title: "认识你自己 — 有些自己，要慢慢被看见",
-    description: "118 个心理测试 + MBTI 关系配对，重新理解你的内在模式。",
+    description: "100+ 个自我探索测试 + MBTI 关系配对，重新理解你的内在模式。",
     siteName: "认识你自己",
     locale: "zh_CN",
     type: "website",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "认识你自己 — 有些自己，要慢慢被看见",
-    description: "118 个心理测试 + MBTI 关系配对，重新理解你的内在模式。",
+    description: "100+ 个自我探索测试 + MBTI 关系配对，重新理解你的内在模式。",
     images: ["/quiz-platform/og-image.png"],
   },
   robots: {
@@ -58,7 +58,7 @@ const jsonLd = {
   alternateName: "Know Yourself",
   url: SITE_URL,
   description:
-    "通过人格、情绪与关系叙事，重新理解你的内在模式。118 个心理测试，覆盖自我认知、情绪图谱、关系动力等 9 大维度。",
+    "通过人格、情绪与关系叙事，重新理解你的内在模式。100+ 个自我探索测试，覆盖自我认知、情绪图谱、关系动力等 9 大维度。",
   inLanguage: "zh-CN",
   publisher: {
     "@type": "Organization",

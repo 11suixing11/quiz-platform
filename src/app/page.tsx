@@ -143,7 +143,7 @@ export default function Home() {
           <HowItWorksStep
             icon="🎯"
             title={lang === "zh" ? "选择测试" : lang === "ja" ? "テストを選ぶ" : "Choose a Test"}
-            desc={lang === "zh" ? "从 9 大维度 118 个测试中，选一个与你此刻相关的。" : lang === "ja" ? "9つの次元から118個のテストを選び、今あなたに響くものを。" : "Pick from 118 tests across 9 dimensions — whatever speaks to you right now."}
+            desc={lang === "zh" ? "从 9 大维度的自我探索题库中，选一个与你此刻相关的。" : lang === "ja" ? "9つの次元の自己探求ライブラリから、今あなたに響くものを。" : "Pick from a 9-dimension self-reflection library — whatever speaks to you right now."}
             index={0}
           />
           <HowItWorksStep

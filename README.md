@@ -13,8 +13,8 @@
   <img src="https://img.shields.io/github/repo-size/11suixing11/quiz-platform?style=flat-square&color=6DD5FA" alt="Repo Size">
 </p>
 
-**一个温暖的内心探索平台，集成了 128 个心理测试与 MBTI 配对功能。**
-A warm inner exploration platform with 128 psychological tests and MBTI relationship matching.
+**一个温暖的内心探索平台，集成了 100+ 个自我探索测试与 MBTI 配对功能。**
+A warm inner exploration platform with 100+ self-reflection quizzes and MBTI relationship matching.
 
 ✨ **在线体验 Demo → [11suixing11.github.io/quiz-platform](https://11suixing11.github.io/quiz-platform/)** ✨
 
@@ -31,15 +31,19 @@ A warm inner exploration platform with 128 psychological tests and MBTI relation
 
 Everyone is a planet waiting to be explored. This platform was born from a simple belief: **understanding yourself is the starting point of all growth.**
 
-我们精心打造了 **128 个心理测试**，覆盖 9 大维度，从性格到情绪，从关系到职业，帮助你用温和的方式，一点一点靠近真实的自己。
+我们维护了一个持续增长的自我探索题库，覆盖 9 大维度，从性格到情绪，从关系到职业，帮助你用温和的方式，一点一点靠近真实的自己。
 
-We've carefully crafted **128 psychological tests** across 9 major dimensions — from personality to emotions, relationships to careers — helping you gently move closer to your true self, one step at a time.
+We maintain a growing self-reflection quiz library across 9 major dimensions — from personality to emotions, relationships to careers — helping you gently move closer to your true self, one step at a time.
+
+> 本项目是自我探索工具，不是临床诊断、心理治疗或医疗建议。遇到持续痛苦、危机或功能受损时，请寻求专业支持。
+>
+> This project is for self-reflection only. It is not clinical diagnosis, therapy, or medical advice.
 
 ---
 
 ## ✨ 功能亮点 | Features
 
-### 🧭 9 大测试维度 · 9 Test Dimensions · 128 Tests
+### 🧭 9 大测试维度 · 9 Test Dimensions
 
 | 维度 Dimension | 主题 Theme | 包含测试（部分） Tests Included |
 |:---:|:---|:---|
@@ -183,7 +187,7 @@ quiz-platform/
 │   │   └── recommendations/ # 🆕 智能推荐 Smart recommendations
 │   ├── i18n/             # 🆕 国际化 English & Chinese
 │   └── lib/              # 核心逻辑 Core logic
-│       ├── tests/        # 128 个心理测试定义
+│       ├── tests/        # 自我探索测试定义
 │       ├── constants.ts  # 分类与配色常量
 │       ├── types.ts      # TypeScript 类型定义
 │       └── utils.ts      # 工具函数

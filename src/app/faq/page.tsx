@@ -26,7 +26,7 @@ const faqs: FaqItem[] = [
   {
     category: "general",
     q: { zh: "这个平台是什么？", en: "What is this platform?", ja: "このプラットフォームは何ですか？" },
-    a: { zh: "Quiz Platform 是一个免费的心理自我探索平台，提供 150+ 种心理学测试，涵盖人格、情绪、关系、职业等多个维度。我们不是诊断工具，而是一面帮助你了解自己的镜子。", en: "Quiz Platform is a free psychological self-exploration platform offering 150+ tests across personality, emotion, relationships, career, and more. We're not a diagnostic tool — we're a mirror to help you understand yourself.", ja: "Quiz Platform は、人格、感情、人間関係、キャリアなど150以上のテストを提供する無料の心理自己探求プラットフォームです。診断ツールではなく、自分を理解するための鏡です。" },
+    a: { zh: "Quiz Platform 是一个免费的心理自我探索平台，提供 100+ 个自我探索测试，涵盖人格、情绪、关系、职业等多个维度。我们不是诊断工具，而是一面帮助你了解自己的镜子。", en: "Quiz Platform is a free self-reflection platform offering 100+ quizzes across personality, emotion, relationships, career, and more. We're not a diagnostic tool — we're a mirror to help you understand yourself.", ja: "Quiz Platform は、人格、感情、人間関係、キャリアなど100以上の自己探求テストを提供する無料プラットフォームです。診断ツールではなく、自分を理解するための鏡です。" },
   },
   {
     category: "general",
@@ -61,7 +61,7 @@ const faqs: FaqItem[] = [
   {
     category: "tests",
     q: { zh: "有多少个测试？", en: "How many tests are there?", ja: "テストはいくつありますか？" },
-    a: { zh: "目前有 150+ 个测试，分布在 9 个维度：人格、情绪、心理、关系、职业、认知、生活、社交和趣味探索。我们还在持续添加新测试。", en: "There are currently 150+ tests across 9 dimensions: personality, emotion, mental health, relationships, career, cognition, lifestyle, social, and playful discovery. We're continuously adding new tests.", ja: "現在150以上のテストがあり、人格、感情、メンタルヘルス、人間関係、キャリア、認知、ライフスタイル、ソーシャル、遊び心の9つの次元にわたっています。新しいテストを継続的に追加中です。" },
+    a: { zh: "目前有 100+ 个测试，分布在 9 个维度：人格、情绪、心理、关系、职业、认知、生活、社交和趣味探索。我们还在持续添加新测试。", en: "There are currently 100+ quizzes across 9 dimensions: personality, emotion, mental health, relationships, career, cognition, lifestyle, social, and playful discovery. We're continuously adding new tests.", ja: "現在100以上のテストがあり、人格、感情、メンタルヘルス、人間関係、キャリア、認知、ライフスタイル、ソーシャル、遊び心の9つの次元にわたっています。新しいテストを継続的に追加中です。" },
   },
   {
     category: "tests",
