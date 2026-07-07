@@ -1,12 +1,12 @@
 ---
-title: I Built a Self-Discovery Platform with 118 Psychological Tests — Here's What I Learned
+title: I Built a Self-Discovery Platform with 100+ Quizzes — Here's What I Learned
 published: true
-description: From MBTI to Dark Triad, from love languages to burnout — how I built a local-first, privacy-respecting psychological testing platform with Next.js 16, and what 118 tests taught me about architecture, content, and shipping.
+description: From MBTI-style reflection to habits and relationships — how I built a local-first, privacy-respecting self-discovery platform with Next.js 16, and what 100+ quizzes taught me about architecture, content, and shipping.
 tags: nextjs, typescript, webdev, opensource
 canonical_url: https://github.com/11suixing11/quiz-platform
 ---
 
-# I Built a Self-Discovery Platform with 118 Psychological Tests — Here's What I Learned
+# I Built a Self-Discovery Platform with 100+ Quizzes — Here's What I Learned
 
 ![Cover](https://11suixing11.github.io/quiz-platform/og-image.png)
 
@@ -18,7 +18,7 @@ I wanted something better. Something that felt like a quiet conversation with yo
 
 So I built it.
 
-**[Know Yourself (认识你自己)](https://11suixing11.github.io/quiz-platform)** — a self-discovery platform with 118 psychological tests, zero ads, zero tracking, and everything stored locally on your device.
+**[Know Yourself (认识你自己)](https://11suixing11.github.io/quiz-platform)** — a self-discovery platform with 100+ quizzes, zero ads, zero tracking, and everything stored locally on your device. It is built for reflection, not clinical diagnosis.
 
 🔗 **Live**: https://11suixing11.github.io/quiz-platform  
 ⭐ **GitHub**: https://github.com/11suixing11/quiz-platform
@@ -82,9 +82,9 @@ export default nextConfig;
 
 Three lines of config. That's it. Next.js handles the rest — static generation of every test page, every result page, and the sitemap.
 
-### 118 Test Modules with Lazy Loading
+### 100+ Quiz Modules with Lazy Loading
 
-This is where it gets interesting. 118 tests means 118 separate modules, each containing questions, scoring logic, and bilingual narrative results. If you loaded all of them upfront, the initial bundle would be massive.
+This is where it gets interesting. 100+ quizzes means 100+ separate modules, each containing questions, scoring logic, and bilingual narrative results. If you loaded all of them upfront, the initial bundle would be massive.
 
 The solution: **a dynamic import registry**.
 
@@ -194,7 +194,7 @@ It also means:
 - **Global CDN**: GitHub's infrastructure handles distribution
 - **No backend to maintain**: One less thing to break at 3 AM
 
-### How 118 Tests Stay Performant: Code Splitting
+### How 100+ Quizzes Stay Performant: Code Splitting
 
 The test registry uses dynamic `import()` — each test is a separate webpack chunk. Here's the performance profile:
 
@@ -302,7 +302,7 @@ Power users can navigate entirely by keyboard: press `1-5` to select an answer, 
 
 ### Content Is King
 
-118 tests × ~16 questions average = **~1,888 unique questions**, each with bilingual text and scored options. Plus narrative results for every possible outcome. The code is maybe 20% of the project; the content is 80%.
+100+ quizzes x ~16 questions average = **a lot of structured content**, each with bilingual text and scored options. Plus narrative results for every possible outcome. The code is maybe 20% of the project; the content is 80%.
 
 Writing good psychological test content is hard. Each question needs to:
 - Be clear and unambiguous in two languages
@@ -340,7 +340,7 @@ Direction-aware animations that feel natural. The `custom` prop on `AnimatePrese
 
 | Metric | Value |
 |--------|-------|
-| Total tests | 118 |
+| Total quizzes | 100+ |
 | Test dimensions | 9 |
 | Inner worlds | 4 |
 | Languages | 2 (中文 / English) |

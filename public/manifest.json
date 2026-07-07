@@ -1,13 +1,13 @@
 {
-  "name": "认识你自己",
-  "short_name": "认识你自己",
-  "description": "通过人格、情绪与关系叙事，重新理解你的内在模式。113 个心理测试。",
+  "name": "Quiz Platform",
+  "short_name": "Quiz",
+  "description": "A self-reflection quiz platform with 100+ quizzes across personality, emotion, relationships, career, and habits. Not a clinical tool.",
   "start_url": "/quiz-platform/",
   "scope": "/quiz-platform/",
   "display": "standalone",
   "background_color": "#FAFAF8",
   "theme_color": "#FAFAF8",
-  "lang": "zh-CN",
+  "lang": "en",
   "icons": [
     {
       "src": "/quiz-platform/icons/icon-192.svg",

@@ -1,26 +1,20 @@
-## 改动说明
+## Summary
 
-简要描述本次 PR 的内容和目的。
+Describe what changed and why.
 
-## 改动类型
+## Product Boundary
 
-- [ ] 新功能
-- [ ] Bug 修复
-- [ ] UI / 样式改进
-- [ ] 新测试 / 测试改进
-- [ ] 文档更新
-- [ ] 其他
+- [ ] This change keeps the app positioned as self-reflection, not clinical diagnosis, therapy, or medical advice.
+- [ ] Quiz/result copy avoids overconfident claims.
+- [ ] If counts changed, metadata, README, and public copy were checked.
 
-## 测试
+## Verification
 
-描述你如何验证这些改动：
+- [ ] `npm run build`
+- [ ] Desktop viewport checked
+- [ ] Mobile viewport checked
+- [ ] Accessibility or keyboard behavior checked, if relevant
 
-- [ ] 本地 `npm run build` 通过
-- [ ] 在桌面端浏览器验证
-- [ ] 在移动端浏览器验证（如适用）
-
-## 截图（如适用）
-
-## 关联 Issue
+## Related Issues
 
 Closes #

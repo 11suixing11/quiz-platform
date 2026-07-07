@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <style>
@@ -9,68 +9,69 @@
     width: 1200px;
     height: 630px;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(135deg, #FAFAF8 0%, #F0E8DC 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #FAFAF8 0%, #F1ECE3 100%);
+    color: #2D2A26;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
   }
 
-  /* Subtle radial glow behind the moon */
   body::before {
     content: "";
     position: absolute;
-    left: 80px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200,180,150,0.18) 0%, transparent 70%);
+    inset: 56px;
+    border: 1px solid rgba(45, 42, 38, 0.1);
   }
 
-  .container {
-    display: flex;
+  .panel {
+    width: 980px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 64px;
     align-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 60px 80px;
-    position: relative;
   }
 
-  /* Left: Moon */
-  .moon {
-    font-size: 140px;
-    line-height: 1;
-    flex-shrink: 0;
-    filter: drop-shadow(0 4px 24px rgba(180,160,120,0.25));
-    margin-right: 50px;
-  }
-
-  /* Center content */
-  .center {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 20px;
+  .kicker {
+    font-size: 22px;
+    font-weight: 700;
+    color: #8A8078;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
   }
 
   .title {
-    font-size: 64px;
+    font-size: 72px;
     font-weight: 800;
-    color: #2D2A26;
-    letter-spacing: 0.04em;
-    line-height: 1.2;
+    line-height: 1.04;
+    letter-spacing: 0;
+    margin-bottom: 28px;
   }
 
   .subtitle {
-    font-size: 26px;
-    font-weight: 500;
-    color: #8A8078;
-    letter-spacing: 0.06em;
+    font-size: 28px;
+    line-height: 1.45;
+    color: #665F58;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .tile {
+    height: 118px;
+    border: 1px solid rgba(45, 42, 38, 0.12);
+    background: rgba(255, 255, 255, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #73695F;
   }
 
   .brand {
@@ -78,47 +79,27 @@
     bottom: 40px;
     left: 80px;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     color: #B8AFA5;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
-
-  /* Right: emoji grid */
-  .emojis {
-    position: absolute;
-    right: 60px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    opacity: 0.35;
-  }
-
-  .emojis span {
-    font-size: 44px;
-    line-height: 1;
-    text-align: center;
-  }
 </style>
 </head>
 <body>
-  <div class="container">
-    <div class="moon">🌙</div>
-
-    <div class="center">
-      <div class="title">认识你自己</div>
-      <div class="subtitle">118 心理测试 · 9 维度 · 4 内在世界</div>
-    </div>
-
-    <div class="brand">quiz-platform</div>
-
-    <div class="emojis">
-      <span>🧬</span><span>💕</span><span>🧘</span>
-      <span>🤝</span><span>💼</span><span>🧪</span>
-      <span>🌿</span><span>🎭</span><span>🎪</span>
-    </div>
+  <div class="panel">
+    <main>
+      <div class="kicker">Self-reflection quizzes</div>
+      <div class="title">Know Yourself</div>
+      <div class="subtitle">100+ quizzes across personality, emotions, relationships, career, and habits. Not a clinical tool.</div>
+    </main>
+    <aside class="grid">
+      <div class="tile">Personality</div>
+      <div class="tile">Emotion</div>
+      <div class="tile">Career</div>
+      <div class="tile">Habits</div>
+    </aside>
   </div>
+  <div class="brand">quiz-platform</div>
 </body>
 </html>

@@ -1,6 +1,6 @@
-# 我用 Next.js 做了一个有 118 个心理测试的自我探索平台
+# 我用 Next.js 做了一个有 100+ 个自我探索测试的平台
 
-> **关键词**：Next.js 16、静态导出、心理测试、localStorage、双语架构、代码分割
+> **关键词**：Next.js 16、静态导出、自我探索测试、localStorage、双语架构、代码分割
 
 ## 前言
 
@@ -10,7 +10,7 @@
 
 我决定自己做一个。
 
-**「认识你自己」** —— 一个有 118 个心理测试的自我探索平台，零广告、零追踪、零后端，所有数据都存在你自己的浏览器里。
+**「认识你自己」** —— 一个有 100+ 个自我探索测试的平台，零广告、零追踪、零后端，所有数据都存在你自己的浏览器里。它用于自我反思，不是临床诊断工具。
 
 🔗 **在线体验**：https://11suixing11.github.io/quiz-platform  
 ⭐ **GitHub**：https://github.com/11suixing11/quiz-platform
@@ -62,9 +62,9 @@ export default nextConfig;
 - **全球 CDN**：GitHub 自带分发
 - **零维护**：没有后端就不会挂
 
-### 118 个测试的加载策略：动态 import 注册表
+### 100+ 个测试的加载策略：动态 import 注册表
 
-118 个测试，每个测试都有题目、评分逻辑、双语叙述结果。如果全部打包到一个 JS 文件里，首屏体积会很恐怖。
+100+ 个测试，每个测试都有题目、评分逻辑、双语叙述结果。如果全部打包到一个 JS 文件里，首屏体积会很恐怖。
 
 解决方案：**动态 import 注册表**。
 
@@ -76,7 +76,7 @@ const registry: Record<string, () => Promise<{ default: any }>> = {
   "anxiety": () => import("./anxiety"),
   "attachment-style": () => import("./attachment-style"),
   "big-five": () => import("./big-five"),
-  // ... 共 118 个条目
+  // ... 共 100+ 个条目
   "zodiac-match": () => import("./zodiac-match"),
 };
 
@@ -299,7 +299,7 @@ const questionVariants = {
 
 ## 四个内在世界的组织方式
 
-118 个测试不是乱序排列的，而是按 **9 个维度** 组织，再归入 **4 个内在世界**：
+100+ 个测试不是乱序排列的，而是按 **9 个维度** 组织，再归入 **4 个内在世界**：
 
 ```ts
 // src/lib/constants.ts
@@ -419,7 +419,7 @@ export function RadarChart({ dimensions, accentColor = "#6B5B95", size = 280 }: 
 
 ### 1. 内容才是王道
 
-118 个测试 × 平均 16 道题 ≈ **1,888 道独立题目**，每道题都有中英文文本和评分选项。再加上每种结果类型的叙述文字……
+100+ 个测试 × 平均 16 道题，意味着大量独立题目、双语文本和评分选项。再加上每种结果类型的叙述文字……
 
 代码可能只占项目的 20%，内容占 80%。
 
@@ -465,7 +465,7 @@ export default async function ResultPage({ params }: { params: Promise<{ type: s
 
 | 指标 | 数值 |
 |------|------|
-| 测试总数 | 118 |
+| 测试总数 | 100+ |
 | 测试维度 | 9 |
 | 内在世界 | 4 |
 | 支持语言 | 2（中文 / English） |

@@ -1,105 +1,68 @@
-name: Bug Report
-description: 提交一个 Bug 报告，帮助我们改进平台
+name: Bug report
+description: Report a reproducible problem in the quiz app.
 title: "[Bug] "
-labels: ["bug"]
+labels: ["bug", "triage"]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        感谢你花时间提交 Bug 报告 🌙
-        请尽量填写以下信息，帮助我们更快定位问题。
-
   - type: input
     id: url
     attributes:
-      label: 问题页面
-      description: 出现问题的页面 URL
-      placeholder: https://11suixing11.github.io/quiz-platform/quiz/...
+      label: Page URL
+      placeholder: https://11suixing11.github.io/quiz-platform/...
     validations:
       required: false
-
-  - type: dropdown
-    id: browser
-    attributes:
-      label: 浏览器
-      options:
-        - Chrome
-        - Firefox
-        - Safari
-        - Edge
-        - 其他
-    validations:
-      required: true
-
-  - type: input
-    id: browser-version
-    attributes:
-      label: 浏览器版本
-      placeholder: "例如: 126.0"
-    validations:
-      required: false
-
-  - type: dropdown
-    id: device
-    attributes:
-      label: 设备类型
-      options:
-        - 桌面端
-        - 手机端
-        - 平板
-    validations:
-      required: true
-
   - type: textarea
     id: description
     attributes:
-      label: Bug 描述
-      description: 清晰描述你遇到的问题
-      placeholder: 当我……的时候，发生了……
+      label: What happened?
+      description: Describe the issue clearly.
     validations:
       required: true
-
   - type: textarea
     id: steps
     attributes:
-      label: 复现步骤
-      description: 列出可以复现这个问题的操作步骤
+      label: Steps to reproduce
       placeholder: |
-        1. 打开……页面
-        2. 点击……
-        3. 滚动到……
-        4. 看到错误
+        1. Open ...
+        2. Click ...
+        3. See ...
     validations:
       required: true
-
   - type: textarea
     id: expected
     attributes:
-      label: 期望行为
-      description: 你期望会发生什么？
+      label: Expected behavior
     validations:
       required: true
-
-  - type: textarea
-    id: actual
+  - type: dropdown
+    id: device
     attributes:
-      label: 实际行为
-      description: 实际发生了什么？
+      label: Device
+      options:
+        - Desktop
+        - Mobile
+        - Tablet
     validations:
       required: true
-
-  - type: textarea
-    id: screenshots
+  - type: input
+    id: browser
     attributes:
-      label: 截图或录屏
-      description: 如果可以，请附上截图或录屏帮助说明问题
+      label: Browser and version
+      placeholder: Chrome 126, Safari 18, Firefox 128
+    validations:
+      required: true
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshot or recording
+      description: Attach one if it helps explain the issue.
     validations:
       required: false
-
-  - type: textarea
-    id: additional
+  - type: checkboxes
+    id: checklist
     attributes:
-      label: 补充信息
-      description: 任何你认为有助于理解这个问题的额外信息
-    validations:
-      required: false
+      label: Checklist
+      options:
+        - label: I searched existing issues first.
+          required: true
+        - label: This report does not include private mental-health or personal crisis details.
+          required: true
