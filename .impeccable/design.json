@@ -1,0 +1,409 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-19T18:34:00.000+08:00",
+  "title": "Design System: ????? | Know Yourself",
+  "extensions": {
+    "colorMeta": {
+      "field-paper": {
+        "role": "neutral",
+        "displayName": "Field Paper",
+        "canonical": "#f4f0e7",
+        "tonalRamp": [
+          "#5d5b58",
+          "#8e8b86",
+          "#bebbb4",
+          "#f4f0e7",
+          "#f6f3ec",
+          "#f9f6f1",
+          "#fbfaf6",
+          "#fdfcfb"
+        ]
+      },
+      "atlas-ink": {
+        "role": "neutral",
+        "displayName": "Atlas Ink",
+        "canonical": "#17221f",
+        "tonalRamp": [
+          "#090d0c",
+          "#0d1412",
+          "#121b18",
+          "#17221f",
+          "#4a5350",
+          "#787f7d",
+          "#abafae",
+          "#d5d7d7"
+        ]
+      },
+      "night-paper": {
+        "role": "neutral",
+        "displayName": "Night Paper",
+        "canonical": "#111715",
+        "tonalRamp": [
+          "#060908",
+          "#0a0d0c",
+          "#0d1210",
+          "#111715",
+          "#454a48",
+          "#757877",
+          "#a9abab",
+          "#d4d5d5"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#f0eee7",
+        "tonalRamp": [
+          "#5b5a58",
+          "#8b8a86",
+          "#bbbab4",
+          "#f0eee7",
+          "#f3f2ec",
+          "#f6f5f1",
+          "#faf9f6",
+          "#fcfcfb"
+        ]
+      },
+      "atlas-teal": {
+        "role": "primary",
+        "displayName": "Atlas Teal",
+        "canonical": "#2f6b5f",
+        "tonalRamp": [
+          "#122924",
+          "#1b3e37",
+          "#25534a",
+          "#2f6b5f",
+          "#5d8c82",
+          "#86a9a2",
+          "#b4cac5",
+          "#dae4e2"
+        ]
+      },
+      "night-teal": {
+        "role": "primary",
+        "displayName": "Night Teal",
+        "canonical": "#7db5a3",
+        "tonalRamp": [
+          "#30453e",
+          "#49695f",
+          "#628d7f",
+          "#7db5a3",
+          "#9ac5b7",
+          "#b4d4ca",
+          "#d0e4de",
+          "#e8f2ee"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#68736f",
+        "tonalRamp": [
+          "#282c2a",
+          "#3c4340",
+          "#515a57",
+          "#68736f",
+          "#89928f",
+          "#a7aeab",
+          "#c9cdcb",
+          "#e4e6e5"
+        ]
+      },
+      "muted-night": {
+        "role": "neutral",
+        "displayName": "Muted Night",
+        "canonical": "#aab4ae",
+        "tonalRamp": [
+          "#414442",
+          "#636865",
+          "#858c88",
+          "#aab4ae",
+          "#bdc4c0",
+          "#ced4d0",
+          "#e0e4e2",
+          "#f0f2f0"
+        ]
+      },
+      "route-rose": {
+        "role": "secondary",
+        "displayName": "Route Rose",
+        "canonical": "#b65c5c",
+        "tonalRamp": [
+          "#452323",
+          "#6a3535",
+          "#8e4848",
+          "#b65c5c",
+          "#c68080",
+          "#d5a0a0",
+          "#e5c4c4",
+          "#f2e2e2"
+        ]
+      },
+      "route-ochre": {
+        "role": "secondary",
+        "displayName": "Route Ochre",
+        "canonical": "#b47b32",
+        "tonalRamp": [
+          "#442f13",
+          "#68471d",
+          "#8c6027",
+          "#b47b32",
+          "#c4985f",
+          "#d4b288",
+          "#e4cfb5",
+          "#f2e7da"
+        ]
+      },
+      "route-blue": {
+        "role": "tertiary",
+        "displayName": "Route Blue",
+        "canonical": "#4e6c8c",
+        "tonalRamp": [
+          "#1e2935",
+          "#2d3f51",
+          "#3d546d",
+          "#4e6c8c",
+          "#758ca5",
+          "#98aabc",
+          "#bfcad6",
+          "#dfe5ea"
+        ]
+      },
+      "danger": {
+        "role": "error",
+        "displayName": "Danger Red",
+        "canonical": "#a53f3f",
+        "tonalRamp": [
+          "#3f1818",
+          "#602525",
+          "#813131",
+          "#a53f3f",
+          "#b96969",
+          "#cb9090",
+          "#dfbaba",
+          "#efdcdc"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Destination, page, and result headings."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Question prompts and major section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Cards, settings groups, and panel headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions, guidance, and result interpretation."
+      },
+      "coordinate": {
+        "displayName": "Coordinate",
+        "purpose": "Counts, indices, scores, and progress markers only."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Compact action, filter, and navigation labels."
+      },
+      "display-mobile": {
+        "displayName": "Display Mobile",
+        "purpose": "Fixed small-screen endpoint for atlas page titles."
+      },
+      "intro": {
+        "displayName": "Intro",
+        "purpose": "Short lead paragraphs and result interpretation."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Secondary actions, metadata, and helper copy."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Mobile navigation and the smallest supporting labels."
+      },
+      "score": {
+        "displayName": "Score",
+        "purpose": "Singular numeric readouts on score-based results."
+      },
+      "quote-mark": {
+        "displayName": "Quote Mark",
+        "purpose": "Decorative opening mark on narrative quotations."
+      }
+    },
+    "shadows": [
+      {
+        "name": "map-plate",
+        "value": "0 22px 60px rgba(23, 34, 31, 0.08)",
+        "purpose": "Lift the singular hero map object."
+      },
+      {
+        "name": "interactive-lift",
+        "value": "0 18px 38px rgba(23, 34, 31, 0.08)",
+        "purpose": "A catalog card responding to hover."
+      },
+      {
+        "name": "primary-action",
+        "value": "0 10px 24px color-mix(in srgb, var(--accent) 20%, transparent)",
+        "purpose": "Give the dominant action restrained presence."
+      },
+      {
+        "name": "feedback",
+        "value": "0 14px 32px rgba(23, 34, 31, 0.18)",
+        "purpose": "Separate transient import/export feedback from the page."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state",
+        "value": "200ms ease",
+        "purpose": "Hover, color, border, and control-state transitions."
+      },
+      {
+        "name": "card",
+        "value": "250ms ease",
+        "purpose": "Catalog-card lift and directional hover."
+      },
+      {
+        "name": "progress",
+        "value": "300ms ease",
+        "purpose": "Scale the quiz and result progress route from its left origin."
+      },
+      {
+        "name": "contour-drift",
+        "value": "16s ease-in-out infinite alternate",
+        "purpose": "Slow ambient movement for hero contour geometry only."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "primary-action",
+      "description": "The single dominant action in a task group.",
+      "html": "<button class=\"ds-primary-action\">Start exploring</button>",
+      "css": ".ds-primary-action { display:inline-flex; min-height:2.75rem; align-items:center; justify-content:center; gap:.55rem; border:0; border-radius:var(--radius-control, .75rem); padding:.7rem 1rem; background:var(--accent, #2f6b5f); color:var(--paper, #f4f0e7); font:750 .78rem/1.4 \"Segoe UI\", sans-serif; box-shadow:0 10px 24px color-mix(in srgb, var(--accent, #2f6b5f) 20%, transparent); transition:transform .2s ease, background .2s ease; } .ds-primary-action:hover { transform:translateY(-2px); background:color-mix(in srgb, var(--accent, #2f6b5f) 86%, black); } .ds-primary-action:focus-visible { outline:2px solid var(--accent, #2f6b5f); outline-offset:3px; } .ds-primary-action:active { transform:translateY(0); }"
+    },
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "secondary-action",
+      "description": "A visible but subordinate alternative to the primary route.",
+      "html": "<button class=\"ds-secondary-action\">View history</button>",
+      "css": ".ds-secondary-action { display:inline-flex; min-height:2.75rem; align-items:center; justify-content:center; gap:.55rem; border:1px solid color-mix(in srgb, var(--ink, #17221f) 18%, transparent); border-radius:var(--radius-control, .75rem); padding:.7rem 1rem; background:transparent; color:color-mix(in srgb, var(--ink, #17221f) 78%, transparent); font:750 .78rem/1.4 \"Segoe UI\", sans-serif; transition:transform .2s ease, border-color .2s ease, color .2s ease; } .ds-secondary-action:hover { transform:translateY(-2px); border-color:var(--accent, #2f6b5f); color:var(--accent, #2f6b5f); } .ds-secondary-action:focus-visible { outline:2px solid var(--accent, #2f6b5f); outline-offset:3px; } .ds-secondary-action:active { transform:translateY(0); }"
+    },
+    {
+      "name": "Atlas Search",
+      "kind": "input",
+      "description": "A transparent catalog search field anchored by a single ink rule.",
+      "html": "<label class=\"ds-search\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-3.8-3.8\"></path></svg><input placeholder=\"Search the map\" /></label>",
+      "css": ".ds-search { display:flex; min-height:3rem; align-items:center; gap:.65rem; border-bottom:1px solid color-mix(in srgb, var(--ink, #17221f) 22%, transparent); padding:.25rem 0; color:color-mix(in srgb, var(--ink, #17221f) 55%, transparent); } .ds-search svg { width:1rem; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; } .ds-search input { min-width:0; flex:1; border:0; outline:0; background:transparent; color:var(--ink, #17221f); font:.88rem/1.5 \"Segoe UI\", sans-serif; } .ds-search input::placeholder { color:color-mix(in srgb, var(--ink, #17221f) 36%, transparent); } .ds-search:focus-within { border-color:var(--accent, #2f6b5f); color:var(--accent, #2f6b5f); }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "A compact catalog filter; the selected state behaves like a route marker.",
+      "html": "<button class=\"ds-filter ds-filter-active\">Personality</button>",
+      "css": ".ds-filter { border:1px solid color-mix(in srgb, var(--ink, #17221f) 14%, transparent); border-radius:999px; padding:.45rem .75rem; background:transparent; color:color-mix(in srgb, var(--ink, #17221f) 62%, transparent); font:700 .72rem/1.4 \"Segoe UI\", sans-serif; transition:border-color .2s ease, color .2s ease, background .2s ease; } .ds-filter:hover, .ds-filter-active { border-color:var(--accent, #2f6b5f); color:var(--accent, #2f6b5f); background:color-mix(in srgb, var(--accent, #2f6b5f) 9%, transparent); } .ds-filter:focus-visible { outline:2px solid var(--accent, #2f6b5f); outline-offset:3px; }"
+    },
+    {
+      "name": "Test Card",
+      "kind": "card",
+      "refersTo": "test-card",
+      "description": "A catalog destination with route metadata and lift only on interaction.",
+      "html": "<article class=\"ds-test-card\"><span class=\"ds-index\">07</span><h3>Big Five Personality Test</h3><p>Explore five broad dimensions that shape how you tend to think and act.</p><small>50 questions ? 10?18 min</small></article>",
+      "css": ".ds-test-card { min-height:15rem; border:1px solid color-mix(in srgb, var(--ink, #17221f) 13%, transparent); border-radius:var(--radius-card, 1rem); padding:1.5rem; background:color-mix(in srgb, var(--paper, #f4f0e7) 93%, white 7%); color:var(--ink, #17221f); font-family:\"Segoe UI\", sans-serif; transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease; } .ds-test-card:hover { transform:translateY(-4px); border-color:color-mix(in srgb, var(--accent, #2f6b5f) 50%, transparent); box-shadow:0 18px 38px rgba(23,34,31,.08); } .ds-test-card:focus-within { outline:2px solid var(--accent, #2f6b5f); outline-offset:3px; } .ds-test-card h3 { margin:2.25rem 0 .65rem; font-size:1.125rem; letter-spacing:-.025em; } .ds-test-card p { margin:0; color:color-mix(in srgb, var(--ink, #17221f) 58%, transparent); font-size:.875rem; line-height:1.7; } .ds-test-card small { display:block; margin-top:2rem; padding-top:1rem; border-top:1px solid color-mix(in srgb, var(--ink, #17221f) 10%, transparent); color:color-mix(in srgb, var(--ink, #17221f) 45%, transparent); } .ds-index { float:right; color:color-mix(in srgb, var(--ink, #17221f) 42%, transparent); font:.67rem/1.4 \"Cascadia Code\", monospace; letter-spacing:.1em; }"
+    },
+    {
+      "name": "Mobile Navigation Item",
+      "kind": "nav",
+      "description": "One of four persistent destinations in the compact bottom navigation.",
+      "html": "<a class=\"ds-nav-item ds-nav-active\" href=\"#\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m15 9-2 5-5 2 2-5 5-2Z\"></path></svg><span>Explore</span></a>",
+      "css": ".ds-nav-item { display:flex; min-height:3rem; flex-direction:column; align-items:center; justify-content:center; gap:.25rem; border-radius:.75rem; color:color-mix(in srgb, var(--ink, #17221f) 50%, transparent); text-decoration:none; font:600 .625rem/1.2 \"Segoe UI\", sans-serif; transition:background .2s ease, color .2s ease; } .ds-nav-item svg { width:1rem; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; } .ds-nav-item:hover { background:color-mix(in srgb, var(--ink, #17221f) 5%, transparent); } .ds-nav-active { background:var(--ink, #17221f); color:var(--paper, #f4f0e7); } .ds-nav-item:focus-visible { outline:2px solid var(--accent, #2f6b5f); outline-offset:3px; }"
+    },
+    {
+      "name": "Answer Option",
+      "kind": "custom",
+      "refersTo": "answer-option",
+      "description": "A full-width quiz choice with a coordinate key and restrained selected state.",
+      "html": "<button class=\"ds-answer ds-answer-selected\"><span class=\"ds-answer-key\">A</span><span>Usually true for me</span><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><path d=\"m5 12 4 4L19 6\"></path></svg></button>",
+      "css": ".ds-answer { display:flex; width:100%; min-height:4.2rem; align-items:center; gap:.8rem; border:1px solid color-mix(in srgb, var(--ink, #17221f) 14%, transparent); border-radius:.9rem; padding:.85rem 1rem; background:transparent; color:color-mix(in srgb, var(--ink, #17221f) 84%, transparent); text-align:left; font:.875rem/1.5 \"Segoe UI\", sans-serif; transition:border-color .2s ease, background .2s ease, transform .2s ease; } .ds-answer:hover { transform:translateX(3px); border-color:color-mix(in srgb, var(--accent, #2f6b5f) 55%, transparent); } .ds-answer:focus-visible { outline:2px solid var(--accent, #2f6b5f); outline-offset:3px; } .ds-answer-selected { border-color:var(--accent, #2f6b5f); background:color-mix(in srgb, var(--accent, #2f6b5f) 10%, transparent); color:var(--ink, #17221f); } .ds-answer-key { display:inline-flex; width:1.8rem; height:1.8rem; flex:none; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:999px; font:.68rem/1 \"Cascadia Code\", monospace; opacity:.65; } .ds-answer > span:nth-child(2) { flex:1; } .ds-answer svg { width:1rem; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Cartographer's Field Atlas",
+    "overview": "The interface treats self-reflection as quiet fieldwork. Paper, ink, contour lines, coordinates, route markers, and measured labels create the feeling of opening a personal atlas rather than entering a game, clinic, or productivity dashboard. The visual system is calm and tactile, with just enough cartographic structure to make a large test library feel navigable.\n\nExpression stays subordinate to the task. Discovery can feel expansive, while test-taking and results narrow into a focused reading column. Chinese and English share the same hierarchy and component geometry; neither language is a secondary skin.",
+    "keyCharacteristics": [
+      "Warm paper and near-black green ink instead of pure white and black.",
+      "Muted teal as the persistent navigational signal.",
+      "Fine contour geometry, dotted map fields, route markers, and coordinate-like numerals.",
+      "Flat surfaces at rest with restrained, ambient lift on interaction.",
+      "Compact labels paired with generous reading space."
+    ],
+    "rules": [
+      {
+        "name": "The Wayfinding Rule",
+        "body": "Teal carries global orientation; route colors identify destinations and do not replace the global accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paper Rule",
+        "body": "Large surfaces use Field Paper or Night Paper. Pure white and pure black are reserved for subtle mixing, not as standalone canvases.",
+        "section": "colors"
+      },
+      {
+        "name": "The Coordinate Rule",
+        "body": "Monospace belongs to numbers, counts, and map coordinates. It is never a decorative body or heading face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Bilingual Parity Rule",
+        "body": "A hierarchy change must be checked with real Chinese and English copy at the same breakpoint before it becomes part of the system.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Route Rule",
+        "body": "A task screen presents one dominant path through the viewport; secondary actions sit after the task or recede visually.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat-at-Rest Rule",
+        "body": "Borders define ordinary surfaces. Shadows appear for hierarchy, interaction, or transient feedback?not to make every container look elevated.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Pill Restraint Rule",
+        "body": "Use a full pill only when the element is compact, atomic, and label-sized. Cards, answer rows, and large actions retain grounded corners.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do begin discovery with a human question or route, then reveal the complete library.",
+      "Do preserve equal navigation, recovery states, and hierarchy in Simplified Chinese and English.",
+      "Do use Lucide icons or precise CSS/SVG geometry with a consistent stroke language.",
+      "Do keep touch targets at least 44px high and preserve visible keyboard focus.",
+      "Do honor reduced motion and keep the default rendered state readable before animation runs.",
+      "Do use route colors as local wayfinding signals while keeping teal as the product-wide accent."
+    ],
+    "donts": [
+      "Don't introduce locale keys, language controls, or fallback behavior beyond Simplified Chinese and English.",
+      "Don't turn results into diagnoses, scores into verdicts, or the interface into a clinical dashboard.",
+      "Don't use emoji as interface icons, celebratory decoration, or category markers in new UI.",
+      "Don't fill the page with equal-weight cards, nested cards, decorative charts, or gamified streaks.",
+      "Don't use gradients, glass effects, thick colored side borders, or hard offset shadows.",
+      "Don't allow decorative map marks to compete with the primary action or reading content."
+    ]
+  }
+}

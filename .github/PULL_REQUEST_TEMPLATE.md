@@ -10,6 +10,11 @@ Describe what changed and why.
 
 ## Verification
 
+- [ ] `npm run lint`
+- [ ] `npx tsc --noEmit`
+- [ ] `npm test`
+- [ ] `npm run audit:flagship`
+- [ ] `npm audit --audit-level=high`
 - [ ] `npm run build`
 - [ ] Desktop viewport checked
 - [ ] Mobile viewport checked

@@ -10,6 +10,8 @@ Thanks for improving Quiz Platform. The project is a self-reflection quiz app, n
 - Add tests or scripts that keep quiz metadata consistent.
 - Refine quiz/result copy to be clearer and less overconfident.
 
+User-facing language support is limited to Simplified Chinese and English. Do not add a third locale without an explicit product decision.
+
 ## Product Boundary
 
 Do not add claims that the app can diagnose, treat, or clinically evaluate users. Content should feel useful and reflective, while encouraging professional support for serious distress or crisis situations.
@@ -19,11 +21,14 @@ Do not add claims that the app can diagnose, treat, or clinically evaluate users
 ```bash
 npm install
 npm run dev
-npm run build
 npm run lint
+npm test
+npm run audit:flagship
+npm audit --audit-level=high
+npm run build
 ```
 
-The existing lint baseline may contain unrelated issues. If you touch linted files, keep your own changes clean and mention any pre-existing failures in the PR.
+New quizzes must be registered once in `src/lib/test-registry.ts`; do not add a second ID list, import map, or page-specific scoring path. Run the full validation set before opening a PR.
 
 ## Pull Requests
 

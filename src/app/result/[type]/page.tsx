@@ -1,11 +1,14 @@
-﻿import ResultClient from "@/components/result/result-client";
-import { TEST_TYPES } from "@/lib/test-types";
+import ResultClient from "@/components/result/result-client";
+import { getQuizEntry, QUIZ_IDS } from "@/core/quiz";
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return TEST_TYPES.map((type) => ({ type }));
+  return QUIZ_IDS.map((type) => ({ type }));
 }
 
 export default async function ResultPage({ params }: { params: Promise<{ type: string }> }) {
   const { type } = await params;
-  return <ResultClient testType={type} />;
+  if (!getQuizEntry(type)) return null;
+  return <ResultClient testId={type} />;
 }

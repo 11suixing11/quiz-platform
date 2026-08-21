@@ -1,69 +1,27 @@
-"use client";
+﻿"use client";
 
-import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, BookmarkX } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
-import { TEST_REGISTRY } from "@/lib/test-registry";
+import { BookmarkX, Compass } from "lucide-react";
+import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { TestCard } from "@/components/TestCard";
-import { cn } from "@/lib/utils";
-import type { Lang } from "@/lib/types";
-
-function getBookmarks(): string[] {
-  try { return JSON.parse(localStorage.getItem("quiz-platform-bookmarks") || "[]"); } catch { return []; }
-}
+import { QUIZ_CATALOG } from "@/core/quiz";
+import { useBookmarks, useLanguage } from "@/hooks/use-local-storage";
 
 export default function BookmarksPage() {
-  const [lang, setLang] = useState<Lang>(() => { try { const saved = localStorage.getItem("quiz-platform-lang") as Lang; return (saved === "zh" || saved === "en" || saved === "ja") ? saved : "zh"; } catch { return "zh"; } });
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
-
-  useEffect(() => { setBookmarks(getBookmarks()); }, []);
-
-  const toggleLang = useCallback(() => {
-    setLang((l) => { const next = l === "zh" ? "en" : l === "en" ? "ja" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; });
-  }, []);
-
-  const bookmarkedTests = bookmarks.map((id) => TEST_REGISTRY.find((t) => t.id === id)).filter(Boolean);
+  const { language } = useLanguage();
+  const { bookmarks } = useBookmarks();
+  const tests = bookmarks.map((id) => QUIZ_CATALOG.find((quiz) => quiz.id === id)).filter((quiz): quiz is NonNullable<typeof quiz> => Boolean(quiz));
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAF8] dark:bg-[#0a0a0a]">
-      <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="sticky top-0 z-30 flex items-center justify-between bg-[#FAFAF8]/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-6 py-4 border-b border-border/40">
-        <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-[#2C2C2C] dark:text-white hover:opacity-80">
-          <ArrowLeft className="size-4" />
-          <span>{lang === "zh" ? "认识你自己" : "Know Yourself"}</span>
-        </Link>
-        <button onClick={toggleLang} className="text-xs font-semibold text-[#2C2C2C]/60 dark:text-white/60 hover:text-[#2C2C2C] dark:hover:text-white">
-          {lang === "zh" ? "EN" : lang === "en" ? "JA" : "中"}
-        </button>
-      </motion.header>
+    <div className="atlas-page min-h-screen">
+      <AppHeader backHref="/" backLabel={language === "zh" ? "探索地图" : "Explore map"} section={language === "zh" ? "收藏" : "Saved"} />
+      <PageContainer>
+        <p className="atlas-section-kicker">{language === "zh" ? "留给以后" : "For another day"}</p>
+        <h1 className="atlas-section-title mt-3">{language === "zh" ? "收藏的测试" : "Saved quizzes"}</h1>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? `这里有 ${tests.length} 条你想稍后再走的路线。` : `${tests.length} route${tests.length === 1 ? "" : "s"} saved for later.`}</p>
 
-      <main className="flex-1 mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl font-bold text-[#2C2C2C] dark:text-white mb-2">
-          {lang === "zh" ? "收藏的测试" : "Bookmarked Tests"}
-        </motion.h1>
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-sm text-[#2C2C2C]/60 dark:text-white/60 mb-8">
-          {lang === "zh" ? "你保存了想稍后再做的测试。" : "Tests you saved to take later."}
-        </motion.p>
-
-        {bookmarkedTests.length === 0 ? (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center">
-            <BookmarkX className="size-12 text-[#2C2C2C]/20 dark:text-white/20 mb-4" />
-            <p className="text-sm text-[#2C2C2C]/40 dark:text-white/40 mb-4">{lang === "zh" ? "还没有收藏任何测试" : "No bookmarked tests yet"}</p>
-            <Link href="/" className={cn(buttonVariants({ variant: "outline" }), "rounded-xl")}>{lang === "zh" ? "去探索测试" : "Explore Tests"}</Link>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <AnimatePresence>
-              {bookmarkedTests.map((test, i) => test && (
-                <motion.div key={test.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ delay: i * 0.05 }}>
-                  <TestCard test={test} index={i} lang={lang} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </main>
+        {tests.length === 0 ? <div className="atlas-empty-state mt-12"><BookmarkX className="mx-auto size-8 text-accent" /><h2 className="mt-5 text-xl font-semibold">{language === "zh" ? "还没有收藏" : "Nothing saved yet"}</h2><p className="mt-3 max-w-sm text-sm leading-6 text-ink/50 dark:text-white/50">{language === "zh" ? "看到想以后再做的测试时，点一下收藏即可。" : "Save a quiz whenever you want to return later."}</p><Link href="/#library" className="atlas-primary-action mx-auto mt-7"><Compass className="size-4" />{language === "zh" ? "浏览精选路线" : "Browse curated routes"}</Link></div> : <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{tests.map((test, index) => <TestCard key={test.id} test={test} index={index} lang={language} />)}</div>}
+      </PageContainer>
     </div>
   );
 }

@@ -1,12 +1,14 @@
 ---
-title: I Built a Self-Discovery Platform with 100+ Quizzes — Here's What I Learned
-published: true
-description: From MBTI-style reflection to habits and relationships — how I built a local-first, privacy-respecting self-discovery platform with Next.js 16, and what 100+ quizzes taught me about architecture, content, and shipping.
+title: I Built a Self-Discovery Platform — Here's What I Learned
+published: false
+description: Historical pre-v0.2 draft about the architecture and lessons behind the Know Yourself quiz platform.
 tags: nextjs, typescript, webdev, opensource
 canonical_url: https://github.com/11suixing11/quiz-platform
 ---
 
-# I Built a Self-Discovery Platform with 100+ Quizzes — Here's What I Learned
+> **Archive note (August 20, 2026):** This is a pre-v0.2 publication draft. References to the former 100+ quiz public surface and retired features are historical, not current product claims. The current public release exposes 16 reviewed routes; see `README.md` for the source of truth.
+
+# I Built a Self-Discovery Platform — Here's What I Learned
 
 ![Cover](https://11suixing11.github.io/quiz-platform/og-image.png)
 

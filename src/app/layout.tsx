@@ -1,55 +1,33 @@
-﻿import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+﻿import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Analytics from "@/components/analytics";
-import BottomNav from "@/components/bottom-nav";
-import { AccessibilityControls } from "@/components/accessibility-controls";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { MobileNav, PreferenceSync } from "@/components/shell/app-shell";
 
 const SITE_URL = "https://11suixing11.github.io/quiz-platform";
+const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "认识你自己 — 内在探索平台",
-  description:
-    "通过人格、情绪与关系叙事，重新理解你的内在模式。100+ 个自我探索测试，覆盖自我认知、情绪图谱、关系动力等 9 大维度。这里不是诊断，而是一面帮助你靠近自己的镜子。",
-  keywords: ["心理测试", "人格测试", "MBTI", "大五人格", "九型人格", "自我认知", "情绪管理", "关系"],
-  authors: [{ name: "认识你自己" }],
+  title: { default: "认识你自己 | Know Yourself", template: "%s | Know Yourself" },
+  description: "16 条经过审阅的中英双语自我反思路线。选择一个方向，完成测试，得到一张可以带回日常生活的结果地图。所有个人记录只保存在当前浏览器。",
+  keywords: ["自我反思", "人格测试", "情绪", "关系", "self reflection", "personality quiz"],
+  authors: [{ name: "Know Yourself" }],
   manifest: "/quiz-platform/manifest.json",
   openGraph: {
-    title: "认识你自己 — 有些自己，要慢慢被看见",
-    description: "100+ 个自我探索测试 + MBTI 关系配对，重新理解你的内在模式。",
-    siteName: "认识你自己",
+    title: "认识你自己 | Know Yourself",
+    description: "16 条经过审阅的中英双语路线，一条安静、清晰、本地优先的自我探索路径。",
+    siteName: "认识你自己 | Know Yourself",
     locale: "zh_CN",
+    alternateLocale: ["en_US"],
     type: "website",
     url: SITE_URL,
-    images: ["/quiz-platform/og-image.png"],
+    images: [{ url: OG_IMAGE_URL, width: 1200, height: 630, alt: "认识你自己 | Know Yourself" }],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "认识你自己 — 有些自己，要慢慢被看见",
-    description: "100+ 个自我探索测试 + MBTI 关系配对，重新理解你的内在模式。",
-    images: ["/quiz-platform/og-image.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  other: {
-    "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "认识你自己",
-  },
+  twitter: { card: "summary_large_image", title: "认识你自己 | Know Yourself", description: "Bilingual, local-first self-reflection quizzes.", images: [OG_IMAGE_URL] },
+  robots: { index: true, follow: true },
+  other: { "apple-mobile-web-app-capable": "yes", "apple-mobile-web-app-status-bar-style": "default", "apple-mobile-web-app-title": "认识你自己" },
 };
+
+export const viewport: Viewport = { themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F4F0E7" }, { media: "(prefers-color-scheme: dark)", color: "#111715" }], colorScheme: "light dark" };
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -57,53 +35,17 @@ const jsonLd = {
   name: "认识你自己",
   alternateName: "Know Yourself",
   url: SITE_URL,
-  description:
-    "通过人格、情绪与关系叙事，重新理解你的内在模式。100+ 个自我探索测试，覆盖自我认知、情绪图谱、关系动力等 9 大维度。",
-  inLanguage: "zh-CN",
-  publisher: {
-    "@type": "Organization",
-    name: "认识你自己",
-    url: SITE_URL,
-  },
-  potentialAction: {
-    "@type": "SearchAction",
-    target: {
-      "@type": "EntryPoint",
-      urlTemplate: `${SITE_URL}/?q={search_term_string}`,
-    },
-    "query-input": "required name=search_term_string",
-  },
+  description: "A bilingual, local-first self-reflection quiz library.",
+  inLanguage: ["zh-CN", "en"],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const preferenceScript = `(function(){try{var raw=localStorage.getItem('know-yourself:v3');var data=raw?JSON.parse(raw):null;var p=data&&data.version===3?data.preferences:null;var theme=p&&p.theme?p.theme:'system';var dark=theme==='dark'||(theme==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',dark);document.documentElement.style.colorScheme=dark?'dark':'light';document.documentElement.lang=p&&p.lang==='en'?'en':'zh-CN';}catch(e){}})();`;
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="zh"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <head>
-        <meta name="theme-color" content="#FAFAF8" />
-        <link rel="apple-touch-icon" href="/quiz-platform/icons/icon-192.svg" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=JSON.parse('{"warm":{"primary":"#2C2C2C","accent":"#B07D6E","bg":"#FAFAF8","bgDark":"#0a0a0a"},"ocean":{"primary":"#1a4b6b","accent":"#3b82f6","bg":"#f0f7ff","bgDark":"#0a1628"},"forest":{"primary":"#2d5a27","accent":"#22c55e","bg":"#f0f7f0","bgDark":"#0a1a0a"},"sunset":{"primary":"#8b3a3a","accent":"#f97316","bg":"#fff7ed","bgDark":"#1a0a0a"}}');var id=localStorage.getItem("quiz-platform-theme")||"warm";var c=t[id]||t.warm;var r=document.documentElement;r.style.setProperty("--theme-primary",c.primary);r.style.setProperty("--theme-accent",c.accent);r.style.setProperty("--theme-bg",c.bg);r.style.setProperty("--theme-bg-dark",c.bgDark)}catch(e){}})();`,
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </head>
-      <body className="min-h-full flex flex-col font-sans">
-        {children}
-        <BottomNav />
-        <AccessibilityControls />
-        <Analytics />
-      </body>
+    <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+      <head><link rel="apple-touch-icon" href="/quiz-platform/icons/icon-192.svg" /><script dangerouslySetInnerHTML={{ __html: preferenceScript }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} /></head>
+      <body className="min-h-full bg-paper font-sans text-ink dark:bg-night dark:text-white"><a className="skip-link" href="#main-content">跳到主要内容 / Skip to main content</a><PreferenceSync />{children}<MobileNav /></body>
     </html>
   );
 }

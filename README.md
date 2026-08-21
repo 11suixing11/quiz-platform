@@ -1,237 +1,122 @@
-<div align="center">
+﻿# 认识你自己 | Know Yourself
 
-# 🪞 认识你自己 | Quiz Platform
+一个安静、双语、本地优先的自我反思测试平台。
 
-> **每一道题，都是通向内心的一扇窗。**
-> Every question is a window into your inner world.
+> 先找到此刻在意的方向，再用几分钟回答问题。结果是一张可以带回日常生活的地图，不是诊断，也不是固定身份。
 
-<p align="center">
-  <a href="https://github.com/11suixing11/quiz-platform/releases"><img src="https://img.shields.io/github/v/release/11suixing11/quiz-platform?style=flat-square&color=B8A9C9" alt="Release"></a>
-  <a href="https://github.com/11suixing11/quiz-platform/blob/main/LICENSE"><img src="https://img.shields.io/github/license/11suixing11/quiz-platform?style=flat-square&color=94A3B8" alt="License MIT"></a>
-  <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js" alt="Next.js 16">
-  <a href="https://github.com/11suixing11/quiz-platform/actions/workflows/deploy.yml"><img src="https://img.shields.io/github/actions/workflow/status/11suixing11/quiz-platform/deploy.yml?style=flat-square&label=deploy" alt="Deploy Status"></a>
-  <img src="https://img.shields.io/github/repo-size/11suixing11/quiz-platform?style=flat-square&color=6DD5FA" alt="Repo Size">
-</p>
+## 当前版本
 
-**一个温暖的内心探索平台，集成了 100+ 个自我探索测试与 MBTI 配对功能。**
-A warm inner exploration platform with 100+ self-reflection quizzes and MBTI relationship matching.
+- **16 条精选路线**：首页先给方向，再进入经过审阅的公开路线
+- **193 个内部测试模块**：保留在源码中，按内容质量逐批审阅，不自动进入产品入口
+- **三类评分**：type、dimensions、score
+- **核心闭环**：探索 → 测试说明 → 答题 → 结果 → 历史 / 收藏
+- **中英双语**：中文与 English 共用同一套导航、状态和数据模型
+- **本地优先**：无账号、无后端、无云同步；结果保存在当前浏览器
+- **可携带数据**：设置页支持 v3 JSON 导入、导出、合并、替换和清空
+- **静态部署**：Next.js 静态导出，兼容 GitHub Pages 的 `/quiz-platform/` 路径
 
-✨ **在线体验 Demo → [11suixing11.github.io/quiz-platform](https://11suixing11.github.io/quiz-platform/)** ✨
+## 体验路线
 
-</div>
+| 页面 | 作用 |
+| --- | --- |
+| `/` | 首页探索、四条核心路径、精选路线 |
+| `/test/[id]/` | 测试详情、题量、时长、示例问题、收藏 |
+| `/quiz/[type]/` | 答题、进度、键盘操作、未完成会话恢复 |
+| `/result/[type]/` | 结果解读、反思引导、分享、重新测试 |
+| `/history/` | 本地完成记录 |
+| `/bookmarks/` | 收藏的测试 |
+| `/settings/` | 语言、主题、本地数据管理 |
+| `/privacy/` | 数据与隐私说明 |
 
----
+已移除的 secondary routes 不再生成：analytics、dashboard、stats、trends、compare、compat 以及其他旧的内容型页面。旧 URL 不做兼容跳转。
 
-## 🌟 关于这个项目 | About
+## 技术栈
 
-> *"认识你自己" —— 德尔斐神谕*
-> *"Know thyself" — The Oracle at Delphi*
+- Next.js 16 App Router + static export
+- React 19 + TypeScript
+- Tailwind CSS v4 + 原生 CSS tokens
+- Framer Motion（仅用于答题与结果中的必要过渡）
+- lucide-react
+- GitHub Pages + GitHub Actions
 
-每个人都是一座待探索的星球。这个平台的诞生，源于一个简单的信念：**了解自己，是所有成长的起点。**
+## 目录结构
 
-Everyone is a planet waiting to be explored. This platform was born from a simple belief: **understanding yourself is the starting point of all growth.**
-
-我们维护了一个持续增长的自我探索题库，覆盖 9 大维度，从性格到情绪，从关系到职业，帮助你用温和的方式，一点一点靠近真实的自己。
-
-We maintain a growing self-reflection quiz library across 9 major dimensions — from personality to emotions, relationships to careers — helping you gently move closer to your true self, one step at a time.
-
-> 本项目是自我探索工具，不是临床诊断、心理治疗或医疗建议。遇到持续痛苦、危机或功能受损时，请寻求专业支持。
->
-> This project is for self-reflection only. It is not clinical diagnosis, therapy, or medical advice.
-
----
-
-## ✨ 功能亮点 | Features
-
-### 🧭 9 大测试维度 · 9 Test Dimensions
-
-| 维度 Dimension | 主题 Theme | 包含测试（部分） Tests Included |
-|:---:|:---|:---|
-| 🧬 **自我认知** Self Identity | 性格、气质与人格原型 | MBTI、大五人格、九型人格、DISC、A/B 型人格、塔罗性格… |
-| 💕 **情绪图谱** Emotional Landscape | 感受、表达与管理情绪 | 情绪粒度、情绪调节、共情力、情绪韧性、情绪传染… |
-| 🧘 **内在平衡** Inner Balance | 心理状态与内在韧性 | 焦虑、抑郁、OCD、压力、心理韧性、自我关怀、正念… |
-| 🤝 **关系动力** Social Dynamics | 与他人的连接模式 | 依恋类型、爱的语言、亲密关系、信任、边界感、冲突解决… |
-| 💼 **职业原型** Career Archetypes | 工作中的角色定位 | 职业锚、领导力、创业倾向、工作倦怠、工作满意度… |
-| 🧪 **认知模式** Cognitive Patterns | 思维方式与智力图谱 | 逻辑推理、批判性思维、创造力、空间智力、语言智力… |
-| 🌿 **生活哲学** Life Philosophy | 如何选择度过这一生 | 极简主义、时间管理、生活满意度、幸福感、数字健康… |
-| 🎭 **社交智慧** Social Intelligence | 在人群中如何自处 | 社交焦虑、社交技能、社交智力、魅力值、公众演讲… |
-| 🎪 **趣味探索** Playful Discovery | 用轻松的方式认识自己 | 电影性格、音乐性格、咖啡性格、美食性格、颜色性格… |
-
-### 💞 MBTI 配对 · Relationship Matching
-
-不只是测你是什么类型——我们还帮你找到最合拍的人。
-
-It's not just about finding your type — we help you find your perfect match.
-
-- **15 种 MBTI 维度** 深度解析，不只是四个字母
-- **人格兼容性分析** — 看看你们在哪些维度上互补或共鸣
-- **关系建议** — 了解彼此的沟通方式与相处之道
-- **四种配对世界**：
-  - 🌙 **梦境感知者** — 为感受过深的你（情绪 · 共情 · 敏感度）
-  - 🔮 **理性建筑师** — 为在混乱中寻找结构的你（人格 · 认知 · 系统思维）
-  - 🌊 **关系连接者** — 为感受关系温度的你（依恋 · 爱语 · 人际边界）
-  - 🔥 **行动探索者** — 为走出去认识自己的你（职业 · 生活方式 · 冒险）
-
-### 🚀 更多亮点 | What's New
-
-我们一直在用心打磨，希望每一个小细节都能让你感到温暖：
-
-We've been polishing every detail with care, hoping each little touch brings you warmth:
-
-| 功能 Feature | 说明 Description |
-|:---:|:---|
-| 🕐 **测试历史** Test History | 浏览你所有的历史测试结果 — Browse all your past results |
-| 📱 **滑动导航** Swipe Navigation | 移动端友好的题目切换 — Mobile-friendly question navigation |
-| 🎊 **进度庆祝** Progress Confetti | 在 25%、50%、75% 里程碑撒花庆祝 — Celebrate milestones with confetti |
-| 🔗 **原生分享** Web Share | 在手机上一键分享结果 — Share results natively on mobile |
-| 🎯 **智能推荐** Smart Recommendations | 结果页的「你可能还喜欢」— 'You might also like' on results |
-| 🌐 **完整国际化** Full i18n | 完整的中英文支持 — Complete English and Chinese support |
-| 🌙 **深色模式** Dark Mode | 全站深色模式 — Full dark mode support |
-| 📊 **数据看板** Stats Dashboard | 首页动态数字统计 — Animated counters on homepage |
-
----
-
-## 📸 展示 | Screenshots
-
-> 📌 **待添加** — 欢迎提交 PR 补充项目截图或 GIF 演示！
->
-> **TODO** — PRs welcome to add screenshots or GIF demos!
-
-<!-- screenshots: homepage-hero, quiz-in-progress, result-page, dark-mode -->
-```
-┌─────────────────────────────────────────────┐
-│                                             │
-│  🖼️  首页英雄区 / Homepage Hero             │
-│                                             │
-│  🖼️  测试进行中 / Quiz in Progress          │
-│                                             │
-│  🖼️  结果页面 / Result Page                 │
-│                                             │
-│  🖼️  深色模式 / Dark Mode                   │
-│                                             │
-└─────────────────────────────────────────────┘
+```text
+src/
+├─ app/
+│  ├─ page.tsx                 # 首页地图
+│  ├─ test/[id]/               # 测试详情
+│  ├─ quiz/[type]/             # 答题
+│  ├─ result/[type]/           # 结果
+│  ├─ history/                 # 历史
+│  ├─ bookmarks/               # 收藏
+│  ├─ settings/                # 设置与数据管理
+│  └─ privacy/                 # 隐私
+├─ components/
+│  ├─ shell/                   # header、移动导航、偏好同步
+│  ├─ quiz/                    # 答题引擎与分类标记
+│  └─ result/                  # 结果叙事与反思引导
+├─ core/quiz/
+│  ├─ types.ts                 # QuizDefinition 与统一类型
+│  ├─ catalog.ts               # 内部测试目录与公开路线筛选
+│  ├─ scoring.ts               # 三类评分适配器
+│  └─ validation.ts            # 数据定义校验
+├─ lib/
+│  ├─ test-registry.ts         # 唯一测试注册入口
+│  ├─ quiz-definitions/        # 16 个旗舰测试的标准定义
+│  ├─ tests/                   # 193 个测试内容模块
+│  ├─ storage.ts               # know-yourself:v3 snapshot
+│  └─ data-manager.ts          # v3 导入导出
+└─ hooks/use-local-storage.ts  # 语言、主题、历史、收藏 hooks
 ```
 
----
-
-## 🛠️ 技术栈 | Tech Stack
-
-| 层级 Layer | 技术 Technology | 说明 Description |
-|:---:|:---|:---|
-| 🏗️ 框架 | **Next.js 16** | App Router + Turbopack，极速开发体验 |
-| ⚛️ UI 库 | **React 19** | 最新的 React，支持最新特性 |
-| 📝 类型 | **TypeScript 5** | 类型安全，代码更可靠 |
-| 🎨 样式 | **Tailwind CSS v4** | 原子化 CSS，快速构建美观界面 |
-| 🧩 组件 | **Shadcn UI** | 精美可定制的组件库 |
-| ✨ 动效 | **Framer Motion** | 流畅的页面转场与交互动画 |
-| 🚀 部署 | **GitHub Pages** | GitHub Actions CI/CD 自动部署 |
-| 📱 PWA | **manifest.json** | 渐进式 Web 应用，可添加到主屏幕 — Installable PWA |
-| 🔍 SEO | **JSON-LD + Sitemap** | 结构化数据与站点地图，搜索引擎友好 — Structured data & sitemap |
-
----
-
-## 🚀 快速开始 | Quick Start
-
-### 环境要求 | Prerequisites
-
-- **Node.js** >= 18
-- **npm** >= 9
-
-### 安装与运行 | Installation & Run
+## 本地开发
 
 ```bash
-# 克隆仓库 | Clone the repo
-git clone https://github.com/11suixing11/quiz-platform.git
-cd quiz-platform
-
-# 安装依赖 | Install dependencies
 npm install
-
-# 启动开发服务器（默认端口 3333）| Start dev server (port 3333)
 npm run dev
+```
 
-# 构建生产版本 | Build for production
-npm run build
+打开 `http://localhost:3333/quiz-platform/`。
 
-# 代码检查 | Lint
+## 验证命令
+
+```bash
 npm run lint
+npx tsc --noEmit
+npm test
+npm run audit:flagship
+npm audit --audit-level=high
+npm run build
+npm run start
 ```
 
-启动后访问 [http://localhost:3333](http://localhost:3333)，开始探索自己 🪞
+`npm test` 包含：
 
-Open [http://localhost:3333](http://localhost:3333) and start exploring yourself 🪞
+1. `check:registry`：检查 193 个内部 registry loader、源文件和 16 条旗舰路线
+2. `test:scoring`：运行 10,212 个答案边界场景
+3. `test:storage`：验证 v3 snapshot、历史、收藏、会话、导入导出和旧命名空间隔离
 
----
+`audit:flagship` 只审阅首页的 16 个旗舰测试，不会把“能运行”误认为“已达到推荐质量”。当前 16 个旗舰入口均已通过 ready 门槛。
 
-## 📁 项目结构 | Project Structure
+静态构建产物位于 `out/`，预览服务由 `scripts/serve-static.mjs` 提供。
 
-```
-quiz-platform/
-├── .github/              # GitHub Actions 自动部署 CI/CD
-├── public/
-│   ├── manifest.json     # PWA 清单 PWA manifest
-│   ├── sitemap.xml       # SEO 站点地图 Sitemap
-│   └── ...               # 静态资源 Static assets
-├── src/
-│   ├── app/
-│   │   ├── quiz/         # 测试页面 Quiz pages
-│   │   ├── result/       # 结果页面 Result pages
-│   │   ├── compat/       # MBTI 配对 MBTI compatibility
-│   │   └── history/      # 🆕 测试历史 Test history
-│   ├── components/
-│   │   ├── quiz/         # 测试相关组件 Quiz components
-│   │   ├── result/       # 结果相关组件 Result components
-│   │   ├── ui/           # Shadcn 基础组件
-│   │   ├── confetti/     # 🆕 进度庆祝 Progress confetti
-│   │   ├── share/        # 🆕 原生分享 Web share
-│   │   └── recommendations/ # 🆕 智能推荐 Smart recommendations
-│   ├── i18n/             # 🆕 国际化 English & Chinese
-│   └── lib/              # 核心逻辑 Core logic
-│       ├── tests/        # 自我探索测试定义
-│       ├── constants.ts  # 分类与配色常量
-│       ├── types.ts      # TypeScript 类型定义
-│       └── utils.ts      # 工具函数
-├── next.config.ts
-├── tailwind.config.ts
-└── package.json
-```
+## 添加测试
 
----
+1. 在 `src/lib/tests/<id>.ts` 创建双语测试模块；迁移中的标准定义放在 `src/lib/quiz-definitions/<id>.ts`。
+2. 在 `src/lib/test-registry.ts` 添加一条带 `loader` 的注册项。
+3. 如需首页精选入口，再在 `src/lib/core-tests.ts` 明确加入。
+4. 运行 `npm test`、`npm run audit:flagship` 和 `npm run build`。
 
-## 🤝 参与贡献 | Contributing
+不要另建第二份测试 ID 数组、动态 import map 或页面专用评分逻辑。
 
-我们欢迎每一份温暖的贡献 💛
+## 产品边界
 
-We welcome every warm contribution 💛
+- 不做账号、后端、在线数据库或跨设备同步
+- 不做 AI 生成解读
+- 不把结果表述为临床诊断、治疗建议或专业评估
+- 不自动迁移旧 localStorage 数据；新版本使用 `know-yourself:v3` 命名空间
 
-1. **Fork** 本仓库
-2. 创建你的功能分支：`git checkout -b feature/amazing-test`
-3. 提交你的修改：`git commit -m 'Add some amazing test'`
-4. 推送到远程分支：`git push origin feature/amazing-test`
-5. 提交 **Pull Request**
+## License
 
-遇到问题？欢迎 [提交 Issue](https://github.com/11suixing11/quiz-platform/issues) 🙏
-
-Found a bug? Feel free to [open an issue](https://github.com/11suixing11/quiz-platform/issues) 🙏
-
----
-
-## ⭐ Star 趋势 | Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=11suixing11/quiz-platform&type=Date)](https://star-history.com/#11suixing11/quiz-platform&Date)
-
----
-
-## 📄 许可证 | License
-
-[MIT](./LICENSE) © [11suixing11](https://github.com/11suixing11)
-
----
-
-<div align="center">
-
-**愿你在探索中，遇见真实的自己。** 🪞
-
-*May you meet your true self on this journey of discovery.*
-
-</div>
+MIT

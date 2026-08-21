@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated quiz content is validated by dedicated registry and scoring scripts.
+    "src/lib/tests/**",
   ]),
 ]);
 

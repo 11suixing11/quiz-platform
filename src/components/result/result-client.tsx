@@ -1,293 +1,132 @@
-﻿"use client";
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowLeft, Globe, RefreshCw, Share2, Check, BarChart3 } from "lucide-react";
-
-import { Button, buttonVariants } from "@/components/ui/button";
-import { ResultHero } from "@/components/result/result-hero";
+import { ArrowRight, Check, RefreshCw, Share2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { loadQuizDefinition, getQuizEntry, getResultKey, getResultScore, getScoreBand, type QuizDefinition, type QuizResult } from "@/core/quiz";
+import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { NarrativeSection } from "@/components/result/narrative-section";
-import { ShareCard } from "@/components/result/share-card";
-import { getTestById, type TestRegistryEntry } from "@/lib/test-registry";
-import { loadTestData } from "@/lib/tests";
-import { cn } from "@/lib/utils";
-import type { TestData, QuizResult, NarrativeResult, TypeData, Lang } from "@/lib/types";
+import { ReflectionGuide } from "@/components/result/reflection-guide";
+import { useLanguage } from "@/hooks/use-local-storage";
+import { getAttemptById, getLatestAttempt } from "@/lib/storage";
+import type { Lang } from "@/core/quiz";
 
-function pickNarrative(
-  map: Record<string, { zh: NarrativeResult; en: NarrativeResult }> | undefined,
-  key: string,
-  lang: Lang,
-): NarrativeResult | undefined {
-  if (!map) return undefined;
-  const entry = map[key] ?? map[Object.keys(map)[0]];
-  return entry?.[lang === "ja" ? "en" : lang];
+function pickNarrative(definition: QuizDefinition, key: string, language: Lang) {
+  const entry = definition.resultContent.narrative?.[key] ?? definition.resultContent.narrative?.[Object.keys(definition.resultContent.narrative ?? {})[0]];
+  return entry?.[language];
 }
 
-function pickTypeData(
-  map: Record<string, { zh: TypeData; en: TypeData }> | undefined,
-  key: string,
-  lang: Lang,
-): TypeData | undefined {
-  if (!map) return undefined;
-  const entry = map[key] ?? map[Object.keys(map)[0]];
-  return entry?.[lang === "ja" ? "en" : lang];
+function pickType(definition: QuizDefinition, key: string, language: Lang) {
+  const entry = definition.resultContent.types?.[key] ?? definition.resultContent.types?.[Object.keys(definition.resultContent.types ?? {})[0]];
+  return entry?.[language];
 }
 
-interface ResultClientProps {
-  testType: string;
+function pickArchetype(definition: QuizDefinition, key: string, language: Lang) {
+  const entry = definition.resultContent.archetypes?.[key];
+  if (!entry) return undefined;
+  return {
+    title: language === "zh" ? entry.title_zh ?? key : entry.title_en ?? key,
+    description: language === "zh" ? entry.desc_zh : entry.desc_en,
+  };
 }
 
-export default function ResultClient({ testType }: ResultClientProps) {
+function Loading({ language }: { language: Lang }) {
+  return <div className="atlas-page min-h-screen"><AppHeader /><main id="main-content" tabIndex={-1} className="atlas-loading" aria-busy="true"><span className="atlas-loading-orbit" aria-hidden="true" /><p role="status" aria-live="polite">{language === "zh" ? "正在整理这次回答…" : "Reading this route…"}</p></main></div>;
+}
+
+export default function ResultClient({ testId }: { testId: string }) {
   const router = useRouter();
-  const [lang, setLang] = useState<Lang>(() => { try { const saved = localStorage.getItem("quiz-platform-lang") as Lang; return (saved === "zh" || saved === "en" || saved === "ja") ? saved : "zh"; } catch { return "zh"; } });
+  const { language } = useLanguage();
+  const [definition, setDefinition] = useState<QuizDefinition | null>(null);
   const [result, setResult] = useState<QuizResult | null>(null);
-  const [testData, setTestData] = useState<TestData | null>(null);
-  const [registryEntry, setRegistryEntry] = useState<TestRegistryEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [shareDismissed, setShareDismissed] = useState(false);
-  const shareTouchRef = useRef<{ x: number; y: number } | null>(null);
-  const shareRef = useRef<HTMLDivElement>(null);
+  const [shareError, setShareError] = useState(false);
+  const entry = getQuizEntry(testId);
 
   useEffect(() => {
     let cancelled = false;
-    async function run() {
-      setLoading(true);
-      let stored: { result?: QuizResult; answers?: number[] } | null = null;
-      try {
-        const raw = localStorage.getItem(`quiz-result-${testType}`);
-        if (raw) stored = JSON.parse(raw);
-      } catch {}
-
-      const entry = getTestById(testType) ?? null;
-      const data = await loadTestData(testType);
-
-      let calcResult: QuizResult | null = stored?.result ?? null;
-      if (!calcResult && data && stored?.answers) {
-        try {
-          calcResult = data.calculate(stored.answers, data.questions as any);
-        } catch {}
+    loadQuizDefinition(testId).then((loaded) => {
+      if (cancelled) return;
+      setDefinition(loaded);
+      const queryAttempt = new URLSearchParams(window.location.search).get("attempt");
+      const attempt = queryAttempt ? getAttemptById(queryAttempt) : getLatestAttempt(testId);
+      if (attempt?.testId === testId) {
+        setResult(attempt.result);
       }
-
-      if (!cancelled) {
-        setRegistryEntry(entry);
-        setTestData(data);
-        setResult(calcResult);
-        setLoading(false);
-      }
-    }
-    run();
+      setLoading(false);
+    });
     return () => { cancelled = true; };
-  }, [testType]);
+  }, [testId]);
 
-  const pattern = registryEntry?.pattern ?? testData?.pattern ?? "type";
-  const accentColor = testData?.color ?? "#6B5B95";
+  const content = useMemo(() => {
+    if (!definition || !result) return null;
+    const key = getResultKey(result);
+    const narrative = pickNarrative(definition, key, language);
+    const typeData = pickType(definition, key, language);
+    const archetype = pickArchetype(definition, key, language);
+    const scoreBand = getScoreBand(definition, result);
+    const title = (scoreBand?.title[language] ?? narrative?.archetype ?? archetype?.title ?? typeData?.name ?? key) || (language === "zh" ? "这次的结果" : "Your result");
+    const description = scoreBand?.description[language] ?? narrative?.hero ?? narrative?.description ?? archetype?.description ?? typeData?.description;
+    return { key, narrative, typeData, title, description, score: getResultScore(result) };
+  }, [definition, language, result]);
 
-  const heroTitle = useMemo(() => {
-    if (!result) return testType;
-    const key = result.type ?? result.dominant ?? result.primary ?? "";
-    if (testData?.narrative) {
-      const n = pickNarrative(testData.narrative, key, lang);
-      if (n?.archetype) return n.archetype;
+  const share = useCallback(async () => {
+    if (!content || !entry) return;
+    setShareError(false);
+    const shareUrl = new URL(window.location.href);
+    const resultRoute = `/result/${testId}`;
+    const resultRouteIndex = shareUrl.pathname.lastIndexOf(resultRoute);
+    const basePath = resultRouteIndex >= 0 ? shareUrl.pathname.slice(0, resultRouteIndex) : "";
+    shareUrl.pathname = `${basePath}/test/${testId}/`;
+    shareUrl.search = "";
+    shareUrl.hash = "";
+    const url = shareUrl.toString();
+    const text = language === "zh"
+      ? `我完成了「${entry.title.zh}」，结果是 ${content.title}。`
+      : `I completed “${entry.title.en}” and got ${content.title}.`;
+    if (navigator.share) {
+      try { await navigator.share({ title: content.title, text, url }); return; } catch (error) { if (error instanceof DOMException && error.name === "AbortError") return; }
     }
-    if (testData?.archetypes?.[key]) {
-      const a = testData.archetypes[key];
-      return lang === "zh" ? a.title_zh ?? key : a.title_en ?? key;
-    }
-    return key || testType;
-  }, [result, testData, lang, testType]);
-
-  const heroSubtitle = useMemo(() => {
-    if (!result) return undefined;
-    const key = result.type ?? result.dominant ?? result.primary ?? "";
-    return pickNarrative(testData?.narrative, key, lang)?.subtitle;
-  }, [result, testData, lang]);
-
-  const heroDescription = useMemo(() => {
-    if (!result) return undefined;
-    const key = result.type ?? result.dominant ?? result.primary ?? "";
-    const n = pickNarrative(testData?.narrative, key, lang);
-    return n?.hero ?? n?.description;
-  }, [result, testData, lang]);
-
-  const heroIcon = registryEntry?.icon ?? "🧪";
-
-  const narrative = useMemo(() => {
-    if (!result) return undefined;
-    const key = result.type ?? result.dominant ?? result.primary ?? "";
-    return pickNarrative(testData?.narrative, key, lang);
-  }, [result, testData, lang]);
-
-  const typeData = useMemo(() => {
-    if (!result) return undefined;
-    const key = result.type ?? result.dominant ?? result.primary ?? "";
-    return pickTypeData(testData?.types, key, lang);
-  }, [result, testData, lang]);
-
-  const handleRetake = useCallback(() => {
-    try { localStorage.removeItem(`quiz-result-${testType}`); } catch {}
-    router.push(`/quiz/${testType}/`);
-  }, [router, testType]);
-
-  const handleCopy = useCallback(async () => {
-    const text = lang === "zh"
-      ? `我在「认识你自己」完成了${registryEntry?.zh.name ?? testType}测试，结果是：${heroTitle}。来试试吧！`
-      : `I just took the ${registryEntry?.en.name ?? testType} on "Know Yourself" and got: ${heroTitle}. Give it a try!`;
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(`${text} ${url}`);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {}
-  }, [testType, lang, registryEntry, heroTitle]);
+      window.setTimeout(() => setCopied(false), 2200);
+    } catch {
+      setShareError(true);
+    }
+  }, [content, entry, language, testId]);
 
-  const toggleLang = useCallback(() => {
-    setLang((l) => { const next = l === "zh" ? "en" : "zh"; try { localStorage.setItem("quiz-platform-lang", next); } catch {} return next; });
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-[#FAFAF8] dark:bg-[#0a0a0a]">
-        <motion.div
-          className="h-12 w-12 rounded-full border-3 border-muted border-t-transparent"
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
-          style={{ borderColor: accentColor + "40", borderTopColor: "transparent" }}
-        />
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-4 text-sm text-muted-foreground"
-        >
-          {lang === "zh" ? "正在解读你的结果……" : "Reading your story..."}
-        </motion.p>
-      </div>
-    );
+  if (loading) return <Loading language={language} />;
+  if (!definition || !entry || !result || !content) {
+    return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state mx-auto mt-16 max-w-lg"><h1 className="text-2xl font-semibold">{language === "zh" ? "还没有找到这次结果" : "No result found yet"}</h1><p className="mt-3 max-w-md text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? "先完成一次测试，结果会保存在当前浏览器中。" : "Complete the route once. Results stay in this browser."}</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><Link href={`/test/${testId}/`} className="atlas-primary-action justify-center">{language === "zh" ? "查看测试说明" : "View test details"}<ArrowRight className="size-4" /></Link><Link href="/" className="atlas-secondary-action justify-center">{language === "zh" ? "回到探索" : "Back to explore"}</Link></div></div></PageContainer></div>;
   }
 
-  if (!result || !registryEntry) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 min-h-screen px-6 text-center bg-[#FAFAF8] dark:bg-[#0a0a0a]">
-        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }} className="text-5xl">🔍</motion.span>
-        <h1 className="text-xl font-semibold">{lang === "zh" ? "未找到测试结果" : "No Results Yet"}</h1>
-        <p className="text-sm text-muted-foreground max-w-sm">
-          {lang === "zh" ? "你可能还没有完成这个测试，或者结果数据已被清除。" : "It looks like you haven't taken this test yet, or your results may have been cleared."}
-        </p>
-        <div className="flex gap-3">
-          <Link href={`/quiz/${testType}/`} className={cn(buttonVariants({ variant: "default" }), "rounded-xl")}>
-            {lang === "zh" ? "去做测试" : "Take the Test"}
-          </Link>
-          <Link href="/" className={cn(buttonVariants({ variant: "outline" }), "rounded-xl")}>
-            {lang === "zh" ? "回到首页" : "Back to Home"}
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const testName = lang === "zh" ? registryEntry.zh.name : registryEntry.en.name;
+  const pattern = definition.kind;
+  const accent = definition.accent;
+  const testName = language === "zh" ? entry.title.zh : entry.title.en;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAF8] dark:bg-[#0a0a0a]">
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="sticky top-0 z-30 flex items-center justify-between bg-[#FAFAF8]/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-border/40"
-      >
-        <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-foreground hover:opacity-80 transition-opacity">
-          <ArrowLeft className="size-4" />
-          <span>认识你自己</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">{testName}</span>
-          <Button variant="ghost" size="icon" onClick={toggleLang} aria-label="Toggle language">
-            <Globe className="size-4" />
-          </Button>
+    <div className="atlas-page min-h-screen">
+      <AppHeader backHref="/" backLabel={language === "zh" ? "探索地图" : "Explore map"} section={testName} />
+      <PageContainer className="max-w-3xl">
+        <div className="atlas-result-intro-block" style={{ "--result-accent": accent } as React.CSSProperties}>
+          <p className="atlas-section-kicker">{language === "zh" ? "这次路线的回看" : "A reading of this route"}</p>
+          <h1 className="mt-5 max-w-2xl text-5xl font-semibold leading-[0.94] tracking-[-0.065em] sm:text-7xl">{content.title}</h1>
+          {content.description && <p className="mt-6 max-w-2xl text-base leading-7 text-ink/60 dark:text-white/60">{content.description}</p>}
+          {content.score !== null && <div className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-accent"><span className="atlas-result-score-dot" />{language === "zh" ? `当前分数 ${Math.round(content.score)}` : `Current score ${Math.round(content.score)}`}</div>}
+          <p className="mt-8 text-xs text-ink/40 dark:text-white/40">{language === "zh" ? "它是一张此刻的地图，不是固定的身份。" : "A map of this moment, not a fixed identity."}</p>
         </div>
-      </motion.header>
 
-      <main className="flex flex-1 flex-col items-center gap-8 sm:gap-10 px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12 w-full max-w-2xl mx-auto">
-        <ResultHero icon={heroIcon} title={heroTitle} subtitle={heroSubtitle} description={heroDescription} accentColor={accentColor} />
+        <section className="atlas-result-panel mt-10"><h2 className="atlas-section-kicker">{language === "zh" ? "展开看看" : "Read the contour"}</h2><div className="mt-7"><NarrativeSection pattern={pattern} result={result} narrative={content.narrative} typeData={content.typeData} dimensions={definition.resultContent.dimensions} archetypes={definition.resultContent.archetypes} scoreBands={definition.resultContent.scoreBands} accentColor={accent} lang={language} /></div></section>
+        <ReflectionGuide testId={testId} entry={entry} pattern={pattern} result={result} narrative={content.narrative} typeData={content.typeData} dimensions={definition.resultContent.dimensions} accentColor={accent} lang={language} />
 
-        <section className="w-full">
-          <NarrativeSection
-            pattern={pattern}
-            result={result}
-            narrative={narrative}
-            typeData={typeData}
-            dimensions={testData?.dimensions}
-            archetypes={testData?.archetypes}
-            accentColor={accentColor}
-            lang={lang}
-          />
-        </section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="w-full flex justify-center"
-        >
-          {!shareDismissed && (
-            <motion.div
-              ref={shareRef}
-              className="w-full"
-              onTouchStart={(e) => { shareTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
-              onTouchEnd={(e) => {
-                if (!shareTouchRef.current) return;
-                const dy = e.changedTouches[0].clientY - shareTouchRef.current.y;
-                shareTouchRef.current = null;
-                if (dy < -60) setShareDismissed(true);
-              }}
-            >
-              <ShareCard icon={heroIcon} title={heroTitle} subtitle={heroSubtitle} description={heroDescription} accentColor={accentColor} />
-            </motion.div>
-          )}
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.5 }}
-          className="w-full flex flex-col sm:flex-row gap-3"
-        >
-          <Button variant="secondary" className="flex-1 h-12 rounded-xl gap-2" onClick={handleRetake}>
-            <RefreshCw className="size-4" />
-            {lang === "zh" ? "重新测试" : "Retake Test"}
-          </Button>
-          <Button className="flex-1 h-12 rounded-xl gap-2" style={{ backgroundColor: accentColor }} onClick={handleCopy}>
-            {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-            {copied ? (lang === "zh" ? "已复制" : "Copied!") : (lang === "zh" ? "分享结果" : "Share Result")}
-          </Button>
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="w-full flex flex-col sm:flex-row gap-3"
-        >
-          <Link href="/" className={cn(buttonVariants({ variant: "outline" }), "flex-1 h-12 rounded-xl justify-center")}>
-            {lang === "zh" ? "探索更多测试" : "Discover More Tests"}
-          </Link>
-          <Link href="/compare/" className={cn(buttonVariants({ variant: "outline" }), "flex-1 h-12 rounded-xl justify-center gap-2")}>
-            <BarChart3 className="size-4" />
-            {lang === "zh" ? "对比测试结果" : "Compare Results"}
-          </Link>
-        </motion.section>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 0.5 }}
-          className="text-xs text-muted-foreground/60 text-center pb-8"
-        >
-          {lang === "zh" ? "本测试仅供参考，不构成专业心理评估。" : "This is a self-reflection tool, not a clinical assessment. Take what resonates, leave what doesn't."}
-        </motion.p>
-      </main>
+        <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测试" : "Retake"}</button><button type="button" onClick={share} className="atlas-primary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "分享这张地图" : "Share this map")}</button></section>
+        <p id="share-status" className="mt-3 min-h-5 text-center text-xs text-ink/55 dark:text-white/55" role="status" aria-live="polite">{copied ? (language === "zh" ? "分享文字和链接已复制。" : "Share text and link copied.") : shareError ? (language === "zh" ? "暂时无法分享或复制，请稍后再试。" : "Sharing and clipboard access are unavailable. Please try again.") : ""}</p>
+        <div className="mt-5 flex flex-col gap-3 text-center text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-center"><Link href="/history/" className="atlas-text-link justify-center">{language === "zh" ? "查看历史" : "View history"}</Link><span className="hidden sm:inline">/</span><Link href={`/test/${testId}/`} className="atlas-text-link justify-center">{language === "zh" ? "查看测试说明" : "Test details"}</Link></div>
+        <p className="mt-9 text-center text-xs leading-5 text-ink/35 dark:text-white/35">{language === "zh" ? "仅用于自我反思，不构成诊断或专业评估。" : "For self-reflection only. This is not a diagnosis or professional assessment."}</p>
+      </PageContainer>
     </div>
   );
 }

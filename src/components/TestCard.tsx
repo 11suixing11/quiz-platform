@@ -1,114 +1,57 @@
-﻿"use client";
+"use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import type { CSSProperties } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import type { TestEntry, Lang } from "@/lib/types";
-import { CATEGORY_COLORS } from "@/lib/constants";
-import { isBookmarked, toggleBookmark } from "@/lib/bookmarks";
+import { ArrowUpRight, Bookmark, BookmarkCheck, Clock3 } from "lucide-react";
+import type { QuizCatalogEntry } from "@/core/quiz";
+import type { TestRegistryEntry } from "@/lib/test-registry";
+import type { Lang } from "@/lib/types";
+import { useBookmarks } from "@/hooks/use-local-storage";
+import { CategoryMark } from "@/components/quiz/category-mark";
 
-interface TestCardProps {
-  test: TestEntry;
-  index?: number;
-  lang?: Lang;
+type TestCardItem = TestRegistryEntry | QuizCatalogEntry;
+
+function getCardCopy(test: TestCardItem, lang: Lang) {
+  if ("title" in test) {
+    return {
+      title: test.title[lang],
+      description: test.description[lang],
+      duration: test.duration,
+    };
+  }
+  return {
+    title: test[lang].name,
+    description: test[lang].description,
+    duration: test.time,
+  };
 }
 
-export function TestCard({ test, index = 0, lang = "zh" }: TestCardProps) {
-  const categoryColor = CATEGORY_COLORS[test.category] || "#666";
-  const name = lang === "en" ? test.en.name : test.zh.name;
-  const description = lang === "en" ? test.en.description : test.zh.description;
-  const [bookmarked, setBookmarked] = useState(false);
-
-  // Difficulty badge
-  const difficultyBadge = useMemo(() => {
-    const q = test.questions;
-    if (q <= 16) return { emoji: "⚡", label: lang === "en" ? "Quick" : "快速", color: "bg-emerald-500" };
-    if (q <= 25) return { emoji: "📋", label: lang === "en" ? "Standard" : "标准", color: "bg-blue-500" };
-    return { emoji: "🔬", label: lang === "en" ? "Deep" : "深度", color: "bg-purple-500" };
-  }, [test.questions, lang]);
-
-  useEffect(() => {
-    setBookmarked(isBookmarked(test.id));
-  }, [test.id]);
-
-  const handleBookmark = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const updated = toggleBookmark(test.id);
-      setBookmarked(updated.includes(test.id));
-    },
-    [test.id]
-  );
+export function TestCard({ test, index = 0, lang = "zh" }: { test: TestCardItem; index?: number; lang?: Lang }) {
+  const { isBookmarked, toggleBookmark } = useBookmarks();
+  const saved = isBookmarked(test.id);
+  const { title, description, duration } = getCardCopy(test, lang);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.3) }}
-    >
-      <Link href={`/test/${test.id}`} className="block group">
-        <Card className="h-full cursor-pointer border-[#2C2C2C]/8 dark:border-white/10 transition-all duration-300 hover:border-[#2C2C2C]/20 dark:hover:border-white/20 hover:shadow-lg hover:shadow-[#2C2C2C]/5 dark:hover:shadow-black/20 hover:-translate-y-1">
-          <CardHeader className="pb-2">
-            <div className="flex items-start justify-between">
-              <span className="text-3xl transition-transform duration-300 group-hover:scale-110">{test.icon}</span>
-              <div className="flex items-center gap-1.5">
-                {test.new && (
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide text-white bg-gradient-to-r from-amber-500 to-orange-500 shadow-sm">
-                    NEW
-                  </span>
-                )}
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow-sm ${difficultyBadge.color}`}>
-                  {difficultyBadge.emoji} {difficultyBadge.label}
-                </span>
-                <span
-                  className="rounded-full px-2.5 py-0.5 text-xs font-medium text-white transition-all duration-300 group-hover:shadow-sm"
-                  style={{ backgroundColor: categoryColor }}
-                >
-                  {test.questions} {lang === "en" ? "Q" : "题"}
-                </span>
-                <button
-                  onClick={handleBookmark}
-                  className="flex h-6 w-6 items-center justify-center rounded-full transition-all hover:scale-110"
-                  aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
-                >
-                  {bookmarked ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="2">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#2C2C2C]/25 dark:text-white/25">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-            <h3 className="mt-2 text-base font-semibold text-[#2C2C2C] dark:text-white group-hover:text-[#2C2C2C]/90 dark:group-hover:text-white/90 transition-colors">
-              {name}
-            </h3>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm leading-relaxed text-[#2C2C2C]/60 dark:text-white/60 line-clamp-2">
-              {description}
-            </p>
-            <div className="mt-3 flex items-center justify-between">
-              <div className="flex items-center gap-1 text-xs text-[#2C2C2C]/40 dark:text-white/40">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-                <span>{test.time} {lang === "en" ? "min" : "分钟"}</span>
-              </div>
-              <span className="text-xs font-medium text-[#2C2C2C]/30 dark:text-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {lang === "en" ? "Details →" : "详情 →"}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+    <article className="atlas-test-card" style={{ "--delay": `${Math.min(index * 35, 210)}ms` } as CSSProperties}>
+      <Link href={`/test/${test.id}/`} className="group block h-full">
+        <div className="flex h-full flex-col gap-5 p-5 sm:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <CategoryMark category={test.category} className="text-accent" />
+            <span className="atlas-index">{String(index + 1).padStart(2, "0")}</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-semibold tracking-[-0.025em] text-ink transition group-hover:text-accent dark:text-white">{title}</h3>
+            <p className="mt-2 line-clamp-3 text-sm leading-6 text-ink/58 dark:text-white/58">{description}</p>
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t border-ink/10 pt-4 text-xs text-ink/45 dark:border-white/10 dark:text-white/45">
+            <span className="inline-flex items-center gap-1.5"><Clock3 className="size-3.5" />{test.questions} {lang === "zh" ? "题" : "questions"} · {duration} {lang === "zh" ? "分钟" : "min"}</span>
+            <span className="inline-flex items-center gap-1 font-semibold text-ink/70 transition group-hover:text-accent dark:text-white/70"><span>{lang === "zh" ? "查看" : "Open"}</span><ArrowUpRight className="size-3.5 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span>
+          </div>
+        </div>
       </Link>
-    </motion.div>
+      <button type="button" onClick={() => toggleBookmark(test.id)} className="atlas-card-save" aria-pressed={saved} aria-label={saved ? (lang === "zh" ? "取消收藏" : "Remove bookmark") : (lang === "zh" ? "收藏测试" : "Save test")}>
+        {saved ? <BookmarkCheck className="size-4" aria-hidden="true" /> : <Bookmark className="size-4" aria-hidden="true" />}
+      </button>
+    </article>
   );
 }
