@@ -100,7 +100,7 @@ https://github.com/11suixing11/quiz-platform
 - Languages: Simplified Chinese and English
 - Scoring families: type, dimensions, score
 - Storage: browser-local `know-yourself:v3` snapshot
-- Deployment: static export under `/quiz-platform/`
+- Deployment: GitHub Pages static export at `https://loveuu.xyz/`
 - License: MIT
 
 ## Claims to avoid

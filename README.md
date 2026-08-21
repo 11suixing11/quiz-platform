@@ -13,7 +13,7 @@
 - **中英双语**：中文与 English 共用同一套导航、状态和数据模型
 - **本地优先**：无账号、无后端、无云同步；结果保存在当前浏览器
 - **可携带数据**：设置页支持 v3 JSON 导入、导出、合并、替换和清空
-- **静态部署**：Next.js 静态导出，兼容 GitHub Pages 的 `/quiz-platform/` 路径
+- **静态部署**：Next.js 静态导出，通过 GitHub Pages 发布到 `https://loveuu.xyz/`
 
 ## 体验路线
 
@@ -77,7 +77,7 @@ npm install
 npm run dev
 ```
 
-打开 `http://localhost:3333/quiz-platform/`。
+打开 `http://localhost:3333/`。
 
 ## 验证命令
 

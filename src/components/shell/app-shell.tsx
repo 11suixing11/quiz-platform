@@ -85,7 +85,7 @@ export function AppHeader({ backHref, backLabel, section }: { backHref?: string;
 export function MobileNav() {
   const pathname = usePathname();
   const { language } = useLanguage();
-  const routePath = pathname.replace(/^\/quiz-platform(?=\/|$)/, "") || "/";
+  const routePath = pathname || "/";
   if (routePath.startsWith("/quiz/") || routePath.startsWith("/result/")) return null;
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 px-3 py-2 backdrop-blur-xl dark:border-white/10 dark:bg-night/95 sm:hidden" aria-label={language === "zh" ? "主导航" : "Primary navigation"}>

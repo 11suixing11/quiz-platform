@@ -6,7 +6,6 @@ import { fileURLToPath } from "node:url";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = path.join(projectRoot, "out");
-const basePath = "/quiz-platform";
 const port = Number(process.env.PORT || 3333);
 
 const MIME_TYPES = {
@@ -36,11 +35,7 @@ function sendText(response, statusCode, body, headers = {}) {
 }
 
 function toOutputPath(requestPath) {
-  if (requestPath === "/") return null;
-  const relativePath = requestPath.startsWith(`${basePath}/`)
-    ? requestPath.slice(basePath.length)
-    : requestPath;
-  const decodedPath = decodeURIComponent(relativePath || "/");
+  const decodedPath = decodeURIComponent(requestPath || "/");
   const resolved = path.resolve(outputRoot, `.${decodedPath}`);
   if (resolved !== outputRoot && !resolved.startsWith(`${outputRoot}${path.sep}`)) return null;
   return resolved;
@@ -79,12 +74,6 @@ const server = http.createServer(async (request, response) => {
     const requestUrl = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
     const requestPath = requestUrl.pathname;
 
-    if (requestPath === "/" || requestPath === basePath) {
-      response.writeHead(302, { Location: `${basePath}/` });
-      response.end();
-      return;
-    }
-
     const filePath = await resolveFile(requestPath);
     if (!filePath) {
       const notFoundPath = path.join(outputRoot, "404.html");
@@ -109,7 +98,7 @@ const server = http.createServer(async (request, response) => {
 
 server.listen(port, () => {
   console.log(`Serving ${outputRoot}`);
-  console.log(`Local: http://localhost:${port}${basePath}/`);
+  console.log(`Local: http://localhost:${port}/`);
 });
 
 function shutdown() {

@@ -10,7 +10,7 @@ canonical_url: https://github.com/11suixing11/quiz-platform
 
 # I Built a Self-Discovery Platform — Here's What I Learned
 
-![Cover](https://11suixing11.github.io/quiz-platform/og-image.png)
+![Cover](https://loveuu.xyz/og-image.png)
 
 ## The Moment It Started
 
@@ -20,9 +20,9 @@ I wanted something better. Something that felt like a quiet conversation with yo
 
 So I built it.
 
-**[Know Yourself (认识你自己)](https://11suixing11.github.io/quiz-platform)** — a self-discovery platform with 100+ quizzes, zero ads, zero tracking, and everything stored locally on your device. It is built for reflection, not clinical diagnosis.
+**[Know Yourself (认识你自己)](https://loveuu.xyz/)** — a self-discovery platform with 100+ quizzes, zero ads, zero tracking, and everything stored locally on your device. It is built for reflection, not clinical diagnosis.
 
-🔗 **Live**: https://11suixing11.github.io/quiz-platform  
+🔗 **Live**: https://loveuu.xyz/
 ⭐ **GitHub**: https://github.com/11suixing11/quiz-platform
 
 ---
@@ -357,7 +357,7 @@ Direction-aware animations that feel natural. The `custom` prop on `AnimatePrese
 
 The platform is live and free:
 
-🔗 **https://11suixing11.github.io/quiz-platform**
+🔗 **https://loveuu.xyz/**
 
 Start with the Big Five, MBTI, or Enneagram if you're into personality. Try the Emotional Intelligence or Love Language tests for relationships. Or just browse — there's something for every kind of self-curious person.
 

@@ -2,7 +2,7 @@
 import { QUIZ_CATALOG } from "@/core/quiz";
 
 export const dynamic = "force-static";
-const BASE_URL = "https://11suixing11.github.io/quiz-platform";
+const BASE_URL = "https://loveuu.xyz";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [

@@ -2,15 +2,15 @@
   "name": "认识你自己 | Know Yourself",
   "short_name": "Know Yourself",
   "description": "A bilingual, local-first self-reflection platform with 16 curated routes.",
-  "start_url": "/quiz-platform/",
-  "scope": "/quiz-platform/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#F4F0E7",
   "theme_color": "#2F6B5F",
   "lang": "zh-CN",
   "icons": [
-    { "src": "/quiz-platform/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
-    { "src": "/quiz-platform/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" },
-    { "src": "/quiz-platform/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" },
+    { "src": "/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
   ]
 }

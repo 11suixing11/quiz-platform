@@ -2,7 +2,7 @@
 import "./globals.css";
 import { MobileNav, PreferenceSync } from "@/components/shell/app-shell";
 
-const SITE_URL = "https://11suixing11.github.io/quiz-platform";
+const SITE_URL = "https://loveuu.xyz";
 const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "16 条经过审阅的中英双语自我反思路线。选择一个方向，完成测试，得到一张可以带回日常生活的结果地图。所有个人记录只保存在当前浏览器。",
   keywords: ["自我反思", "人格测试", "情绪", "关系", "self reflection", "personality quiz"],
   authors: [{ name: "Know Yourself" }],
-  manifest: "/quiz-platform/manifest.json",
+  manifest: "/manifest.json",
   openGraph: {
     title: "认识你自己 | Know Yourself",
     description: "16 条经过审阅的中英双语路线，一条安静、清晰、本地优先的自我探索路径。",
@@ -44,7 +44,7 @@ const preferenceScript = `(function(){try{var raw=localStorage.getItem('know-you
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
-      <head><link rel="apple-touch-icon" href="/quiz-platform/icons/icon-192.svg" /><script dangerouslySetInnerHTML={{ __html: preferenceScript }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} /></head>
+      <head><link rel="apple-touch-icon" href="/icons/icon-192.svg" /><script dangerouslySetInnerHTML={{ __html: preferenceScript }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} /></head>
       <body className="min-h-full bg-paper font-sans text-ink dark:bg-night dark:text-white"><a className="skip-link" href="#main-content">跳到主要内容 / Skip to main content</a><PreferenceSync />{children}<MobileNav /></body>
     </html>
   );

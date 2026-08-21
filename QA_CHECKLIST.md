@@ -74,4 +74,4 @@ Keep every item unchecked until it has been verified manually in the named brows
 - [ ] History and bookmarks update after storage changes without a reload.
 - [ ] All 16 public flagship routes load, score, save, reopen, and retake successfully.
 - [ ] No non-flagship route is exposed through navigation, sitemap, or generated public routes.
-- [ ] Static export works under the `/quiz-platform` base path with no broken internal asset or route links.
+- [ ] Static export works at the custom-domain root path with no broken internal asset or route links.

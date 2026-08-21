@@ -7,7 +7,7 @@ body:
     id: url
     attributes:
       label: Page URL
-      placeholder: https://11suixing11.github.io/quiz-platform/...
+      placeholder: https://loveuu.xyz/...
     validations:
       required: false
   - type: textarea

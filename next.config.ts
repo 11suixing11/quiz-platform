@@ -2,7 +2,6 @@
 
 const nextConfig: NextConfig = {
   output: "export",
-  basePath: "/quiz-platform",
   images: {
     unoptimized: true,
   },
