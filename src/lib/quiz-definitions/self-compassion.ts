@@ -5,9 +5,36 @@ import type { DimensionData } from "../../core/quiz/types";
 const questions = normalizeLegacyQuestions(legacy.questions);
 
 const dimensions: Record<string, DimensionData> = {
-  SK: { name: "Self-kindness", zh: "自我善意", description: "犯错或受挫时，是否能减少苛责并给予自己理解。" },
-  CH: { name: "Common humanity", zh: "共同人性", description: "能否记得困难并非只发生在自己身上。" },
-  MI: { name: "Mindful awareness", zh: "清醒觉察", description: "能否看见痛苦而不否认，也不被它完全淹没。" },
+  SK: {
+    name: "Self-kindness",
+    zh: "自我善意",
+    description: "犯错或受挫时，是否能减少苛责并给予自己理解。",
+    descriptionEn: "Responding to mistakes or setbacks with less self-criticism and more understanding.",
+    observation: {
+      zh: "你对别人往往比对自己宽容；真正的练习不是放过错误，而是在承认错误后，仍然愿意站在自己这边。",
+      en: "You may be more forgiving toward others than yourself. The practice is not excusing mistakes, but staying on your own side after acknowledging them.",
+    },
+  },
+  CH: {
+    name: "Common humanity",
+    zh: "共同人性",
+    description: "能否记得困难并非只发生在自己身上。",
+    descriptionEn: "Remembering that difficulty is part of being human and not yours alone.",
+    observation: {
+      zh: "难受时你很容易以为“只有我这样”；当你想起别人也会卡住、失败和需要时间，孤立感会松开一点。",
+      en: "When things hurt, it can feel like “I am the only one like this.” Remembering that others also struggle can loosen the sense of isolation.",
+    },
+  },
+  MI: {
+    name: "Mindful awareness",
+    zh: "清醒觉察",
+    description: "能否看见痛苦而不否认，也不被它完全淹没。",
+    descriptionEn: "Seeing pain without denying it or being completely overwhelmed by it.",
+    observation: {
+      zh: "你可以一边承认“我现在真的不好受”，一边不让这份感受替你决定全部结论；这中间的空间很珍贵。",
+      en: "You can acknowledge “this really hurts” without letting the feeling decide every conclusion for you. That space in between matters.",
+    },
+  },
 };
 
 const definition = defineQuiz({

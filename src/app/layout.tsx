@@ -8,13 +8,13 @@ const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "认识你自己 | Know Yourself", template: "%s | Know Yourself" },
-  description: "16 条经过审阅的中英双语自我反思路线。选择一个方向，完成测试，得到一张可以带回日常生活的结果地图。所有个人记录只保存在当前浏览器。",
+  description: "16 项经过审阅的中英双语心理评测。选择一个当下在意的方向，完成回答，获得可带回日常生活的自我观察。所有个人记录只保存在当前浏览器。",
   keywords: ["自我反思", "人格测试", "情绪", "关系", "self reflection", "personality quiz"],
   authors: [{ name: "Know Yourself" }],
   manifest: "/manifest.json",
   openGraph: {
     title: "认识你自己 | Know Yourself",
-    description: "16 条经过审阅的中英双语路线，一条安静、清晰、本地优先的自我探索路径。",
+    description: "16 项经过审阅的中英双语心理评测，安静、清晰，并且本地优先。",
     siteName: "认识你自己 | Know Yourself",
     locale: "zh_CN",
     alternateLocale: ["en_US"],
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   other: { "apple-mobile-web-app-capable": "yes", "apple-mobile-web-app-status-bar-style": "default", "apple-mobile-web-app-title": "认识你自己" },
 };
 
-export const viewport: Viewport = { themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F4F0E7" }, { media: "(prefers-color-scheme: dark)", color: "#111715" }], colorScheme: "light dark" };
+export const viewport: Viewport = { themeColor: [{ media: "(prefers-color-scheme: light)", color: "#FAF0E5" }, { media: "(prefers-color-scheme: dark)", color: "#17201E" }], colorScheme: "light dark" };
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -43,7 +43,7 @@ const preferenceScript = `(function(){try{var raw=localStorage.getItem('know-you
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+    <html lang="zh-CN" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head><link rel="apple-touch-icon" href="/icons/icon-192.svg" /><script dangerouslySetInnerHTML={{ __html: preferenceScript }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} /></head>
       <body className="min-h-full bg-paper font-sans text-ink dark:bg-night dark:text-white"><a className="skip-link" href="#main-content">跳到主要内容 / Skip to main content</a><PreferenceSync />{children}<MobileNav /></body>
     </html>

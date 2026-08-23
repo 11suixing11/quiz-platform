@@ -11,27 +11,54 @@ const dimensions: Record<string, DimensionData> = {
   JP: { name: "Judging / Perceiving", zh: "判断 / 感知", description: "更偏好预先确定结构，还是保留弹性与开放选项。" },
 };
 
+function cleanEnglish(text: string) {
+  return text
+    .replaceAll("feel不安 about", "feel uneasy about")
+    .replaceAll("excel at感受 beauty", "excel at appreciating beauty")
+    .replaceAll("—", ",");
+}
+
 const types: Record<string, { zh: TypeData; en: TypeData }> = {
   ...legacy.types,
   ISFP: {
     ...legacy.types.ISFP,
     en: {
       ...legacy.types.ISFP.en,
-      description: legacy.types.ISFP.en.description.replace("excel at感受 beauty", "excel at appreciating beauty"),
+      description: cleanEnglish(legacy.types.ISFP.en.description),
     },
   },
 };
 
-const narrative: Record<string, { zh: NarrativeResult; en: NarrativeResult }> = {
+const baseNarrative: Record<string, { zh: NarrativeResult; en: NarrativeResult }> = {
   ...legacy.narrative,
   ESTP: {
     ...legacy.narrative.ESTP,
     en: {
       ...legacy.narrative.ESTP.en,
-      inRelationship: legacy.narrative.ESTP.en.inRelationship.replace("feel不安 about", "feel uneasy about"),
+      inRelationship: cleanEnglish(legacy.narrative.ESTP.en.inRelationship),
     },
   },
 };
+
+function splitScenes(value: unknown) {
+  if (typeof value !== "string") return undefined;
+  const scenes = value.split(";").map((scene) => scene.trim()).filter(Boolean);
+  return scenes.length ? scenes : undefined;
+}
+
+const legacyArchetypes = legacy.archetypes as Record<string, { scenes_zh?: string; scenes_en?: string } | undefined>;
+const narrative: Record<string, { zh: NarrativeResult; en: NarrativeResult }> = Object.fromEntries(
+  Object.entries(baseNarrative).map(([key, value]) => {
+    const scenes = legacyArchetypes?.[key];
+    return [
+      key,
+      {
+        zh: { ...value.zh, scenes: splitScenes(scenes?.scenes_zh) },
+        en: { ...value.en, scenes: splitScenes(cleanEnglish(scenes?.scenes_en ?? "")) },
+      },
+    ];
+  }),
+) as Record<string, { zh: NarrativeResult; en: NarrativeResult }>;
 
 const definition = defineQuiz({
   id: "mbti",

@@ -16,7 +16,7 @@ function collectFiles(directory) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const filePath = path.join(directory, entry.name);
     if (entry.isDirectory()) files.push(...collectFiles(filePath));
-    else if (/\.(?:[jt]sx?)$/u.test(entry.name)) files.push(filePath);
+    else if (/\.(?:[jt]sx?|css)$/u.test(entry.name)) files.push(filePath);
   }
   return files;
 }
@@ -96,7 +96,7 @@ for (const { name, source } of sources) {
 
 if (!/aria-current\s*=/u.test(allSource)) add(warnings, "No current-page navigation state found; verify active navigation semantics");
 if (!/aria-live\s*=/u.test(allSource)) add(warnings, "No live region found; verify loading and recovery feedback");
-if (!/useReducedMotion/u.test(allSource)) add(warnings, "No Framer Motion reduced-motion hook found");
+if (!/useReducedMotion|prefers-reduced-motion/u.test(allSource)) add(warnings, "No reduced-motion fallback found");
 
 console.log("# Accessibility audit");
 console.log(`Scanned ${sources.length} source files.`);

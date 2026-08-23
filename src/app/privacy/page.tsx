@@ -45,7 +45,7 @@ export default function PrivacyPage() {
   const t = content[language];
   return (
     <div className="atlas-page min-h-screen">
-      <AppHeader backHref="/" backLabel={language === "zh" ? "探索地图" : "Explore map"} section={t.title} />
+      <AppHeader backHref="/" backLabel={language === "zh" ? "返回首页" : "Back home"} section={t.title} />
       <PageContainer className="max-w-3xl">
         <p className="atlas-section-kicker">{language === "zh" ? "本地优先" : "Local first"}</p>
         <h1 className="atlas-section-title mt-3">{t.title}</h1>

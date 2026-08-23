@@ -5,8 +5,26 @@ import type { DimensionData, ScoreBand } from "../../core/quiz/types";
 const questions = normalizeLegacyQuestions(legacy.questions);
 
 const dimensions: Record<string, DimensionData> = {
-  HB: { name: "Boundary expression", zh: "边界表达", description: "表达需要、拒绝、保护空间并尊重彼此界限的能力。" },
-  PB: { name: "Boundary pressure", zh: "边界压力", description: "因为担心拒绝、关系受损或被否定而难以坚持界限的程度。" },
+  HB: {
+    name: "Boundary expression",
+    zh: "边界表达",
+    description: "表达需要、拒绝、保护空间并尊重彼此界限的能力。",
+    descriptionEn: "Expressing needs, saying no, protecting space, and respecting each other’s limits.",
+    observation: {
+      zh: "你会把‘我需要什么’和‘我现在能做到什么’说得更清楚，让关系不必靠猜。",
+      en: "You are more able to say what you need and what you can realistically offer, so the relationship does not have to rely on guessing.",
+    },
+  },
+  PB: {
+    name: "Boundary pressure",
+    zh: "边界压力",
+    description: "因为担心拒绝、关系受损或被否定而难以坚持界限的程度。",
+    descriptionEn: "The pressure that can make it harder to hold a limit when rejection or relationship loss feels possible.",
+    observation: {
+      zh: "当你担心让别人失望、关系变僵或被误解时，坚持自己的界限会更费力。",
+      en: "Holding a limit can feel harder when you worry about disappointing someone, changing the relationship, or being misunderstood.",
+    },
+  },
 };
 
 const scoreBands: ScoreBand[] = [

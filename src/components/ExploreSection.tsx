@@ -40,15 +40,15 @@ export default function ExploreSection({ lang = "zh" }: { lang?: Lang }) {
     <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
       <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
         <div>
-          <h2 className="atlas-section-title">{lang === "zh" ? "精选路线" : "Curated routes"}</h2>
+          <h2 className="atlas-section-title">{lang === "zh" ? "精选测评" : "Curated assessments"}</h2>
           <p className="mt-3 max-w-lg text-sm leading-6 text-ink/58 dark:text-white/58">
-            {lang === "zh" ? `这里先开放 ${QUIZ_CATALOG.length} 条经过审阅的路线。按主题、题量或一个此刻在意的词，找到下一条路径。` : `${QUIZ_CATALOG.length} reviewed routes are open for now. Search by subject, length, or a question that matters today.`}
+            {lang === "zh" ? `这里有 ${QUIZ_CATALOG.length} 项经过审阅的测评。可以按主题、题量，或一个此刻在意的词来筛选。` : `${QUIZ_CATALOG.length} reviewed assessments are available. Search by subject, length, or a question that matters today.`}
           </p>
         </div>
-        <label className="atlas-search" htmlFor="route-search">
-          <span className="sr-only">{lang === "zh" ? "搜索路线" : "Search routes"}</span>
+        <label className="atlas-search" htmlFor="assessment-search">
+          <span className="sr-only">{lang === "zh" ? "搜索测评" : "Search assessments"}</span>
           <Search className="size-4 text-ink/35 dark:text-white/35" aria-hidden="true" />
-          <input id="route-search" name="route-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={lang === "zh" ? "搜索性格、情绪、关系……" : "Search personality, emotion, relationships…"} />
+          <input id="assessment-search" name="assessment-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={lang === "zh" ? "搜索性格、情绪、关系……" : "Search personality, emotion, relationships…"} />
           {query && <button type="button" onClick={() => setQuery("")} className="atlas-icon-button" aria-label={lang === "zh" ? "清除搜索" : "Clear search"}><X className="size-4" aria-hidden="true" /></button>}
         </label>
       </div>
@@ -82,8 +82,8 @@ export default function ExploreSection({ lang = "zh" }: { lang?: Lang }) {
         </div>
       ) : (
         <div className="atlas-empty-state mt-8">
-          <p className="font-semibold">{lang === "zh" ? "这条路径暂时没有结果" : "No path matched those filters"}</p>
-          <button type="button" onClick={reset} className="mt-3 text-sm font-semibold text-accent hover:underline">{lang === "zh" ? "回到精选路线" : "Return to curated routes"}</button>
+          <p className="font-semibold">{lang === "zh" ? "暂时没有符合条件的测评" : "No assessment matched those filters"}</p>
+          <button type="button" onClick={reset} className="mt-3 text-sm font-semibold text-accent hover:underline">{lang === "zh" ? "清除筛选" : "Clear filters"}</button>
         </div>
       )}
     </div>

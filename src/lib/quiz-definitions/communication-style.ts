@@ -5,10 +5,46 @@ import type { DimensionData, TypeData } from "../../core/quiz/types";
 const questions = normalizeLegacyQuestions(legacy.questions);
 
 const dimensions: Record<string, DimensionData> = {
-  AS: { name: "Assertive", zh: "坚定表达", description: "清楚表达需求，同时为对方保留空间。" },
-  PA: { name: "Accommodating", zh: "迁就配合", description: "优先维持关系与和谐，较容易让步。" },
-  AG: { name: "Forceful", zh: "强势主导", description: "倾向用控制、批评或压迫感推动对话。" },
-  AN: { name: "Reserved / Avoidant", zh: "内敛回避", description: "较少主动表达，面对分歧时更容易退回沉默。" },
+  AS: {
+    name: "Assertive",
+    zh: "坚定表达",
+    description: "清楚表达需求，同时为对方保留空间。",
+    descriptionEn: "Expressing needs clearly while leaving room for the other person.",
+    observation: {
+      zh: "你更愿意把“我不舒服”说成一件具体的事，也希望讨论最后能落到双方都知道该怎么做。",
+      en: "You are more likely to turn “I feel uncomfortable” into something specific and want the conversation to end with both people knowing what to do next.",
+    },
+  },
+  PA: {
+    name: "Accommodating",
+    zh: "迁就配合",
+    description: "优先维持关系与和谐，较容易让步。",
+    descriptionEn: "Prioritizing harmony and the relationship, sometimes by yielding.",
+    observation: {
+      zh: "你很快就能看见对方的难处，常会先把气氛照顾好；只是自己的那句“其实我不想”可能会晚一点才出现。",
+      en: "You quickly notice the other person's difficulty and often take care of the atmosphere first, while your own “I actually do not want this” may arrive later.",
+    },
+  },
+  AG: {
+    name: "Forceful",
+    zh: "强势主导",
+    description: "倾向用控制、批评或压迫感推动对话。",
+    descriptionEn: "Pushing a conversation through control, criticism, or increased pressure.",
+    observation: {
+      zh: "当事情迟迟没有结论时，你会本能地提高力度、收紧选择，希望尽快把局面带回可控范围。",
+      en: "When a conversation stalls without a conclusion, you may instinctively increase the pressure and narrow the options to bring the situation back under control.",
+    },
+  },
+  AN: {
+    name: "Reserved / Avoidant",
+    zh: "内敛回避",
+    description: "较少主动表达，面对分歧时更容易退回沉默。",
+    descriptionEn: "Speaking less and retreating into silence more easily during disagreement.",
+    observation: {
+      zh: "你不是没有想法，而是会先衡量说出来会不会让事情更糟；如果没有足够安全感，沉默会比解释更省力。",
+      en: "It is not that you have no opinion. You first weigh whether speaking will make things worse, and without enough safety, silence can feel easier than explaining.",
+    },
+  },
 };
 
 const types: Record<string, { zh: TypeData; en: TypeData }> = {
@@ -30,7 +66,7 @@ const types: Record<string, { zh: TypeData; en: TypeData }> = {
   },
   MIXED: {
     zh: { title: "情境切换型", name: "情境切换", description: "这次回答中没有一种沟通方式明显领先。你可能会根据对象、关系安全感和压力程度切换表达方式。" },
-    en: { title: "Context-Switching Communicator", name: "Context-switching", description: "No single communication pattern clearly leads in these answers. You may shift styles depending on the person, relational safety, and level of pressure." },
+    en: { title: "Context-Switching Communicator", name: "Context-switching", description: "You are a context-switching communicator: you adjust how you express yourself based on the person, relational safety, and pressure. Reading the room and shifting is part of your communication strength." },
   },
 };
 

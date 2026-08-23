@@ -5,10 +5,46 @@ import type { DimensionData, TypeData } from "../../core/quiz/types";
 const questions = normalizeLegacyQuestions(legacy.questions);
 
 const dimensions: Record<string, DimensionData> = {
-  LI: { name: "Lion drive", zh: "狮子行动力", description: "主动、果断、愿意承担领导责任的倾向。" },
-  DO: { name: "Dog connection", zh: "狗狗连接力", description: "重视忠诚、协作与相互支持的倾向。" },
-  CA: { name: "Cat independence", zh: "猫咪独立性", description: "按自己的节奏行动并从独处中恢复的倾向。" },
-  OW: { name: "Owl observation", zh: "猫头鹰观察力", description: "先观察、思考，再形成判断的倾向。" },
+  LI: {
+    name: "Lion drive",
+    zh: "狮子行动力",
+    description: "主动、果断、愿意承担领导责任的倾向。",
+    descriptionEn: "A tendency to act decisively, take initiative, and carry responsibility.",
+    observation: {
+      zh: "别人还在判断要不要开始时，你更容易先站出来，把模糊的问题变成一个可以行动的下一步。",
+      en: "While others are still deciding whether to begin, you are more likely to step forward and turn an unclear problem into a next action.",
+    },
+  },
+  DO: {
+    name: "Dog connection",
+    zh: "狗狗连接力",
+    description: "重视忠诚、协作与相互支持的倾向。",
+    descriptionEn: "A tendency to value loyalty, cooperation, and mutual support.",
+    observation: {
+      zh: "你会记得谁需要被照顾、谁答应过什么，也很在意一段关系能不能经得住时间和小摩擦。",
+      en: "You remember who needs support and who promised what, and you care whether a relationship can hold up through time and small frictions.",
+    },
+  },
+  CA: {
+    name: "Cat independence",
+    zh: "猫咪独立性",
+    description: "按自己的节奏行动并从独处中恢复的倾向。",
+    descriptionEn: "A tendency to move at your own pace and recover through solitude.",
+    observation: {
+      zh: "你不一定抗拒连接，但需要保留一块不被打扰的空间，才能重新听见自己的节奏和判断。",
+      en: "You do not necessarily avoid connection, but you need some undisturbed space to hear your own pace and judgment again.",
+    },
+  },
+  OW: {
+    name: "Owl observation",
+    zh: "猫头鹰观察力",
+    description: "先观察、思考，再形成判断的倾向。",
+    descriptionEn: "A tendency to observe and think before forming a judgment.",
+    observation: {
+      zh: "你常会先看清气氛、细节和前因后果，再开口；别人觉得你安静时，你可能已经在心里整理出完整判断。",
+      en: "You often read the atmosphere, details, and context before speaking. While others see quiet, you may already be forming a complete judgment.",
+    },
+  },
 };
 
 const types: Record<string, { zh: TypeData; en: TypeData }> = {
@@ -17,12 +53,12 @@ const types: Record<string, { zh: TypeData; en: TypeData }> = {
     zh: {
       title: "混合动物画像",
       name: "混合型",
-      description: "这次回答中没有单一动物倾向明显领先。你可能会根据情境切换行动、连接、独处与观察的方式。",
+      description: "你是混合型：行动、连接、独处与观察都能成为你的自然方式，你会根据情境切换。多面性就是你的特点。",
     },
     en: {
       title: "Mixed Animal Profile",
       name: "Mixed profile",
-      description: "No single animal pattern clearly leads in these answers. You may shift between action, connection, independence, and observation depending on the situation.",
+      description: "You are a mixed profile: action, connection, independence, and observation can all come naturally to you. Your range is part of what makes this profile yours.",
     },
   },
 };

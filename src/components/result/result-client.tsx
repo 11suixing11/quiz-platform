@@ -8,9 +8,10 @@ import { loadQuizDefinition, getQuizEntry, getResultKey, getResultScore, getScor
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { NarrativeSection } from "@/components/result/narrative-section";
 import { ReflectionGuide } from "@/components/result/reflection-guide";
+import { ResultDetails } from "@/components/result/result-details";
 import { useLanguage } from "@/hooks/use-local-storage";
 import { getAttemptById, getLatestAttempt } from "@/lib/storage";
-import type { Lang } from "@/core/quiz";
+import type { ArchetypeData, DimensionData, Lang, ScoreBand } from "@/core/quiz";
 
 function pickNarrative(definition: QuizDefinition, key: string, language: Lang) {
   const entry = definition.resultContent.narrative?.[key] ?? definition.resultContent.narrative?.[Object.keys(definition.resultContent.narrative ?? {})[0]];
@@ -25,14 +26,318 @@ function pickType(definition: QuizDefinition, key: string, language: Lang) {
 function pickArchetype(definition: QuizDefinition, key: string, language: Lang) {
   const entry = definition.resultContent.archetypes?.[key];
   if (!entry) return undefined;
+  const localize = (zh: keyof ArchetypeData, en: keyof ArchetypeData) => language === "zh" ? entry[zh] : entry[en];
+  const splitList = (value: unknown) => typeof value === "string"
+    ? value.split(/[;；]/u).map((item) => item.trim()).filter(Boolean)
+    : undefined;
   return {
     title: language === "zh" ? entry.title_zh ?? key : entry.title_en ?? key,
     description: language === "zh" ? entry.desc_zh : entry.desc_en,
+    high: localize("high_zh", "high_en"),
+    low: localize("low_zh", "low_en"),
+    quote: localize("quote_zh", "quote_en"),
+    traits: localize("traits_zh", "traits_en"),
+    scenes: splitList(localize("scenes_zh", "scenes_en")),
+    contradiction: localize("contradiction_zh", "contradiction_en"),
+    growthCost: localize("growth_cost_zh", "growth_cost_en"),
+    coreDesire: localize("core_desire_zh", "core_desire_en"),
+    coreFear: localize("core_fear_zh", "core_fear_en"),
+    loveStyle: localize("love_style_zh", "love_style_en"),
+    breakdownStyle: localize("breakdown_style_zh", "breakdown_style_en"),
+    defenseMechanism: localize("defense_mechanism_zh", "defense_mechanism_en"),
+    growthPath: localize("growth_path_zh", "growth_path_en"),
+    bestRelationship: localize("best_relationship_zh", "best_relationship_en"),
   };
 }
 
 function Loading({ language }: { language: Lang }) {
-  return <div className="atlas-page min-h-screen"><AppHeader /><main id="main-content" tabIndex={-1} className="atlas-loading" aria-busy="true"><span className="atlas-loading-orbit" aria-hidden="true" /><p role="status" aria-live="polite">{language === "zh" ? "正在整理这次回答…" : "Reading this route…"}</p></main></div>;
+  return <div className="atlas-page min-h-screen"><AppHeader /><main id="main-content" tabIndex={-1} className="atlas-loading" aria-busy="true"><span className="atlas-loading-orbit" aria-hidden="true" /><p role="status" aria-live="polite">{language === "zh" ? "正在整理你的回答…" : "Reading your responses…"}</p></main></div>;
+}
+
+const resultLeadCopy: Record<string, { zh: string; en: string }> = {
+  personality: {
+    zh: "你更常用什么方式，走进这个世界？",
+    en: "How do you tend to move through the world?",
+  },
+  emotion: {
+    zh: "情绪起来时，你通常怎样照顾自己？",
+    en: "How do you tend to care for yourself when emotions rise?",
+  },
+  relationship: {
+    zh: "在靠近别人时，你也在保护什么？",
+    en: "What are you protecting as you move closer to others?",
+  },
+  career: {
+    zh: "什么样的做事方式，更接近你？",
+    en: "What way of working feels most like you?",
+  },
+  lifestyle: {
+    zh: "你的日常，正在为哪些事留位置？",
+    en: "What is your daily life making room for?",
+  },
+  mental: {
+    zh: "最近的你，正在用什么方式应对生活？",
+    en: "How have you been meeting life lately?",
+  },
+};
+
+function getResultLead(category: string, language: Lang) {
+  const copy = resultLeadCopy[category] ?? {
+    zh: "这次回答，带来了什么线索？",
+    en: "What clues did this response bring up?",
+  };
+  return language === "zh" ? copy.zh : copy.en;
+}
+
+function getDominantDimension(definition: QuizDefinition, result: QuizResult, language: Lang) {
+  const first = Object.entries(result.percentages ?? {}).sort((a, b) => b[1] - a[1])[0];
+  if (!first) return undefined;
+  const [key, score] = first;
+  const metadata = definition.resultContent.dimensions?.[key];
+  return {
+    key,
+    score,
+    label: language === "zh" ? metadata?.zh ?? key : metadata?.name ?? key,
+  };
+}
+
+interface ResultSummaryItem {
+  label: string;
+  value: string;
+}
+
+function getResultSummary(definition: QuizDefinition, result: QuizResult, language: Lang): ResultSummaryItem[] {
+  if (result.dimensions?.length) {
+    return result.dimensions.map((dimension) => {
+      const metadata = definition.resultContent.dimensions?.[dimension.name];
+      const label = language === "zh"
+        ? metadata?.zh ?? dimension.zh ?? dimension.name
+        : metadata?.name ?? dimension.en ?? dimension.name;
+      const hasPair = dimension.left && dimension.right
+        && typeof dimension.leftScore === "number"
+        && typeof dimension.rightScore === "number";
+      const value = hasPair
+        ? `${dimension.left} ${Math.round(dimension.leftScore ?? 0)}% / ${dimension.right} ${Math.round(dimension.rightScore ?? 0)}%`
+        : `${Math.round(dimension.score)}%`;
+      return { label, value };
+    });
+  }
+
+  if (result.percentages && Object.keys(result.percentages).length) {
+    return Object.entries(result.percentages).map(([key, score]) => {
+      const metadata = definition.resultContent.dimensions?.[key];
+      return {
+        label: language === "zh" ? metadata?.zh ?? key : metadata?.name ?? key,
+        value: `${Math.round(score)}%`,
+      };
+    });
+  }
+
+  const score = getResultScore(result);
+  return score === null
+    ? []
+    : [{
+        label: language === "zh" ? "这次的分数" : "Score in this response",
+        value: `${Math.round(score)}%`,
+      }];
+}
+
+type ResultDetailItem = { label: string; text: string };
+type LocalizedArchetype = NonNullable<ReturnType<typeof pickArchetype>>;
+
+interface ResultDetailsCopy {
+  title: string;
+  subtitle: string;
+  items: ResultDetailItem[];
+  quote?: string;
+}
+
+interface ResultDimensionEntry {
+  key: string;
+  label: string;
+  score: number;
+  metadata?: DimensionData;
+}
+
+function getResultDimensionEntries(definition: QuizDefinition, result: QuizResult, language: Lang): ResultDimensionEntry[] {
+  if (result.dimensions?.length) {
+    return result.dimensions.map((dimension) => ({
+      key: dimension.name,
+      label: language === "zh"
+        ? definition.resultContent.dimensions?.[dimension.name]?.zh ?? dimension.zh ?? dimension.name
+        : definition.resultContent.dimensions?.[dimension.name]?.name ?? dimension.en ?? dimension.name,
+      score: dimension.score,
+      metadata: definition.resultContent.dimensions?.[dimension.name],
+    }));
+  }
+
+  return Object.entries(result.percentages ?? {}).map(([key, score]) => ({
+    key,
+    label: language === "zh"
+      ? definition.resultContent.dimensions?.[key]?.zh ?? key
+      : definition.resultContent.dimensions?.[key]?.name ?? key,
+    score,
+    metadata: definition.resultContent.dimensions?.[key],
+  }));
+}
+
+function getDimensionDetailText(
+  entry: ResultDimensionEntry,
+  archetype: LocalizedArchetype | undefined,
+  language: Lang,
+) {
+  const score = Math.round(entry.score);
+  const detail = score >= 65 ? archetype?.high : score <= 35 ? archetype?.low : undefined;
+  const base = detail
+    ?? entry.metadata?.observation?.[language]
+    ?? (language === "zh" ? entry.metadata?.description : entry.metadata?.descriptionEn)
+    ?? (language === "zh" ? `${entry.label} 是这次回答里的一条重要线索。` : `${entry.label} is one of the meaningful signals in this response.`);
+
+  if (language === "zh") {
+    if (detail) return `这条线索在这次回答里比较鲜明：${base}`;
+    if (score >= 65) return `这已经是你比较常调用的方式：${base}`;
+    if (score >= 45) return `你会在一些情境里这样反应：${base}`;
+    if (score >= 35) return `这不是每次都会出现，但在某些情境里仍能被看见：${base}`;
+    return `这可能不是你最先采用的方式：${base}`;
+  }
+  if (detail) return `This signal comes through clearly in these answers: ${base}`;
+  if (score >= 65) return `This is one of the responses you call on more often: ${base}`;
+  if (score >= 45) return `This shows up for you in some situations: ${base}`;
+  if (score >= 35) return `This is not present every time, but it still appears in some situations: ${base}`;
+  return `This may not be your first response: ${base}`;
+}
+
+function getResultDetails(
+  definition: QuizDefinition,
+  result: QuizResult,
+  language: Lang,
+  narrative: ReturnType<typeof pickNarrative>,
+  typeData: ReturnType<typeof pickType>,
+  archetype: LocalizedArchetype | undefined,
+  scoreBand: ScoreBand | undefined,
+): ResultDetailsCopy | null {
+  const items: ResultDetailItem[] = [];
+  const add = (label: string, text?: unknown) => {
+    if (typeof text === "string" && text.trim()) items.push({ label, text: text.trim() });
+  };
+
+  if (definition.kind === "type") {
+    add(language === "zh" ? "你身上的小特质" : "Small traits that show up", archetype?.traits);
+    add(language === "zh" ? "你真正想要的" : "What you may be protecting", archetype?.coreDesire);
+    add(language === "zh" ? "你表达在乎的方式" : "How you show care", archetype?.loveStyle);
+    add(language === "zh" ? "容易拉扯的地方" : "Where it can pull both ways", archetype?.contradiction ?? archetype?.growthCost);
+    add(
+      language === "zh" ? "压力上来时" : "When pressure rises",
+      narrative?.underPressure
+        ?? typeData?.underPressure
+        ?? archetype?.growthCost
+        ?? archetype?.breakdownStyle
+        ?? archetype?.defenseMechanism,
+    );
+    add(language === "zh" ? "可以带走的一点" : "A useful direction", archetype?.growthPath);
+
+    if (items.length < 3) {
+      const ranked = getResultDimensionEntries(definition, result, language).sort((a, b) => b.score - a.score).slice(0, 2);
+      ranked.forEach((entry) => add(entry.label, getDimensionDetailText(entry, undefined, language)));
+    }
+
+    if (!items.length) {
+      add(language === "zh" ? "关系里的你" : "You in relationships", narrative?.inRelationship ?? typeData?.inRelationship);
+      add(language === "zh" ? "你可以依靠的部分" : "What you can rely on", narrative?.hiddenStrength ?? typeData?.hiddenStrength);
+    }
+
+    if (!items.length) return null;
+    return {
+      title: language === "zh" ? "你可能会认出的细节" : "The details you may recognize",
+      subtitle: language === "zh"
+        ? "不是给你贴的新标签，而是把这次回答里容易被忽略的部分说得更具体。"
+        : "Not a new label — just a closer look at the parts of this response that are easy to miss.",
+      items: items.slice(0, 6),
+      quote: archetype?.quote,
+    };
+  }
+
+  if (definition.kind === "dimensions") {
+    const ranked = getResultDimensionEntries(definition, result, language).sort((a, b) => b.score - a.score);
+    ranked.slice(0, 3).forEach((entry) => {
+      const dimensionArchetype = pickArchetype(definition, entry.key, language);
+      add(entry.label, getDimensionDetailText(entry, dimensionArchetype, language));
+    });
+
+    if (ranked.length > 1) {
+      const first = ranked[0];
+      const second = ranked[1];
+      add(
+        language === "zh" ? "放在一起看" : "Look at the combination",
+        language === "zh"
+          ? `这次不只是「${first.label}」突出，「${second.label}」也同时出现。比起只盯着最高的一条，更值得留意的是：你可能会在不同场景里调用这两种方式。`
+          : `It is not only “${first.label}” that stands out; “${second.label}” appears alongside it. Rather than focusing only on the highest score, notice how different situations may call on both tendencies.`,
+      );
+    }
+
+    if (!items.length) return null;
+    return {
+      title: language === "zh" ? "你可能会认出的细节" : "The details you may recognize",
+      subtitle: language === "zh"
+        ? "分数只是入口，真正有用的是看见这些倾向在日常里怎样变成你的反应。"
+        : "The scores are only an entry point. What matters is how these tendencies become real reactions in daily life.",
+      items: items.slice(0, 4),
+    };
+  }
+
+  if (definition.kind === "score") {
+    const score = getResultScore(result);
+    const ranked = getResultDimensionEntries(definition, result, language).sort((a, b) => b.score - a.score);
+    add(
+      language === "zh" ? "这个分数在生活里的样子" : "How this may feel in daily life",
+      scoreBand?.description[language],
+    );
+
+    const suggestions = scoreBand?.suggestions?.[language];
+    if (suggestions?.length) {
+      add(
+        language === "zh" ? "可以先试试" : "A place to begin",
+        suggestions.join(language === "zh" ? "；" : " · "),
+      );
+    }
+
+    ranked.slice(0, 3).forEach((entry) => add(entry.label, getDimensionDetailText(entry, undefined, language)));
+    if (ranked.length > 1) {
+      add(
+        language === "zh" ? "分数背后的组合" : "The pattern behind the score",
+        language === "zh"
+          ? `整体分数之外，「${ranked[0].label}」和「${ranked.at(-1)?.label ?? ranked[1].label}」之间的差异，可能更能解释你在什么情况下会感觉顺手或费力。`
+          : `Beyond the overall score, the difference between “${ranked[0].label}” and “${ranked.at(-1)?.label ?? ranked[1].label}” may explain when this feels easier or harder for you.`,
+      );
+    }
+
+    if (!items.length && score !== null) {
+      add(
+        language === "zh" ? "先从这里看起" : "A place to start",
+        language === "zh"
+          ? `这次得分是 ${Math.round(score)}。比起把它当成高低判断，更值得留意的是哪些问题让你停顿，哪些部分最近最像你的生活。`
+          : `This response landed at ${Math.round(score)}. Rather than treating it as a high-or-low judgment, notice which questions made you pause and what has felt most like your life lately.`,
+      );
+    }
+
+    if (!items.length) return null;
+    const hasSupportingSignals = ranked.length > 0;
+    return {
+      title: hasSupportingSignals
+        ? (language === "zh" ? "把分数拆开看" : "Look beneath the score")
+        : (language === "zh" ? "这个分数的更多细节" : "A closer look at this score"),
+      subtitle: hasSupportingSignals
+        ? (language === "zh"
+          ? "整体分数告诉你大致位置，分项线索更接近你在生活里真正遇到的细节。"
+          : "The overall score gives you a position. The separate signals are closer to what you actually experience day to day.")
+        : (language === "zh"
+          ? "分数不是结论，结合最近的生活情境看，它才会变成真正属于你的线索。"
+          : "A score is not a conclusion. It becomes useful when you place it beside what has been happening in your life lately."),
+      items: items.slice(0, 5),
+    };
+  }
+
+  return null;
 }
 
 export default function ResultClient({ testId }: { testId: string }) {
@@ -62,14 +367,48 @@ export default function ResultClient({ testId }: { testId: string }) {
 
   const content = useMemo(() => {
     if (!definition || !result) return null;
-    const key = getResultKey(result);
+    const dominantDimension = getDominantDimension(definition, result, language);
+    const key = getResultKey(result) || dominantDimension?.key || "";
     const narrative = pickNarrative(definition, key, language);
     const typeData = pickType(definition, key, language);
     const archetype = pickArchetype(definition, key, language);
     const scoreBand = getScoreBand(definition, result);
-    const title = (scoreBand?.title[language] ?? narrative?.archetype ?? archetype?.title ?? typeData?.name ?? key) || (language === "zh" ? "这次的结果" : "Your result");
-    const description = scoreBand?.description[language] ?? narrative?.hero ?? narrative?.description ?? archetype?.description ?? typeData?.description;
-    return { key, narrative, typeData, title, description, score: getResultScore(result) };
+    const title = (scoreBand?.title[language] ?? narrative?.archetype ?? archetype?.title ?? typeData?.name ?? dominantDimension?.label ?? key) || (language === "zh" ? "这次的结果" : "Your result");
+    const description = scoreBand?.description[language]
+      ?? narrative?.subtitle
+      ?? narrative?.description
+      ?? narrative?.hero
+      ?? archetype?.description
+      ?? typeData?.description
+      ?? (dominantDimension
+        ? (language === "zh"
+          ? `在这次回答里，「${dominantDimension.label}」相对更明显。它只是整体轮廓的一部分，其他方向也会随着情境变化。`
+          : `${dominantDimension.label} stands out more in this response. It is one part of a wider profile, and other tendencies may shift with context.`)
+        : undefined);
+    const resultLabel = definition.kind === "type"
+      ? (language === "zh" ? "你的类型" : "Your type")
+      : definition.kind === "score"
+        ? (language === "zh" ? "这次的状态区间" : "Your current range")
+        : (language === "zh" ? "这次更鲜明的方向" : "What stands out this time");
+    const identityNote = definition.kind === "type"
+      ? (language === "zh"
+        ? "这是一种你可以认领的倾向；在不同情境里，它也会呈现出不同侧面。"
+        : "This is a tendency you can claim as your own; different situations may bring out different sides.")
+      : definition.kind === "score"
+        ? (language === "zh" ? "把它当作理解最近状态的一扇窗。" : "Use it as a window into how you have been lately.")
+        : (language === "zh" ? "这些方向共同构成了这次回答的轮廓。" : "Together, these directions form the shape of this response.");
+    return {
+      key,
+      narrative,
+      typeData,
+      title,
+      description,
+      resultLabel,
+      identityNote,
+      summary: getResultSummary(definition, result, language),
+      lead: getResultLead(definition.category, language),
+      details: getResultDetails(definition, result, language, narrative, typeData, archetype, scoreBand),
+    };
   }, [definition, language, result]);
 
   const share = useCallback(async () => {
@@ -100,7 +439,7 @@ export default function ResultClient({ testId }: { testId: string }) {
 
   if (loading) return <Loading language={language} />;
   if (!definition || !entry || !result || !content) {
-    return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state mx-auto mt-16 max-w-lg"><h1 className="text-2xl font-semibold">{language === "zh" ? "还没有找到这次结果" : "No result found yet"}</h1><p className="mt-3 max-w-md text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? "先完成一次测试，结果会保存在当前浏览器中。" : "Complete the route once. Results stay in this browser."}</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><Link href={`/test/${testId}/`} className="atlas-primary-action justify-center">{language === "zh" ? "查看测试说明" : "View test details"}<ArrowRight className="size-4" /></Link><Link href="/" className="atlas-secondary-action justify-center">{language === "zh" ? "回到探索" : "Back to explore"}</Link></div></div></PageContainer></div>;
+    return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state mx-auto mt-16 max-w-lg"><h1 className="text-2xl font-semibold">{language === "zh" ? "还没有找到这次结果" : "No result found yet"}</h1><p className="mt-3 max-w-md text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? "先完成一次测评，结果会保存在当前浏览器中。" : "Complete the assessment once. Results stay in this browser."}</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><Link href={`/test/${testId}/`} className="atlas-primary-action justify-center">{language === "zh" ? "查看测评说明" : "View assessment details"}<ArrowRight className="size-4" /></Link><Link href="/" className="atlas-secondary-action justify-center">{language === "zh" ? "返回首页" : "Back home"}</Link></div></div></PageContainer></div>;
   }
 
   const pattern = definition.kind;
@@ -109,22 +448,39 @@ export default function ResultClient({ testId }: { testId: string }) {
 
   return (
     <div className="atlas-page min-h-screen">
-      <AppHeader backHref="/" backLabel={language === "zh" ? "探索地图" : "Explore map"} section={testName} />
+      <AppHeader narrow backHref="/" backLabel={language === "zh" ? "返回首页" : "Back home"} section={testName} />
       <PageContainer className="max-w-3xl">
         <div className="atlas-result-intro-block" style={{ "--result-accent": accent } as React.CSSProperties}>
-          <p className="atlas-section-kicker">{language === "zh" ? "这次路线的回看" : "A reading of this route"}</p>
-          <h1 className="mt-5 max-w-2xl text-5xl font-semibold leading-[0.94] tracking-[-0.065em] sm:text-7xl">{content.title}</h1>
-          {content.description && <p className="mt-6 max-w-2xl text-base leading-7 text-ink/60 dark:text-white/60">{content.description}</p>}
-          {content.score !== null && <div className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-accent"><span className="atlas-result-score-dot" />{language === "zh" ? `当前分数 ${Math.round(content.score)}` : `Current score ${Math.round(content.score)}`}</div>}
-          <p className="mt-8 text-xs text-ink/40 dark:text-white/40">{language === "zh" ? "它是一张此刻的地图，不是固定的身份。" : "A map of this moment, not a fixed identity."}</p>
+          <p className="atlas-result-question">{content.lead}</p>
+          <div className="atlas-result-identity mt-6">
+            <span className="atlas-result-identity-label">{content.resultLabel}</span>
+            <h1 className="atlas-result-identity-title">{content.title}</h1>
+            {content.description && <p className="atlas-result-identity-description">{content.description}</p>}
+          </div>
+          {content.summary.length > 0 && (
+            <div className="atlas-result-summary" aria-label={language === "zh" ? "结果摘要" : "Result summary"}>
+              {content.summary.map((item) => (
+                <div key={item.label} className="atlas-result-summary-item">
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="atlas-result-identity-note">{content.identityNote}</p>
         </div>
 
-        <section className="atlas-result-panel mt-10"><h2 className="atlas-section-kicker">{language === "zh" ? "展开看看" : "Read the contour"}</h2><div className="mt-7"><NarrativeSection pattern={pattern} result={result} narrative={content.narrative} typeData={content.typeData} dimensions={definition.resultContent.dimensions} archetypes={definition.resultContent.archetypes} scoreBands={definition.resultContent.scoreBands} accentColor={accent} lang={language} /></div></section>
-        <ReflectionGuide testId={testId} entry={entry} pattern={pattern} result={result} narrative={content.narrative} typeData={content.typeData} dimensions={definition.resultContent.dimensions} accentColor={accent} lang={language} />
+        {content.details && <ResultDetails {...content.details} />}
 
-        <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测试" : "Retake"}</button><button type="button" onClick={share} className="atlas-primary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "分享这张地图" : "Share this map")}</button></section>
+        {!(definition.kind === "score" && !Object.keys(result.percentages ?? {}).length && !content.narrative && !content.typeData) && (
+          <section className="atlas-result-panel mt-8"><h2 className="atlas-result-section-title">{language === "zh" ? "结果解释" : "Result interpretation"}</h2><div className="mt-7"><NarrativeSection pattern={pattern} result={result} narrative={content.narrative} typeData={content.typeData} dimensions={definition.resultContent.dimensions} archetypes={definition.resultContent.archetypes} accentColor="var(--accent)" lang={language} introDescription={content.description} /></div></section>
+        )}
+
+        <ReflectionGuide testId={testId} entry={entry} pattern={pattern} result={result} dimensions={definition.resultContent.dimensions} accentColor={accent} lang={language} />
+
+        <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测评" : "Retake"}</button><button type="button" onClick={share} className="atlas-primary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "分享结果" : "Share result")}</button></section>
         <p id="share-status" className="mt-3 min-h-5 text-center text-xs text-ink/55 dark:text-white/55" role="status" aria-live="polite">{copied ? (language === "zh" ? "分享文字和链接已复制。" : "Share text and link copied.") : shareError ? (language === "zh" ? "暂时无法分享或复制，请稍后再试。" : "Sharing and clipboard access are unavailable. Please try again.") : ""}</p>
-        <div className="mt-5 flex flex-col gap-3 text-center text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-center"><Link href="/history/" className="atlas-text-link justify-center">{language === "zh" ? "查看历史" : "View history"}</Link><span className="hidden sm:inline">/</span><Link href={`/test/${testId}/`} className="atlas-text-link justify-center">{language === "zh" ? "查看测试说明" : "Test details"}</Link></div>
+        <div className="mt-5 flex flex-col gap-3 text-center text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-center"><Link href="/history/" className="atlas-text-link justify-center">{language === "zh" ? "查看历史" : "View history"}</Link><span className="hidden sm:inline">/</span><Link href={`/test/${testId}/`} className="atlas-text-link justify-center">{language === "zh" ? "查看测评说明" : "Assessment details"}</Link></div>
         <p className="mt-9 text-center text-xs leading-5 text-ink/35 dark:text-white/35">{language === "zh" ? "仅用于自我反思，不构成诊断或专业评估。" : "For self-reflection only. This is not a diagnosis or professional assessment."}</p>
       </PageContainer>
     </div>

@@ -84,6 +84,8 @@ export interface DimensionData {
   name: string;
   zh: string;
   description?: string;
+  descriptionEn?: string;
+  observation?: LocalizedText;
 }
 
 export interface ScoreBand {
@@ -124,6 +126,30 @@ export interface ArchetypeData {
   low_en?: string;
   quote_zh?: string;
   quote_en?: string;
+  traits_zh?: string;
+  traits_en?: string;
+  scenes_zh?: string;
+  scenes_en?: string;
+  contradiction_zh?: string;
+  contradiction_en?: string;
+  growth_cost_zh?: string;
+  growth_cost_en?: string;
+  core_desire_zh?: string;
+  core_desire_en?: string;
+  core_fear_zh?: string;
+  core_fear_en?: string;
+  love_style_zh?: string;
+  love_style_en?: string;
+  breakdown_style_zh?: string;
+  breakdown_style_en?: string;
+  defense_mechanism_zh?: string;
+  defense_mechanism_en?: string;
+  growth_path_zh?: string;
+  growth_path_en?: string;
+  best_relationship_zh?: string;
+  best_relationship_en?: string;
+  music_mood_zh?: string;
+  music_mood_en?: string;
 }
 
 export interface LegacyQuizContent {

@@ -84,10 +84,11 @@ const server = http.createServer(async (request, response) => {
 
     const extension = path.extname(filePath).toLowerCase();
     const stat = await fs.stat(filePath);
+    const cacheable = [".css", ".gif", ".ico", ".jpeg", ".jpg", ".js", ".png", ".svg", ".webp", ".woff", ".woff2"].includes(extension);
     response.writeHead(200, {
       "Content-Type": MIME_TYPES[extension] || "application/octet-stream",
       "Content-Length": stat.size,
-      "Cache-Control": "no-cache",
+      "Cache-Control": cacheable ? "public, max-age=31536000, immutable" : "no-cache",
     });
     createReadStream(filePath).pipe(response);
   } catch (error) {

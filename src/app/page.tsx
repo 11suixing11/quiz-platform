@@ -1,18 +1,8 @@
 "use client";
 
-/*
- * DIRECTION CONTRACT
- * WORLD: cartographer's field atlas — quiet ink, contour lines, route markers.
- * FIRST VIEWPORT: four lived questions become four visible routes; the next action is a destination, not a generic CTA.
- * PRIMARY ACTION: choose one route and start a test.
- * FORM: assigned grounded direction 7 from seed 2beb0247; the route map is the shared grammar across discovery, quiz, and result.
- * FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
- */
-
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Bookmark, History, Map, MoveRight, Sparkles } from "lucide-react";
-import ExploreSection from "@/components/ExploreSection";
+import { ArrowDown, ArrowRight, ArrowUpRight, Bookmark, History, MoveRight, ShieldCheck } from "lucide-react";
+import LazyExploreSection from "@/components/LazyExploreSection";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { CategoryMark } from "@/components/quiz/category-mark";
 import { CORE_TEST_GROUPS, getCoreGroupTests } from "@/lib/core-tests";
@@ -20,11 +10,13 @@ import { useAttempts, useLanguage } from "@/hooks/use-local-storage";
 import { getQuizEntry } from "@/core/quiz";
 
 const groupColors: Record<string, string> = {
-  self: "#2F6B5F",
-  emotion: "#B65C5C",
-  relationship: "#B47B32",
-  life: "#4E6C8C",
+  self: "#5E7F70",
+  emotion: "#B77770",
+  relationship: "#B38A54",
+  life: "#7A856B",
 };
+
+const checkinGroups = CORE_TEST_GROUPS.slice(0, 3);
 
 function localized(language: "zh" | "en", zh: string, en: string) {
   return language === "zh" ? zh : en;
@@ -34,129 +26,155 @@ function relativeTime(timestamp: number, language: "zh" | "en") {
   const days = Math.floor((Date.now() - timestamp) / 86400000);
   if (days <= 0) return localized(language, "今天", "Today");
   if (days === 1) return localized(language, "昨天", "Yesterday");
-  return language === "zh" ? `${days} 天前` : `${days} days ago`;
+  return language === "zh" ? days + " 天前" : days + " days ago";
 }
 
-function RouteCard({ group, language, reduceMotion }: { group: (typeof CORE_TEST_GROUPS)[number]; language: "zh" | "en"; reduceMotion: boolean }) {
+function RouteCard({ group, language }: { group: (typeof CORE_TEST_GROUPS)[number]; language: "zh" | "en" }) {
   const tests = getCoreGroupTests(group);
   const color = groupColors[group.id];
+
   return (
-    <motion.section whileHover={reduceMotion ? undefined : { y: -3 }} transition={{ duration: reduceMotion ? 0 : 0.2 }} className="atlas-route-card" style={{ "--route-color": color } as React.CSSProperties}>
-      <div className="flex items-start justify-between gap-5">
-        <div>
-          <p className="atlas-route-kicker">{language === "zh" ? "一条可能的路径" : "A possible route"}</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">{language === "zh" ? group.zh : group.en}</h2>
-          <p className="mt-2 max-w-md text-sm leading-6 text-ink/58 dark:text-white/58">{language === "zh" ? group.descriptionZh : group.descriptionEn}</p>
+    <section id={`topic-${group.id}`} className="wellness-topic scroll-mt-8" style={{ "--topic-color": color } as React.CSSProperties}>
+      <div className="wellness-topic-heading">
+        <div className="min-w-0">
+          <h3 className="wellness-topic-title">{language === "zh" ? group.zh : group.en}</h3>
+          <p className="wellness-topic-description">{language === "zh" ? group.descriptionZh : group.descriptionEn}</p>
+          <p className="wellness-topic-count">{tests.length} {language === "zh" ? "项测评可选" : "assessments to explore"}</p>
         </div>
-        <span className="atlas-route-dot" aria-hidden="true" />
+        <span className="wellness-topic-mark" aria-hidden="true" />
       </div>
-      <div className="mt-7 border-t border-ink/10 pt-4 dark:border-white/10">
-        <div className="grid gap-1 sm:grid-cols-2">
-          {tests.map((test, index) => (
-            <Link key={test.id} href={`/test/${test.id}/`} className="atlas-route-link group">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--route-color)_12%,transparent)] text-[color:var(--route-color)]"><CategoryMark category={test.category} className="size-8 border-0" /></span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold">{language === "zh" ? test.zh.name : test.en.name}</span>
-                <span className="mt-1 block text-[11px] text-ink/42 dark:text-white/42">{test.questions} {language === "zh" ? "题" : "questions"} · {test.time} {language === "zh" ? "分钟" : "min"}</span>
-              </span>
-              <span className="atlas-route-number">{String(index + 1).padStart(2, "0")}</span>
-            </Link>
-          ))}
-        </div>
+
+      <div className="wellness-topic-routes">
+        {tests.map((test) => (
+          <Link key={test.id} href={"/test/" + test.id + "/"} className="wellness-route-link group">
+            <span className="wellness-route-icon"><CategoryMark category={test.category} className="size-8 border-0" /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold">{language === "zh" ? test.zh.name : test.en.name}</span>
+              <span className="mt-1 block text-xs text-ink/48 dark:text-white/48">{test.questions} {language === "zh" ? "题" : "questions"} · {test.time} {language === "zh" ? "分钟" : "min"}</span>
+            </span>
+            <ArrowRight className="size-4 shrink-0 text-ink/32 transition group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/32" aria-hidden="true" />
+          </Link>
+        ))}
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 export default function HomePage() {
   const { language } = useLanguage();
   const { attempts } = useAttempts();
-  const shouldReduceMotion = useReducedMotion();
   const latest = attempts[0];
   const latestEntry = latest ? getQuizEntry(latest.testId) : undefined;
 
   return (
-    <div className="atlas-page">
+    <div className="atlas-page wellness-page">
       <AppHeader />
-      <PageContainer className="pt-0 sm:pt-0">
-        <section className="atlas-hero relative overflow-hidden py-14 sm:py-20">
-          <div className="atlas-contour atlas-contour-one" aria-hidden="true" />
-          <div className="atlas-contour atlas-contour-two" aria-hidden="true" />
-          <div className="relative z-10 grid gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
-            <div>
-              <div className="atlas-coordinate"><Map className="size-3.5" />{localized(language, "一份给自己的地图", "A map for the self")}</div>
-              <h1 className="mt-7 max-w-3xl text-[clamp(3.25rem,8vw,7.5rem)] font-semibold leading-[0.92] tracking-[-0.075em] text-ink dark:text-white">
-                {language === "zh" ? <>先找到<br /><span className="text-accent">你在意的方向。</span></> : <>Start with<br /><span className="text-accent">what matters now.</span></>}
-              </h1>
-              <p className="mt-8 max-w-xl text-base leading-7 text-ink/60 dark:text-white/60 sm:text-lg">
-                {localized(language, "不用先定义自己。选一条最接近此刻的路径，花几分钟回答问题，再带着一个更清晰的自己离开。", "You do not need to define yourself first. Choose the route that feels closest today, answer for a few minutes, and leave with a clearer next step.")}
-              </p>
-              <div className="mt-9 flex flex-wrap items-center gap-3">
-                <a href="#routes" className="atlas-primary-action"><span>{localized(language, "开始探索", "Start exploring")}</span><MoveRight className="size-4" /></a>
-                <Link href="/history/" className="atlas-secondary-action"><History className="size-4" />{localized(language, "查看记录", "View history")}</Link>
-              </div>
+      <PageContainer className="wellness-home pt-0 sm:pt-0">
+        <section className="wellness-hero">
+          <div className="wellness-hero-copy">
+            <h1 className="wellness-display">
+              {language === "zh" ? <>最近，<br /><em>什么让你</em><br />想更懂自己？</> : <>What is making you<br /><em>want to know yourself</em><br />better?</>}
+            </h1>
+            <p className="wellness-hero-context">
+              {localized(language, "面向日常的心理与自我认知测评，覆盖性格、情绪、关系与生活。", "Everyday psychology and self-understanding assessments across personality, emotions, relationships, and life.")}
+            </p>
+            <p className="wellness-hero-lede">
+              {localized(language, "不用先给自己下结论。选一个你想了解的主题，花几分钟回答问题，再带走一个更清晰的观察。", "You do not need a conclusion first. Choose a subject, answer a few questions, and leave with a clearer observation.")}
+            </p>
+            <div className="wellness-hero-actions">
+              <a href="#routes" className="wellness-primary-action"><span>{localized(language, "开始测评", "Start an assessment")}</span><MoveRight className="size-4" aria-hidden="true" /></a>
+              <Link href="/history/" className="wellness-secondary-action"><History className="size-4" aria-hidden="true" />{localized(language, "查看记录", "View history")}</Link>
             </div>
-            <div className="relative hidden min-h-[270px] lg:block">
-              <div className="atlas-map-plate">
-                <div className="atlas-map-grid" aria-hidden="true" />
-                <div className="atlas-map-pin pin-a" aria-hidden="true" />
-                <div className="atlas-map-pin pin-b" aria-hidden="true" />
-                <div className="atlas-map-pin pin-c" aria-hidden="true" />
-                <svg className="absolute inset-0 h-full w-full" viewBox="0 0 520 300" fill="none" aria-hidden="true">
-                  <path d="M30 244C93 196 106 222 156 164C198 115 219 169 270 115C327 56 338 94 391 54C427 27 466 46 503 20" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 8" className="text-accent/70" />
-                  <path d="M17 271C115 246 139 264 210 208C273 159 304 205 360 140C414 78 454 105 505 81" stroke="currentColor" strokeWidth="1" className="text-ink/25 dark:text-white/25" />
-                </svg>
-                <div className="absolute bottom-5 left-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/35 dark:text-white/35">FIELD NOTE 01 / 16</div>
-              </div>
-            </div>
+            <div className="wellness-trust-note"><ShieldCheck className="size-4" aria-hidden="true" /><span>{localized(language, "仅供自我反思，不是诊断；结果只保存在当前浏览器。", "For self-reflection, not diagnosis. Results stay in this browser.")}</span></div>
           </div>
+
+          <aside id="checkin" className="wellness-checkin scroll-mt-8" aria-label={localized(language, "选择测评主题", "Choose an assessment subject")}>
+            <div className="wellness-checkin-topline"><span>{localized(language, "在线自我测评", "Everyday self-assessment")}</span></div>
+            <h2>{localized(language, "你想先了解哪一部分自己？", "What part of yourself do you want to understand first?")}</h2>
+            <p>{localized(language, "选择一个主题，完成几分钟的测评，再从结果里找到可以继续思考的线索。", "Choose a subject, take a few minutes to answer, and find a clue to keep thinking about.")}</p>
+            <div className="wellness-checkin-list">
+              {checkinGroups.map((group) => (
+                <Link key={group.id} href={`/test/${group.entryTestId}/`}>
+                  <span className="wellness-checkin-entry">
+                    <strong>{language === "zh" ? group.zh : group.en}</strong>
+                    <small>{language === "zh" ? group.entryZh : group.entryEn}</small>
+                  </span>
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              ))}
+            </div>
+            <a href="#routes" className="wellness-checkin-more">{localized(language, "查看全部测评", "See all assessments")}<ArrowUpRight className="size-3.5" aria-hidden="true" /></a>
+            <div className="wellness-sheet-note"><span className="wellness-sheet-dot" aria-hidden="true" />{localized(language, "本地完成 · 无需注册", "Local by default · No account")}</div>
+          </aside>
         </section>
 
+        <a href="#routes" className="wellness-hero-bridge">
+          <span className="wellness-hero-bridge-rule" aria-hidden="true" />
+          <span>{localized(language, "下一步，选一个你想了解的测评主题。", "Next, choose an assessment subject to explore.")}</span>
+          <ArrowDown className="size-4" aria-hidden="true" />
+        </a>
+
         {latest && latestEntry && (
-          <section className="atlas-return-strip">
+          <section className="wellness-return" aria-label={localized(language, "继续上次的记录", "Continue your last reflection")}>
             <div className="flex min-w-0 items-center gap-4">
-              <span className="atlas-return-marker"><Sparkles className="size-4" /></span>
+              <span className="wellness-return-mark" aria-hidden="true" />
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40 dark:text-white/40">{localized(language, "最近走过", "Last visited")}</p>
+                <p className="wellness-small-label">{localized(language, "继续上次的记录", "Continue your last reflection")}</p>
                 <p className="mt-1 truncate text-sm font-semibold">{language === "zh" ? latestEntry.title.zh : latestEntry.title.en}</p>
               </div>
-              <span className="ml-auto shrink-0 text-xs text-ink/40 dark:text-white/40">{relativeTime(latest.timestamp, language)}</span>
+              <span className="ml-auto shrink-0 text-xs text-ink/42 dark:text-white/42">{relativeTime(latest.timestamp, language)}</span>
             </div>
-            <Link href={`/result/${latest.testId}/?attempt=${encodeURIComponent(latest.id)}`} className="atlas-inline-action">{localized(language, "回看结果", "Review result")} <ArrowUpRight className="size-3.5" /></Link>
+            <Link href={"/result/" + latest.testId + "/?attempt=" + encodeURIComponent(latest.id)} className="wellness-inline-action">{localized(language, "回看结果", "Review result")} <ArrowUpRight className="size-3.5" aria-hidden="true" /></Link>
           </section>
         )}
 
-        <section id="routes" className="scroll-mt-8 py-12 sm:py-16">
-          <div className="mb-8 flex items-end justify-between gap-6">
+        <section className="wellness-section">
+          <div id="routes" className="wellness-section-heading scroll-mt-20" tabIndex={-1}>
             <div>
-              <p className="atlas-section-kicker">{localized(language, "从这里开始", "Begin here")}</p>
-              <h2 className="atlas-section-title mt-2">{localized(language, "四条入口，足够今天。", "Four routes are enough for today.")}</h2>
+              <h2 className="wellness-section-title">{localized(language, "选择一个测评主题，先从这里开始。", "Choose a subject to start with.")}</h2>
             </div>
-            <Link href="#library" className="hidden items-center gap-1.5 text-xs font-semibold text-accent hover:underline sm:inline-flex">{localized(language, "看精选路线", "See the curated routes")} <ArrowUpRight className="size-3.5" /></Link>
+            <Link href="#library" className="wellness-inline-action hidden sm:inline-flex">{localized(language, "浏览全部测评", "Browse all assessments")} <ArrowUpRight className="size-3.5" aria-hidden="true" /></Link>
           </div>
-          <div className="grid gap-4 lg:grid-cols-2">
-            {CORE_TEST_GROUPS.map((group) => <RouteCard key={group.id} group={group} language={language} reduceMotion={Boolean(shouldReduceMotion)} />)}
+          <div className="wellness-topic-grid">
+            {CORE_TEST_GROUPS.map((group) => <RouteCard key={group.id} group={group} language={language} />)}
           </div>
         </section>
 
-        <section id="library" className="-mx-5 border-t border-ink/10 dark:border-white/10 sm:-mx-8">
-          <ExploreSection lang={language} />
+        <section className="wellness-process" aria-labelledby="process-title">
+          <div className="wellness-process-heading">
+            <h2 id="process-title">{localized(language, "从一个问题开始，带走一个可以继续思考的观察。", "Start with one question. Leave with an observation you can keep thinking about.")}</h2>
+          </div>
+          <ol className="wellness-process-list">
+            <li><span className="wellness-process-marker" aria-hidden="true" /><div><strong>{localized(language, "选一个当下的问题", "Choose one question")}</strong><p>{localized(language, "不用一次解决所有事情。", "You do not need to solve everything at once.")}</p></div></li>
+            <li><span className="wellness-process-marker" aria-hidden="true" /><div><strong>{localized(language, "诚实回答，不求完美", "Answer without performing")}</strong><p>{localized(language, "没有标准答案，也没有需要迎合的形象。", "There is no right answer and no image to maintain.")}</p></div></li>
+            <li><span className="wellness-process-marker" aria-hidden="true" /><div><strong>{localized(language, "带走一个小小的下一步", "Take one small next step")}</strong><p>{localized(language, "结果是起点，不是给自己的结论。", "The result is a starting point, not a verdict.")}</p></div></li>
+          </ol>
         </section>
 
-        <section className="grid gap-4 py-12 sm:grid-cols-2 sm:py-16">
-          <Link href="/bookmarks/" className="atlas-support-panel group">
-            <Bookmark className="size-5 text-accent" />
-            <div><h2 className="text-lg font-semibold">{localized(language, "留一条以后再走的路", "Save a route for later")}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{localized(language, "收藏测试，不需要注册，也不会离开你的浏览器。", "Bookmark a test. No account, no upload, nothing leaves your browser.")}</p></div>
-            <ArrowUpRight className="ml-auto size-4 text-ink/35 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/35" />
+        <section id="library" className="wellness-library border-t border-ink/12 dark:border-white/12">
+          <LazyExploreSection lang={language} />
+        </section>
+
+        <section className="wellness-support-grid">
+          <Link href="/bookmarks/" className="wellness-support-panel group">
+            <Bookmark className="size-5 text-accent" aria-hidden="true" />
+            <div><h2>{localized(language, "收藏一项以后再做", "Save an assessment for later")}</h2><p>{localized(language, "收藏测评，不需要注册，也不会离开你的浏览器。", "Bookmark an assessment. No account, no upload, nothing leaves your browser.")}</p></div>
+            <ArrowUpRight className="ml-auto size-4 text-ink/35 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/35" aria-hidden="true" />
           </Link>
-          <Link href="/settings/" className="atlas-support-panel group">
-            <span className="atlas-data-symbol" aria-hidden="true">⌁</span>
-            <div><h2 className="text-lg font-semibold">{localized(language, "你的数据，你来决定", "Your data, your call")}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{localized(language, "随时导出、导入或清除这台设备上的记录。", "Export, import, or clear everything stored on this device.")}</p></div>
-            <ArrowUpRight className="ml-auto size-4 text-ink/35 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/35" />
+          <Link href="/settings/" className="wellness-support-panel group">
+            <ShieldCheck className="size-5 text-accent" aria-hidden="true" />
+            <div><h2>{localized(language, "你的数据，你来决定", "Your data, your call")}</h2><p>{localized(language, "随时导出、导入或清除这台设备上的记录。", "Export, import, or clear everything stored on this device.")}</p></div>
+            <ArrowUpRight className="ml-auto size-4 text-ink/35 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/35" aria-hidden="true" />
           </Link>
         </section>
       </PageContainer>
-      <footer className="border-t border-ink/10 px-5 py-12 dark:border-white/10 sm:px-8"><div className="mx-auto flex max-w-6xl flex-col gap-5 text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-between"><span className="font-semibold text-ink/70 dark:text-white/70">认识你自己 / Know Yourself</span><div className="flex gap-5"><Link href="/privacy/" className="atlas-text-link">{localized(language, "隐私", "Privacy")}</Link><a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noreferrer" className="atlas-text-link">GitHub</a></div></div></footer>
+
+      <footer className="wellness-footer">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-semibold text-ink/70 dark:text-white/70">认识你自己 / Know Yourself</span>
+          <div className="flex gap-5"><Link href="/privacy/" className="atlas-text-link">{localized(language, "隐私", "Privacy")}</Link><a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noreferrer" className="atlas-text-link">GitHub</a></div>
+        </div>
+      </footer>
     </div>
   );
 }

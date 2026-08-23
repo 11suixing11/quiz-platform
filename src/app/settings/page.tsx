@@ -45,7 +45,7 @@ export default function SettingsPage() {
 
   return (
     <div className="atlas-page min-h-screen">
-      <AppHeader backHref="/" backLabel={language === "zh" ? "探索地图" : "Explore map"} section={copy.title} />
+      <AppHeader backHref="/" backLabel={language === "zh" ? "返回首页" : "Back home"} section={copy.title} />
       <PageContainer className="max-w-3xl">
         <div className="max-w-2xl">
           <p className="atlas-section-kicker">{language === "zh" ? "由你掌控" : "In your hands"}</p>

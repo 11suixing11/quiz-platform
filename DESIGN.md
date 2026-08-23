@@ -1,302 +1,179 @@
 ---
 name: "认识你自己 | Know Yourself"
-description: "A quiet cartographer's field atlas for bilingual self-reflection."
+description: "A quiet reflection room for bilingual self-assessment and everyday self-observation."
 colors:
-  field-paper: "#f4f0e7"
-  atlas-ink: "#17221f"
-  night-paper: "#111715"
-  night-ink: "#f0eee7"
-  atlas-teal: "#2f6b5f"
-  night-teal: "#7db5a3"
-  muted-ink: "#68736f"
-  muted-night: "#aab4ae"
-  route-rose: "#b65c5c"
-  route-ochre: "#b47b32"
-  route-blue: "#4e6c8c"
-  danger: "#a53f3f"
+  paper: "#FAF0E5"
+  paper-strong: "#FFF8F0"
+  ink: "#2D3530"
+  night-paper: "#17201E"
+  night-ink: "#F1EEE7"
+  accent: "#4F705F"
+  night-accent: "#A8C7B5"
+  muted-text: "#716A62"
+  warm-wash: "#F2D7C5"
+  warm-surface: "#FFF1E3"
+  warm-ink: "#936451"
+  line: "rgba(45, 53, 48, .14)"
+  soft-line: "rgba(45, 53, 48, .09)"
+  emotion: "#B77770"
+  relationship: "#B38A54"
+  life: "#7A856B"
+  danger: "#A53F3F"
 typography:
   display:
-    fontSize: "clamp(2.2rem, 6vw, 4.3rem)"
-    fontWeight: 650
-    lineHeight: 0.98
-    letterSpacing: "-0.065em"
+    fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
+    fontSize: "clamp(3rem, 6.4vw, 5.8rem)"
+    fontWeight: 570
+    lineHeight: 1.02
+    letterSpacing: "-0.03em"
   headline:
-    fontSize: "clamp(1.875rem, 5vw, 3rem)"
-    fontWeight: 600
-    lineHeight: 1.08
-    letterSpacing: "-0.045em"
-  display-mobile:
-    fontSize: "2.7rem"
-    fontWeight: 650
-    lineHeight: 0.98
-    letterSpacing: "-0.065em"
-  title:
-    fontSize: "1.125rem"
-    fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: "-0.025em"
+    fontSize: "clamp(2.15rem, 5vw, 4rem)"
+    fontWeight: 620
+    lineHeight: 1
+    letterSpacing: "-0.04em"
   body:
     fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
     fontSize: "0.875rem"
     fontWeight: 400
-    lineHeight: 1.7
-    letterSpacing: "normal"
+    lineHeight: 1.75
   control:
-    fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
     fontSize: "0.78rem"
-    fontWeight: 700
+    fontWeight: 750
     lineHeight: 1.4
-    letterSpacing: "normal"
-  intro:
-    fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
-    fontSize: ".95rem"
-    fontWeight: 400
-    lineHeight: 1.8
-    letterSpacing: "normal"
-  caption:
-    fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
-    fontSize: ".72rem"
-    fontWeight: 700
-    lineHeight: 1.4
-    letterSpacing: "normal"
-  micro:
-    fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
-    fontSize: "10px"
-    fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "normal"
-  coordinate:
+  mono:
     fontFamily: '"Cascadia Code", "SFMono-Regular", Consolas, monospace'
-    fontSize: "0.67rem"
-    fontWeight: 400
+    fontSize: "0.66rem"
     lineHeight: 1.4
-    letterSpacing: "0.1em"
-  score:
-    fontFamily: '"Cascadia Code", "SFMono-Regular", Consolas, monospace'
-    fontSize: "3.5rem"
-    fontWeight: 700
-    lineHeight: 1
-    letterSpacing: "-0.08em"
-  quote-mark:
-    fontSize: "1.8rem"
-    fontWeight: 400
-    lineHeight: 1
-    letterSpacing: "normal"
+    letterSpacing: "0.08em"
 rounded:
-  danger: "0.7rem"
-  control: "0.75rem"
-  field: "0.8rem"
+  control: "1rem"
   answer: "0.9rem"
-  card: "1rem"
-  panel: "1.1rem"
-  plate: "1.25rem"
+  panel: "1rem"
+  feature: "1.5rem"
   pill: "999px"
 spacing:
-  xs: "0.5rem"
-  sm: "0.75rem"
-  md: "1rem"
-  lg: "1.5rem"
-  xl: "2rem"
-  section: "3rem"
+  section: "clamp(4.5rem, 9vw, 7rem)"
 components:
   primary-action:
-    backgroundColor: "{colors.atlas-teal}"
-    textColor: "{colors.field-paper}"
-    typography: "{typography.body}"
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.paper}"
     rounded: "{rounded.control}"
-    padding: "0.7rem 1rem"
-    height: "2.75rem"
+    minHeight: "2.9rem"
   secondary-action:
     backgroundColor: "transparent"
-    textColor: "{colors.atlas-ink}"
-    typography: "{typography.body}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.control}"
-    padding: "0.7rem 1rem"
-    height: "2.75rem"
-  filter-chip:
-    backgroundColor: "transparent"
-    textColor: "{colors.muted-ink}"
-    typography: "{typography.control}"
-    rounded: "{rounded.pill}"
-    padding: "0.45rem 0.75rem"
-  test-card:
-    backgroundColor: "{colors.field-paper}"
-    textColor: "{colors.atlas-ink}"
-    rounded: "{rounded.card}"
-    padding: "1.5rem"
+    minHeight: "2.9rem"
+  assessment-card:
+    backgroundColor: "{colors.paper-strong}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.panel}"
   answer-option:
-    backgroundColor: "transparent"
-    textColor: "{colors.atlas-ink}"
-    typography: "{typography.body}"
+    backgroundColor: "{colors.paper-strong}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.answer}"
-    padding: "0.85rem 1rem"
-    height: "4.2rem"
-  danger-action:
-    backgroundColor: "transparent"
-    textColor: "{colors.danger}"
-    typography: "{typography.caption}"
-    rounded: "{rounded.danger}"
-    padding: "0.55rem 0.75rem"
+    minHeight: "4.2rem"
 ---
 
 # Design System: 认识你自己 | Know Yourself
 
-## Overview
+## Direction
 
-**Creative North Star: "The Cartographer's Field Atlas"**
+**Creative North Star: The quiet reflection room.**
 
-The interface treats self-reflection as quiet fieldwork. Paper, ink, contour lines, coordinates, route markers, and measured labels create the feeling of opening a personal atlas rather than entering a game, clinic, or productivity dashboard. The visual system is calm and tactile, with just enough cartographic structure to make a large test library feel navigable.
+This is a bilingual online self-assessment product for people arriving with a small, human question. The interface should feel like a clear desk, a notebook, and a calm guide. It is not a game board, clinical dashboard, productivity cockpit, or AI showcase.
 
-Expression stays subordinate to the task. Discovery can feel expansive, while test-taking and results narrow into a focused reading column. Chinese and English share the same hierarchy and component geometry; neither language is a secondary skin.
+The homepage begins with a real question and four understandable subjects. The detail page explains what a person will answer. The quiz keeps attention on one question at a time. Results are framed as observations from this attempt, followed by a practical prompt for daily life.
 
-**Key Characteristics:**
-- Warm paper and near-black green ink instead of pure white and black.
-- Muted teal as the persistent navigational signal.
-- Fine contour geometry, dotted map fields, route markers, and coordinate-like numerals.
-- Flat surfaces at rest with restrained, ambient lift on interaction.
-- Compact labels paired with generous reading space.
+The visual language is sun-warmed paper, deep botanical green, soft peach reflection surfaces, quiet rules, and a small amount of muted subject color. The warmth comes from large calm surfaces and humane spacing rather than decorative clutter. There is no decorative gradient, glass stack, mesh background, remote font, or ornamental image dependency.
+
+## Users and voice
+
+- Chinese and English readers who want a low-pressure way to reflect on personality, emotions, relationships, work, or daily life.
+- Voice is calm, direct, humane, and non-judgmental.
+- Copy says **测评 / assessment**, **问题 / question**, **回答 / response**, and **结果 / result**. Avoid diagnosis language and avoid turning a result into a fixed identity.
+- Every result keeps the boundary: for self-reflection, not diagnosis or professional assessment.
 
 ## Colors
 
-The palette resembles a field notebook: warm neutral paper, botanical ink, and faded route colors that guide without turning the interface into a rainbow.
+- **Paper** (`#FAF0E5`) is the default light canvas and gives the product a warmer ambient temperature.
+- **Paper strong** (`#FFF8F0`) separates focused panels and answer surfaces without a floating-card effect.
+- **Ink** (`#2D3530`) is the primary text and rule color.
+- **Accent** (`#4F705F`) is the single product action color for links, focus, progress, and primary actions.
+- **Warm surface / warm wash** (`#FFF1E3` / `#F2D7C5`) belong to reflective prompts, gentle process explanations, and supportive moments. They never replace the action color.
+- **Night paper / night ink** (`#17201E` / `#F1EEE7`) form the dark theme. `#A8C7B5` is the dark-theme accent.
+- Subject colors are local signals only: emotion `#B77770`, relationship `#B38A54`, life `#7A856B`. They never replace the global accent.
+- Danger red is reserved for data deletion and error feedback.
 
-### Primary
-- **Atlas Teal** (`atlas-teal`): primary actions, focus, active filters, progress, wayfinding marks, and links in the light theme.
-- **Night Teal** (`night-teal`): the adjusted accent for dark surfaces; use it anywhere Atlas Teal would lose contrast.
-
-### Secondary
-- **Route Rose** (`route-rose`): the emotional-reflection route only.
-- **Route Ochre** (`route-ochre`): the relationship route only.
-
-### Tertiary
-- **Route Blue** (`route-blue`): the work-and-life route only.
-
-### Neutral
-- **Field Paper** (`field-paper`): the light canvas and the foreground used on teal actions.
-- **Atlas Ink** (`atlas-ink`): primary light-theme text, dividers, and cartographic linework.
-- **Night Paper** (`night-paper`): the low-light canvas.
-- **Night Ink** (`night-ink`): primary dark-theme text.
-- **Muted Ink** (`muted-ink`) and **Muted Night** (`muted-night`): supporting text that must remain readable without competing with headings.
-- **Danger Red** (`danger`): destructive data controls and error feedback only.
-
-**The Wayfinding Rule.** Teal carries global orientation; route colors identify destinations and do not replace the global accent.
-
-**The Paper Rule.** Large surfaces use Field Paper or Night Paper. Pure white and pure black are reserved for subtle mixing, not as standalone canvases.
+**Color consistency rule:** use one global accent across a page. Subject colors may identify a catalog group, not a CTA or a separate theme.
 
 ## Typography
 
-**Display Font:** not yet established as a durable identity token; current headings inherit the body stack
-**Body Font:** Segoe UI with PingFang SC, Microsoft YaHei, and Noto Sans CJK SC fallbacks
-**Label/Mono Font:** Cascadia Code with SFMono-Regular and Consolas fallbacks
+System Chinese and Latin fallbacks are intentional for fast first paint and bilingual parity. Headings use decisive scale and restrained negative tracking, not a decorative display face. Body copy stays around a readable 65 to 75 character measure. Monospace is limited to counts, question indices, progress counts, and storage summaries.
 
-**Character:** The body stack is neutral, humane, and reliable across Simplified Chinese and English. The implemented hierarchy gets character from decisive scale, tight display tracking, and atlas-like metadata, but the inherited system face is not the long-term display identity.
-
-### Hierarchy
-- **Display:** large destination and result headings; compact line-height and tight tracking make short statements feel like map titles.
-- **Display Mobile:** the fixed small-screen endpoint for shared atlas page titles.
-- **Headline:** question prompts and major page headings; prominent without reaching the display scale.
-- **Title:** test cards, settings groups, and panel headings.
-- **Body:** descriptions, interpretation, and supporting guidance; keep long passages near a 65–75 character measure.
-- **Control:** compact action, filter, and navigation labels with high legibility at small sizes.
-- **Intro:** slightly enlarged result interpretation and other short lead paragraphs.
-- **Caption / Micro:** secondary actions, metadata, helper copy, and the mobile navigation label; never long-form reading text.
-- **Coordinate:** counts, indices, and progress markers only.
-- **Score:** the singular numeric readout used by score-based results.
-- **Quote Mark:** the decorative opening mark attached to narrative quotations, not a text style.
-
-**The Coordinate Rule.** Monospace belongs to numbers, counts, and map coordinates. It is never a decorative body or heading face.
-
-**The Bilingual Parity Rule.** A hierarchy change must be checked with real Chinese and English copy at the same breakpoint before it becomes part of the system.
-
-**Not canonized:** The current build's repeated pre-heading section kickers and inherited system display face remain implementation debt; new surfaces should not repeat either pattern as visual identity.
+Avoid all-caps marketing eyebrows as a visual identity. Small labels are functional metadata only. Do not use gradient text, emoji as icons, or monospace as decorative body copy.
 
 ## Layout
 
-The primary application shell uses a centered 72rem container with 1.25rem mobile gutters and 2rem gutters from the small breakpoint upward. Focused operations such as answering and reading results narrow to roughly 48rem. Reading sections separate by about 3rem, while controls within a task group use 0.5–1rem gaps.
+- The app shell is a centered 72rem container with 1.25rem mobile gutters and 2rem desktop gutters.
+- The homepage hero is a two-column question and check-in composition on wide screens, then a single column below 800px.
+- The catalog is below the fold and is loaded when it approaches the viewport. The first view contains no remote images or font requests.
+- Detail, quiz, and result pages narrow to a focused reading column. Quiz and result routes hide the mobile primary navigation so the task has the full viewport.
+- The main responsive breakpoints are 800px for the hero and 640px for compact stacks. Touch targets stay at least 44px.
+- Use `min-height: 100dvh`; do not use fixed `h-screen` layouts that break on mobile browser chrome.
 
-Discovery begins as a map: broad first-view composition, four visible routes, then the complete catalog. Task pages collapse that breadth into a single forward path. On small screens, persistent primary navigation moves to the bottom; quiz and result routes remove it so the current task keeps the full viewport.
+## Surfaces and depth
 
-The principal responsive breakpoint is 640px. Multi-column routes, settings choices, and action rows become one-column stacks below it. Components should reflow rather than shrink their tap targets or type.
+The default surface is a hairline rule or a tonal shift, not a stack of floating cards. Panels use one border and a restrained radius. Shadows are reserved for the homepage check-in panel and clear interactive lift. No backdrop blur is needed for the primary header or task surfaces.
 
-**The One Route Rule.** A task screen presents one dominant path through the viewport; secondary actions sit after the task or recede visually.
+Long catalog regions use `content-visibility: auto` with an intrinsic size. Static assets use immutable caching; HTML remains revalidatable. Do not add a dependency for decorative animation.
 
-## Elevation & Depth
+## Interaction and motion
 
-The system is flat by default. Fine ink-tinted borders and small tonal differences separate surfaces. Depth appears as a soft downward shadow when a map plate or interactive card needs to lift, never as a permanent stack of floating panels. The sticky header uses translucent paper and backdrop blur because content physically passes beneath it.
+The core flow is readable before motion runs. Answer selection uses a subtle state change and the next question may use a short transform animation implemented in CSS. Result bars use width transitions only. All motion has a `prefers-reduced-motion` fallback. Never animate layout-driving padding, width of surrounding content, or page scroll position.
 
-### Shadow Vocabulary
-- **Map Plate:** `0 22px 60px rgba(23, 34, 31, 0.08)` for the singular hero map object.
-- **Interactive Lift:** `0 18px 38px rgba(23, 34, 31, 0.08)` for a card on hover.
-- **Primary Action:** `0 10px 24px color-mix(in srgb, var(--accent) 20%, transparent)` for the main action only.
-- **Feedback:** `0 14px 32px rgba(23, 34, 31, 0.18)` for transient import/export status.
-
-**The Flat-at-Rest Rule.** Borders define ordinary surfaces. Shadows appear for hierarchy, interaction, or transient feedback—not to make every container look elevated.
-
-## Shapes
-
-Corners are gently rounded and practical. Controls use a 0.75rem radius, answers approach 0.9rem, and cards and panels live between 1rem and 1.25rem. Full pills are reserved for compact filters, icon controls, metadata chips, route dots, and map pins.
-
-Cartographic circles and ellipses may break the rectangular rhythm as contour lines or destination markers. Their strokes stay fine and low contrast. Dashed borders belong to drop zones and true empty states; ordinary cards use solid hairlines.
-
-**The Pill Restraint Rule.** Use a full pill only when the element is compact, atomic, and label-sized. Cards, answer rows, and large actions retain grounded corners.
+Keyboard behavior is explicit: visible focus, number-key answer shortcuts, arrow navigation, and focus restoration to the new question heading. Progress is communicated with a semantic progressbar and text.
 
 ## Components
 
-### Buttons
-- **Shape:** grounded control corners with a 2.75rem minimum height.
-- **Primary:** Atlas Teal on Field Paper, compact horizontal padding, and a soft accent-tinted shadow.
-- **Hover / Focus:** rise by 2px on hover; use the global 2px accent focus outline with a 3px offset.
-- **Secondary:** transparent with a fine ink border; switch border and text to the accent on hover.
-- **Destructive:** outlined Danger Red and used only after the user has entered a destructive data flow.
+### Header
 
-### Chips
-- **Style:** full-pill filters and metadata chips use fine borders, compact labels, and no shadow.
-- **State:** selected filters gain an accent border, accent text, and a very light accent wash.
+Wordmark, optional back context, language, and theme controls stay on one line. The header is sticky with a solid paper background and a hairline divider. The mobile bottom navigation is limited to Explore, History, Saved, and Settings, and is hidden during quiz and result flows.
 
-### Cards / Containers
-- **Corner Style:** 1rem for catalog cards and 1.1rem for focused panels.
-- **Background:** paper mixed subtly toward white or the route color; dark mode mixes Night Paper toward a small amount of white.
-- **Shadow Strategy:** flat at rest; catalog cards lift only on hover.
-- **Border:** one low-contrast ink hairline.
-- **Internal Padding:** 1.25–1.5rem depending on content density.
+### Assessment catalog
 
-### Inputs / Fields
-- **Style:** search uses a transparent field with a single bottom rule; import uses a dashed bounded drop zone.
-- **Focus:** the global accent outline remains visible even when an inner input removes its native outline.
-- **Error / Disabled:** disabled actions reduce opacity and retain their shape; invalid data uses explicit recovery copy plus Danger Red feedback.
+Use a heading, one search field, compact filter controls, and a responsive list of assessment cards. Cards are not equal-weight marketing tiles: title and description lead, metadata stays quiet, and bookmark is a secondary action.
 
-### Navigation
-- The sticky header keeps the wordmark, optional back context, theme, and language controls on one line.
-- Mobile primary navigation is a four-destination bottom bar. The active destination reverses to ink-on-paper (or its dark equivalent) rather than adding another accent color.
-- Quiz and result screens suppress global bottom navigation to preserve focus.
+### Answer options
 
-### Answer Options
-- Answer rows are full-width, left aligned, and at least 4.2rem tall.
-- The leading key is a circular coordinate marker. Selection changes the border and adds a light teal wash; it does not replace the whole row with a saturated fill.
-- Hover motion moves along the route horizontally, while page-to-page quiz motion communicates direction.
+Full-width, left-aligned rows are at least 4.2rem tall. Selected state changes border and adds a light accent wash. The answer key is a small circular marker for keyboard discoverability, not a decorative map pin.
 
-### Narrative Quotes
-- Quotes use italic supporting text and a separate accent-colored opening mark rather than a thick side border.
-- The opening mark is decorative and hidden from assistive reading order.
+### Results
 
-### Map Marks
-- Contours, dotted fields, pins, route numbers, and route lines form one reusable geometry language.
-- Marks are structural wayfinding, not illustration filler. A page should use only the subset that clarifies its role.
+Results start with a short interpretation, then readable narrative sections or dimension bars, then a reflection guide with one question and one small next step. Scores are snapshots, not verdicts. Share copy says “分享结果 / Share result,” not “share this map.”
 
-## Do's and Don'ts
+### Empty and recovery states
 
-### Do:
-- **Do** begin discovery with a human question or route, then reveal the curated public routes.
-- **Do** preserve equal navigation, recovery states, and hierarchy in Simplified Chinese and English.
-- **Do** use Lucide icons or precise CSS/SVG geometry with a consistent stroke language.
-- **Do** keep touch targets at least 44px high and preserve visible keyboard focus.
-- **Do** honor reduced motion and keep the default rendered state readable before animation runs.
-- **Do** use route colors as local wayfinding signals while keeping teal as the product-wide accent.
+Every loading, empty, error, and resume state explains what happened and offers the next useful action. Do not use route or map metaphors in recovery copy.
 
-### Don't:
-- **Don't** introduce locale keys, language controls, or fallback behavior beyond Simplified Chinese and English.
-- **Don't** turn results into diagnoses, scores into verdicts, or the interface into a clinical dashboard.
-- **Don't** use emoji as interface icons, celebratory decoration, or category markers in new UI.
-- **Don't** fill the page with equal-weight cards, nested cards, decorative charts, or gamified streaks.
-- **Don't** use gradients, glass effects, thick colored side borders, or hard offset shadows.
-- **Don't** allow decorative map marks to compete with the primary action or reading content.
+## Accessibility and inclusion
+
+Maintain visible focus, semantic headings, labels for icon-only controls, sufficient contrast, keyboard operation, reduced motion, and equivalent Chinese and English hierarchy. Never hide the only recovery action behind hover. Keep answer options and primary actions usable at 44px or larger.
+
+## Do and do not
+
+### Do
+
+- Begin with a human question.
+- Keep surfaces quiet, grounded, and readable.
+- Use local browser language, theme, history, bookmarks, and backup controls.
+- Prefer CSS transitions and native layout over runtime animation libraries.
+- Keep sensitive or clinical-sounding copy framed as self-reflection.
+
+### Do not
+
+- Do not use AI-purple gradients, glassmorphism, mesh backgrounds, decorative blur, or a fake data dashboard.
+- Do not use map, atlas, coordinate, contour, or route language in new user-facing copy.
+- Do not turn a result into a diagnosis or permanent label.
+- Do not add remote images, web fonts, analytics, or cloud storage for visual polish.
+- Do not animate layout properties or ship a large dependency for a small transition.

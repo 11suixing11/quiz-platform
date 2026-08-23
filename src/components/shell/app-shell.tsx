@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { Bookmark, Compass, History, Languages, Moon, Settings, Sun } from "lucide-react";
+import { ArrowLeft, Bookmark, History, House, Languages, Moon, Settings, Sun } from "lucide-react";
 import { useLanguage, useTheme } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 
 type Theme = "system" | "light" | "dark";
 
 const navItems = [
-  { href: "/", label: "探索", labelEn: "Explore", icon: Compass },
+  { href: "/", label: "首页", labelEn: "Home", icon: House },
   { href: "/history/", label: "记录", labelEn: "History", icon: History },
   { href: "/bookmarks/", label: "收藏", labelEn: "Saved", icon: Bookmark },
   { href: "/settings/", label: "设置", labelEn: "Settings", icon: Settings },
@@ -67,13 +67,13 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   );
 }
 
-export function AppHeader({ backHref, backLabel, section }: { backHref?: string; backLabel?: string; section?: string }) {
+export function AppHeader({ backHref, backLabel, section, narrow = false }: { backHref?: string; backLabel?: string; section?: string; narrow?: boolean }) {
   const { language } = useLanguage();
   return (
     <header className="atlas-header">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
+      <div className={cn("mx-auto flex w-full items-center justify-between gap-4 px-5 py-4 sm:px-8", narrow ? "max-w-3xl" : "max-w-6xl")}>
         <div className="flex min-w-0 items-center gap-4">
-          {backHref ? <Link href={backHref} className="atlas-back-link"><span aria-hidden="true">←</span><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true">⌁</span><span>认识你自己 <span className="text-ink/35 dark:text-white/35">/</span> Know Yourself</span></Link>}
+          {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span>认识你自己 <span className="text-ink/35 dark:text-white/35">/</span> Know Yourself</span></Link>}
           {section && <span className="hidden truncate text-xs font-medium tracking-[0.08em] text-ink/40 sm:inline dark:text-white/40">{section}</span>}
         </div>
         <div className="flex shrink-0 items-center gap-2"><ThemeToggle compact /><LanguageToggle compact /></div>
