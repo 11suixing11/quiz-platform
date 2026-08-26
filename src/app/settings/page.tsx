@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { Check, Moon, Monitor, Sun } from "lucide-react";
+import { Check, Moon, Monitor, Sun, UserRound } from "lucide-react";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { DataManager } from "@/components/data-manager";
 import { useLanguage, useTheme } from "@/hooks/use-local-storage";
@@ -19,7 +19,7 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const copy = language === "zh" ? {
     title: "设置",
-    intro: "把语言、外观和本地数据调整成适合你的样子。",
+    intro: "把语言、外观、账号和本机数据调整成适合你的样子。",
     language: "语言",
     languageDescription: "测试内容与界面会使用同一种语言。",
     chinese: "中文",
@@ -27,11 +27,14 @@ export default function SettingsPage() {
     appearance: "外观",
     appearanceDescription: "结果与答题页面会保持同一套主题。",
     data: "本地数据",
-    dataDescription: "记录只存在于当前浏览器。你可以随时备份、恢复或清空。",
+    account: "账号与同步",
+    accountDescription: "登录后可以选择跨设备同步，也可以继续只在本机保存。",
+    accountAction: "管理账号",
+    dataDescription: "这里管理当前设备的数据。你可以随时备份、恢复或清空。",
     privacy: "查看隐私说明",
   } : {
     title: "Settings",
-    intro: "Set the language, appearance, and local data controls to fit you.",
+    intro: "Set language, appearance, account sync, and device data controls to fit you.",
     language: "Language",
     languageDescription: "Quiz content and navigation use the same language.",
     chinese: "中文",
@@ -39,7 +42,10 @@ export default function SettingsPage() {
     appearance: "Appearance",
     appearanceDescription: "Results and answering stay in one visual mode.",
     data: "Local data",
-    dataDescription: "Records stay in this browser. Back up, restore, or clear them any time.",
+    account: "Account and sync",
+    accountDescription: "Sign in to sync across devices, or keep saving only on this one.",
+    accountAction: "Manage account",
+    dataDescription: "This section manages data on the current device. Back up, restore, or clear it any time.",
     privacy: "Read privacy notes",
   };
 
@@ -65,6 +71,11 @@ export default function SettingsPage() {
           <div className="mt-5 grid gap-3 sm:grid-cols-3" role="group" aria-label={copy.appearance}>
             {themes.map(({ id, icon: Icon, zh, en, descriptionZh, descriptionEn }) => <button type="button" key={id} onClick={() => setTheme(id)} aria-pressed={theme === id} className={cn("flex min-h-28 flex-col justify-between rounded-xl border p-4 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", theme === id ? "border-accent bg-accent/8" : "border-ink/12 hover:border-ink/30 dark:border-white/12 dark:hover:border-white/30")}><span className="flex items-center justify-between"><Icon className="size-4 text-accent" aria-hidden="true" />{theme === id && <Check className="size-4 text-accent" aria-hidden="true" />}</span><span><span className="block text-sm font-semibold">{language === "zh" ? zh : en}</span><span className="mt-1 block text-xs text-ink/45 dark:text-white/45">{language === "zh" ? descriptionZh : descriptionEn}</span></span></button>)}
           </div>
+        </section>
+
+        <section className="atlas-settings-section mt-10">
+          <div><h2 className="text-xl font-semibold tracking-[-0.03em]">{copy.account}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.accountDescription}</p></div>
+          <Link href="/account/" className="atlas-secondary-action mt-5"><UserRound className="size-4" aria-hidden="true" />{copy.accountAction}</Link>
         </section>
 
         <section className="atlas-settings-section mt-10" id="data">

@@ -87,6 +87,7 @@
 @keyframes atlas-spin { to { transform: rotate(360deg); } }
 
 .atlas-page { min-height: 100dvh; overflow-x: clip; background: var(--paper); color: var(--ink); }
+.atlas-mobile-nav { padding-bottom: calc(.5rem + env(safe-area-inset-bottom)); }
 .atlas-header { position: sticky; top: 0; z-index: 30; border-bottom: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); background: var(--paper); }
 .atlas-wordmark { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .55rem; font-size: .76rem; font-weight: 700; letter-spacing: .045em; white-space: nowrap; }
 .atlas-wordmark-mark { position: relative; display: inline-flex; height: 1.7rem; width: 1.7rem; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 999px; color: var(--accent); }
@@ -174,6 +175,12 @@
 .atlas-danger-action { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .4rem; border: 1px solid color-mix(in srgb, #a53f3f 35%, transparent); border-radius: .7rem; padding: .65rem .8rem; color: #a53f3f; font-size: .72rem; font-weight: 750; }
 .atlas-danger-action:hover { background: color-mix(in srgb, #a53f3f 8%, transparent); }
 .atlas-settings-section { border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); padding-top: 2rem; }
+.atlas-account-input { min-height: 2.9rem; width: 100%; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); border-radius: .5rem; background: color-mix(in srgb, var(--paper) 92%, white 8%); padding: .7rem .8rem; color: var(--ink); font-size: .9rem; font-weight: 400; outline: none; transition: border-color .18s ease, box-shadow .18s ease; }
+.dark .atlas-account-input { background: color-mix(in srgb, var(--night) 90%, white 5%); }
+.atlas-account-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+.atlas-sync-summary { display: flex; min-height: 4.5rem; flex-direction: column; justify-content: space-between; gap: .65rem; border-top: 1px solid var(--soft-line); border-bottom: 1px solid var(--soft-line); padding: .75rem 0; }
+.atlas-sync-summary span { color: var(--muted-text); font-size: .7rem; font-weight: 700; }
+.atlas-sync-summary strong { color: var(--ink); font-size: .8rem; font-weight: 750; line-height: 1.6; }
 .atlas-data-summary, .atlas-data-row { padding: 1.1rem 1.15rem; }
 .atlas-data-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
 .atlas-data-danger { border-color: color-mix(in srgb, #a53f3f 25%, transparent); }
@@ -212,6 +219,7 @@
   --warm-ink: #936451;
   --warm-line: rgba(147, 100, 81, .2);
   --blue-wash: #e9eef1;
+  --danger: #a53f3f;
 }
 .dark {
   --paper: #17201e;
@@ -226,6 +234,7 @@
   --warm-surface: #332824;
   --warm-ink: #e0ad94;
   --warm-line: rgba(224, 173, 148, .22);
+  --danger: #efaaa3;
   --blue-wash: #29363b;
 }
 
@@ -347,6 +356,12 @@
 .assessment-reselect-link { display: inline-flex; min-height: 2.75rem; align-items: center; padding: .6rem .25rem; color: var(--muted-text); font-size: .72rem; font-weight: 700; transition: color .18s ease; }
 .assessment-reselect-link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: .22em; }
 .atlas-result-question { max-width: 38rem; color: var(--muted-text); font-size: .82rem; font-weight: 700; line-height: 1.6; }
+.atlas-result-save-status { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-bottom: 1.5rem; border-top: 1px solid var(--soft-line); border-bottom: 1px solid var(--soft-line); padding: .85rem 0; }
+.atlas-result-save-status-copy { display: flex; min-width: 0; align-items: flex-start; gap: .7rem; }
+.atlas-result-save-status-copy > svg { width: 1rem; height: 1rem; margin-top: .15rem; flex: 0 0 auto; color: var(--accent); }
+.atlas-result-save-status-copy strong { display: block; color: var(--ink); font-size: .76rem; font-weight: 750; line-height: 1.5; }
+.atlas-result-save-status-copy p { margin-top: .1rem; color: var(--muted-text); font-size: .72rem; line-height: 1.55; }
+.atlas-result-save-status--warning .atlas-result-save-status-copy > svg, .atlas-result-save-status--warning .atlas-result-save-status-copy strong { color: var(--danger); }
 .atlas-result-identity { max-width: 42rem; border: 1px solid var(--warm-line); border-radius: 1rem; background: var(--warm-surface); padding: 1.15rem 1.25rem 1.2rem; }
 .atlas-result-identity-label { color: var(--muted-text); font-size: .72rem; font-weight: 750; letter-spacing: .03em; }
 .atlas-result-identity-title { margin-top: .4rem; color: var(--ink); font-size: clamp(2.7rem, 6vw, 5rem); font-weight: 650; letter-spacing: -.055em; line-height: .98; text-wrap: balance; }
@@ -425,6 +440,8 @@
   .atlas-result-details-heading { align-items: flex-start; flex-direction: column; gap: .45rem; }
   .atlas-result-details-heading p { max-width: none; text-align: left; }
   .atlas-result-details-grid { grid-template-columns: 1fr; }
+  .atlas-result-save-status { align-items: flex-start; flex-direction: column; gap: .55rem; }
+  .atlas-result-save-status > .atlas-text-link { margin-left: 1.7rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .assessment-detail-enter { animation: none; }
@@ -449,6 +466,11 @@
 .quiz-main-title { color: var(--ink); font-size: clamp(1.7rem, 3vw, 2.35rem); font-weight: 650; letter-spacing: -.045em; line-height: 1.08; }
 .quiz-progress-block { margin-top: 1.45rem; }
 .quiz-progress-meta { display: flex; justify-content: space-between; gap: 1rem; margin-top: .6rem; color: color-mix(in srgb, var(--ink) 48%, transparent); font-size: .72rem; line-height: 1.4; }
+.quiz-draft-status { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; margin-top: .65rem; color: color-mix(in srgb, var(--ink) 48%, transparent); font-size: .68rem; line-height: 1.5; }
+.quiz-draft-status-dot { width: .38rem; height: .38rem; flex: none; border-radius: 999px; background: var(--accent); }
+.quiz-draft-status--warning { color: var(--danger); }
+.quiz-draft-status--warning .quiz-draft-status-dot { background: var(--danger); }
+.quiz-draft-status-separator { opacity: .55; }
 .quiz-question-area { margin-top: 2.8rem; border-top: 1px solid var(--soft-line); padding-top: 1.35rem; }
 .quiz-question-title { max-width: 35rem; margin-top: .8rem; color: var(--ink); font-size: clamp(2rem, 4.2vw, 3.3rem); font-weight: 650; letter-spacing: -.048em; line-height: 1.12; text-wrap: balance; }
 /* The heading receives programmatic focus so screen readers announce the next question. It is not an interactive control, so a full focus ring would look like an input border around the copy. */
@@ -468,6 +490,7 @@
 .quiz-actions { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 2.1rem; border-top: 1px solid var(--quiz-rule); padding-top: .9rem; }
 .quiz-actions .atlas-primary-action, .quiz-actions .atlas-secondary-action { min-height: 2.9rem; border-radius: 1rem; }
 @media (max-width: 640px) {
+  .atlas-page-container { padding-bottom: calc(7rem + env(safe-area-inset-bottom)); }
   .quiz-main { padding-top: 1.4rem; }
   .quiz-main-title { font-size: 1.65rem; }
   .quiz-progress-block { margin-top: 1.2rem; }

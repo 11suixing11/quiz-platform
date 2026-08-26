@@ -1,0 +1,31 @@
+[Unit]
+Description=Quiz Platform Next.js application
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=quizdeploy
+Group=quizdeploy
+WorkingDirectory=/srv/quiz-platform/releases/current
+EnvironmentFile=/etc/quiz-platform/quiz-platform.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=3333
+Environment=DATABASE_PATH=/var/lib/quiz-platform/app.sqlite3
+ExecStart=/usr/bin/node /srv/quiz-platform/releases/current/server.js
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadOnlyPaths=/srv/quiz-platform/releases
+ReadWritePaths=/var/lib/quiz-platform
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

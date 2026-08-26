@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { ArrowLeft, Bookmark, History, House, Languages, Moon, Settings, Sun } from "lucide-react";
+import { ArrowLeft, Bookmark, History, House, Languages, Moon, Settings, Sun, UserRound } from "lucide-react";
+import { useAccount } from "@/components/account-provider";
 import { useLanguage, useTheme } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ const navItems = [
   { href: "/history/", label: "记录", labelEn: "History", icon: History },
   { href: "/bookmarks/", label: "收藏", labelEn: "Saved", icon: Bookmark },
   { href: "/settings/", label: "设置", labelEn: "Settings", icon: Settings },
+  { href: "/account/", label: "账号", labelEn: "Account", icon: UserRound },
 ];
 
 export function applyTheme(theme: Theme) {
@@ -69,14 +71,15 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
 
 export function AppHeader({ backHref, backLabel, section, narrow = false }: { backHref?: string; backLabel?: string; section?: string; narrow?: boolean }) {
   const { language } = useLanguage();
+  const { user } = useAccount();
   return (
     <header className="atlas-header">
       <div className={cn("mx-auto flex w-full items-center justify-between gap-4 px-5 py-4 sm:px-8", narrow ? "max-w-3xl" : "max-w-6xl")}>
         <div className="flex min-w-0 items-center gap-4">
-          {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span>认识你自己 <span className="text-ink/35 dark:text-white/35">/</span> Know Yourself</span></Link>}
+          {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span className="sm:hidden">认识你自己</span><span className="hidden sm:inline">认识你自己 <span className="text-ink/35 dark:text-white/35">/</span> Know Yourself</span></Link>}
           {section && <span className="hidden truncate text-xs font-medium tracking-[0.08em] text-ink/40 sm:inline dark:text-white/40">{section}</span>}
         </div>
-        <div className="flex shrink-0 items-center gap-2"><ThemeToggle compact /><LanguageToggle compact /></div>
+        <div className="flex shrink-0 items-center gap-1.5"><Link href="/account/" className={cn("atlas-icon-link", user && "text-accent")} aria-label={user ? (language === "zh" ? "打开账号" : "Open account") : (language === "zh" ? "登录或注册" : "Sign in or register")} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}><UserRound className="size-4" aria-hidden="true" /></Link><ThemeToggle compact /><LanguageToggle compact /></div>
       </div>
     </header>
   );
@@ -88,8 +91,8 @@ export function MobileNav() {
   const routePath = pathname || "/";
   if (routePath.startsWith("/quiz/") || routePath.startsWith("/result/")) return null;
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 px-3 py-2 backdrop-blur-xl dark:border-white/10 dark:bg-night/95 sm:hidden" aria-label={language === "zh" ? "主导航" : "Primary navigation"}>
-      <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
+    <nav className="atlas-mobile-nav fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 px-3 pt-2 backdrop-blur-xl dark:border-white/10 dark:bg-night/95 sm:hidden" aria-label={language === "zh" ? "主导航" : "Primary navigation"}>
+      <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
         {navItems.map(({ href, label, labelEn, icon: Icon }) => {
           const active = href === "/" ? routePath === "/" : routePath.startsWith(href);
           return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", active ? "bg-ink text-paper dark:bg-white dark:text-ink" : "text-ink/50 hover:bg-ink/5 dark:text-white/55 dark:hover:bg-white/5")}><Icon className="size-4" strokeWidth={active ? 2.2 : 1.7} /><span>{language === "zh" ? label : labelEn}</span></Link>;
@@ -100,5 +103,5 @@ export function MobileNav() {
 }
 
 export function PageContainer({ children, className, id = "main-content" }: { children: React.ReactNode; className?: string; id?: string }) {
-  return <main id={id} tabIndex={-1} className={cn("mx-auto w-full max-w-6xl px-5 pb-28 pt-8 sm:px-8 sm:pb-16 sm:pt-12", className)}>{children}</main>;
+  return <main id={id} tabIndex={-1} className={cn("atlas-page-container mx-auto w-full max-w-6xl px-5 pb-28 pt-8 sm:px-8 sm:pb-16 sm:pt-12", className)}>{children}</main>;
 }

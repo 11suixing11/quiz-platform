@@ -1,6 +1,7 @@
 ﻿import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { MobileNav, PreferenceSync } from "@/components/shell/app-shell";
+import { AccountProvider } from "@/components/account-provider";
 
 const SITE_URL = "https://loveyourself.cc.cd";
 const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
@@ -8,7 +9,7 @@ const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "认识你自己 | Know Yourself", template: "%s | Know Yourself" },
-  description: "16 项经过审阅的中英双语心理评测。选择一个当下在意的方向，完成回答，获得可带回日常生活的自我观察。所有个人记录只保存在当前浏览器。",
+  description: "16 项经过审阅的中英双语心理评测。游客记录保存在当前浏览器，登录后可在自己的设备之间同步。",
   keywords: ["自我反思", "人格测试", "情绪", "关系", "self reflection", "personality quiz"],
   authors: [{ name: "Know Yourself" }],
   manifest: "/manifest.json",
@@ -45,7 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="zh-CN" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head><link rel="apple-touch-icon" href="/icons/icon-192.svg" /><script dangerouslySetInnerHTML={{ __html: preferenceScript }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} /></head>
-      <body className="min-h-full bg-paper font-sans text-ink dark:bg-night dark:text-white"><a className="skip-link" href="#main-content">跳到主要内容 / Skip to main content</a><PreferenceSync />{children}<MobileNav /></body>
+      <body className="min-h-full bg-paper font-sans text-ink dark:bg-night dark:text-white"><a className="skip-link" href="#main-content">跳到主要内容 / Skip to main content</a><AccountProvider><PreferenceSync />{children}<MobileNav /></AccountProvider></body>
     </html>
   );
 }

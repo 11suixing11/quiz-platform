@@ -48,7 +48,7 @@ export default function TestDetailClient({ testId }: { testId: string }) {
               <div className="atlas-assessment-brief-grid">
                 <div className="atlas-assessment-brief-item"><CheckCircle2 aria-hidden="true" /><div><strong>{language === "zh" ? "没有标准答案" : "There is no right answer"}</strong><p>{language === "zh" ? "选择最接近你当下感受的选项即可。" : "Choose the option closest to how you feel today."}</p></div></div>
                 <div className="atlas-assessment-brief-item"><Clock3 aria-hidden="true" /><div><strong>{language === "zh" ? `大约 ${entry.duration} 分钟` : `About ${entry.duration} minutes`}</strong><p>{language === "zh" ? `${entry.questions} 道问题，一次完成也可以。` : `${entry.questions} questions, designed for one sitting.`}</p></div></div>
-                <div className="atlas-assessment-brief-item"><PauseCircle aria-hidden="true" /><div><strong>{language === "zh" ? "可以随时暂停" : "Pause whenever you need"}</strong><p>{language === "zh" ? "未完成的回答会留在当前浏览器中。" : "An unfinished session stays in this browser."}</p></div></div>
+                <div className="atlas-assessment-brief-item"><PauseCircle aria-hidden="true" /><div><strong>{language === "zh" ? "可以随时暂停" : "Pause whenever you need"}</strong><p>{language === "zh" ? "游客进度留在本机；开启同步后可在其他登录设备继续。" : "Guest progress stays on this device; synced progress can continue on another signed-in device."}</p></div></div>
                 <div className="atlas-assessment-brief-item"><ShieldCheck aria-hidden="true" /><div><strong>{language === "zh" ? "只用于自我反思" : "For self-reflection"}</strong><p>{language === "zh" ? "它不是诊断，也不替代专业评估。" : "It is not a diagnosis or a substitute for professional assessment."}</p></div></div>
               </div>
             </section>

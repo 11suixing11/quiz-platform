@@ -1,4 +1,4 @@
-name: Validate and deploy static site
+name: Validate and deploy application
 
 on:
   push:
@@ -15,14 +15,16 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Match the Ubuntu 24.04 production host so native addons do not acquire a
+    # newer glibc dependency than the VPS can provide.
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - name: Install dependencies
         run: npm ci
@@ -38,16 +40,47 @@ jobs:
         run: npm run audit:flagship
       - name: Accessibility audit
         run: npm run audit:a11y
-      - name: Build static export
+      - name: Build standalone application
         run: npm run build
-      - name: Package static export
+      - name: Prepare standalone assets
+        run: npm run package:standalone
+      - name: Verify Linux native addon
         run: |
-          tar -C out -czf quiz-platform.tar.gz .
+          set -euo pipefail
+          addon=.next/standalone/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+          test -f "$addon"
+          test "$(uname -s)" = Linux
+          test "$(uname -m)" = x86_64
+          python3 - "$addon" <<'PY'
+          from pathlib import Path
+          import sys
+
+          header = Path(sys.argv[1]).read_bytes()[:20]
+          if header[:4] != b"\x7fELF" or len(header) < 20 or header[4] != 2:
+              raise SystemExit("better-sqlite3 addon is not an ELF64 Linux binary")
+          # ELF e_machine at bytes 18..19: 0x3e = AMD x86-64.
+          if int.from_bytes(header[18:20], "little") != 0x3E:
+              raise SystemExit("better-sqlite3 addon is not an x86-64 ELF binary")
+          PY
+          file "$addon"
+          file "$addon" | grep -E 'ELF 64-bit.*x86-64'
+          node <<'NODE'
+          const Database = require("./.next/standalone/node_modules/better-sqlite3");
+          const database = new Database(":memory:");
+          database.exec("SELECT 1");
+          database.close();
+          NODE
+      - name: Package standalone release
+        run: |
+          test -f .next/standalone/server.js
+          test -d .next/standalone/public
+          test -d .next/standalone/.next/static
+          tar -C .next/standalone -czf quiz-platform.tar.gz .
           tar -tzf quiz-platform.tar.gz >/dev/null
-      - name: Upload static export
+      - name: Upload standalone release
         uses: actions/upload-artifact@v4
         with:
-          name: static-export
+          name: standalone-release
           path: quiz-platform.tar.gz
           retention-days: 7
 
@@ -60,10 +93,10 @@ jobs:
       name: production
       url: https://loveyourself.cc.cd/
     steps:
-      - name: Download static export
+      - name: Download standalone release
         uses: actions/download-artifact@v4
         with:
-          name: static-export
+          name: standalone-release
       - name: Configure deployment SSH
         env:
           VPS_DEPLOY_SSH_KEY: ${{ secrets.VPS_DEPLOY_SSH_KEY }}
@@ -97,31 +130,54 @@ jobs:
           archive="$releases/.incoming/$release.tar.gz"
           staging="$releases/.incoming/$release"
           target="$releases/$release"
+          previous="$(readlink -f "$releases/current" 2>/dev/null || true)"
 
           test -s "$archive"
           rm -rf "$staging"
           if [ -e "$target" ]; then
-            test -f "$target/index.html"
-            test -f "$target/404.html"
-            test -f "$target/sitemap.xml"
+            test -f "$target/server.js"
+            test -d "$target/public"
+            test -d "$target/.next/static"
           else
             mkdir "$staging"
             tar -xzf "$archive" -C "$staging"
-            test -f "$staging/index.html"
-            test -f "$staging/404.html"
-            test -f "$staging/sitemap.xml"
+            test -f "$staging/server.js"
+            test -d "$staging/public"
+            test -d "$staging/.next/static"
+            test -f "$staging/node_modules/better-sqlite3/build/Release/better_sqlite3.node"
             find "$staging" -type d -exec chmod 0755 {} +
             find "$staging" -type f -exec chmod 0644 {} +
+            find "$staging" -type f -name '*.node' -exec chmod 0755 {} +
             mv "$staging" "$target"
+          fi
+          TARGET="$target" /usr/bin/node <<'NODE'
+          const Database = require(`${process.env.TARGET}/node_modules/better-sqlite3`);
+          const database = new Database(":memory:");
+          database.exec("SELECT 1");
+          database.close();
+          NODE
+          if [ -n "$previous" ] && [ "$previous" != "$target" ]; then
+            rm -f "$releases/.previous-$release"
+            ln -s "$previous" "$releases/.previous-$release"
+            mv -Tf "$releases/.previous-$release" "$releases/previous"
           fi
           rm -f "$releases/.current-$release"
           ln -s "$target" "$releases/.current-$release"
           mv -Tf "$releases/.current-$release" "$releases/current"
           rm -f "$archive"
-          maintenance_host=quiz.107-151-246-167.sslip.io
-          curl --fail --silent --show-error --resolve "$maintenance_host:443:127.0.0.1" "https://$maintenance_host/" -o /dev/null
-          curl --fail --silent --show-error --resolve "$maintenance_host:443:127.0.0.1" "https://$maintenance_host/test/big-five/" -o /dev/null
-          test "$(curl --fail --silent --show-error --resolve "$maintenance_host:443:127.0.0.1" "https://$maintenance_host/healthz")" = ok
+          application_origin=http://127.0.0.1:3333
+          if ! sudo -n systemctl restart quiz-platform || ! sudo -n systemctl is-active quiz-platform >/dev/null || \
+             ! curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-all-errors -H 'Host: loveyourself.cc.cd' "$application_origin/" -o /dev/null || \
+             ! curl --fail --silent --show-error --retry 5 --retry-delay 1 --retry-all-errors -H 'Host: loveyourself.cc.cd' "$application_origin/test/big-five/" -o /dev/null || \
+             ! test "$(curl --fail --silent --show-error -H 'Host: loveyourself.cc.cd' "$application_origin/api/auth/get-session")" = null; then
+            if [ -n "$previous" ] && [ -d "$previous" ]; then
+              rm -f "$releases/.rollback"
+              ln -s "$previous" "$releases/.rollback"
+              mv -Tf "$releases/.rollback" "$releases/current"
+              sudo -n systemctl restart quiz-platform || true
+            fi
+            exit 1
+          fi
           REMOTE
       - name: Smoke test public origin
         env:

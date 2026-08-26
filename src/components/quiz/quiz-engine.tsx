@@ -6,7 +6,9 @@ import { ArrowLeft, ArrowRight, Check, CircleHelp, RotateCcw } from "lucide-reac
 import { useRouter } from "next/navigation";
 import { loadQuizDefinition, scoreQuiz, type QuizDefinition } from "@/core/quiz";
 import { AppHeader } from "@/components/shell/app-shell";
+import { useAccount } from "@/components/account-provider";
 import { useLanguage } from "@/hooks/use-local-storage";
+import { submitCloudQuiz } from "@/lib/account";
 import { clearQuizSession, getQuizSession, saveAttempt, saveQuizSession } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
@@ -30,20 +32,47 @@ function questionTitleClass(prompt: string) {
   return undefined;
 }
 
+function DraftSaveStatus({
+  language,
+  savedAt,
+  label,
+  warning,
+}: {
+  language: "zh" | "en";
+  savedAt: string | null;
+  label: string;
+  warning: boolean;
+}) {
+  if (!savedAt) return null;
+  return (
+    <div className={cn("quiz-draft-status", warning && "quiz-draft-status--warning")} role="status" aria-live="polite">
+      <span className="quiz-draft-status-dot" aria-hidden="true" />
+      <span>{language === "zh" ? "最近保存" : "Last saved"} {savedAt}</span>
+      <span className="quiz-draft-status-separator" aria-hidden="true">·</span>
+      <span>{label}</span>
+    </div>
+  );
+}
+
 export default function QuizEngine({ testId }: QuizEngineProps) {
   const router = useRouter();
   const { language } = useLanguage();
+  const { user, syncChoice, syncState } = useAccount();
   const [definition, setDefinition] = useState<QuizDefinition | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [resumeSession, setResumeSession] = useState<{ answers: (number | null)[]; currentQuestion: number } | null>(null);
+  const [resumeSession, setResumeSession] = useState<{ answers: (number | null)[]; currentQuestion: number; timestamp: number } | null>(null);
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
+  const [draftCloudPending, setDraftCloudPending] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [direction, setDirection] = useState(1);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const questionHeadingRef = useRef<HTMLHeadingElement>(null);
   const shouldFocusQuestion = useRef(false);
+  const draftSyncStarted = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,10 +85,13 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
       setDefinition(next);
       const freshAnswers = new Array(next.questions.length).fill(null) as (number | null)[];
       const session = getQuizSession(testId);
+      setDraftSavedAt(null);
       if (session && session.answers.length === next.questions.length) {
-        setResumeSession({ answers: session.answers, currentQuestion: Math.min(session.currentQuestion, next.questions.length - 1) });
+        setResumeSession({ answers: session.answers, currentQuestion: Math.min(session.currentQuestion, next.questions.length - 1), timestamp: session.timestamp });
+        setDraftSavedAt(session.timestamp);
         setAnswers(freshAnswers);
       } else {
+        setResumeSession(null);
         setAnswers(freshAnswers);
         setCurrentQuestion(0);
       }
@@ -69,8 +101,27 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
 
   useEffect(() => {
     if (!definition || resumeSession || !answers.some((answer) => answer !== null)) return;
+    const savedAt = Date.now();
     saveQuizSession(testId, answers, currentQuestion);
-  }, [answers, currentQuestion, definition, resumeSession, testId]);
+    const shouldSync = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+    draftSyncStarted.current = false;
+    const timer = window.setTimeout(() => {
+      setDraftSavedAt(savedAt);
+      setDraftCloudPending(shouldSync);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [answers, currentQuestion, definition, resumeSession, syncChoice, testId, user]);
+
+  useEffect(() => {
+    const updateConnection = () => setIsOffline(!window.navigator.onLine);
+    updateConnection();
+    window.addEventListener("online", updateConnection);
+    window.addEventListener("offline", updateConnection);
+    return () => {
+      window.removeEventListener("online", updateConnection);
+      window.removeEventListener("offline", updateConnection);
+    };
+  }, []);
 
   const total = definition?.questions.length ?? 0;
   const question = definition?.questions[currentQuestion];
@@ -78,6 +129,69 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
   const answered = answers.filter((answer) => answer !== null).length;
   const progress = total ? ((currentQuestion + 1) / total) * 100 : 0;
   const isLast = currentQuestion === total - 1;
+  const draftAnswers = resumeSession?.answers ?? answers;
+  const hasDraft = draftAnswers.some((answer) => answer !== null);
+  const cloudSyncEnabled = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+
+  useEffect(() => {
+    if (!draftCloudPending) return;
+    if (!cloudSyncEnabled) {
+      draftSyncStarted.current = false;
+      const timer = window.setTimeout(() => setDraftCloudPending(false), 0);
+      return () => window.clearTimeout(timer);
+    }
+    if (syncState === "syncing") {
+      draftSyncStarted.current = true;
+      return;
+    }
+    if (syncState === "ready" && draftSyncStarted.current) {
+      draftSyncStarted.current = false;
+      const timer = window.setTimeout(() => setDraftCloudPending(false), 0);
+      return () => window.clearTimeout(timer);
+    }
+  }, [cloudSyncEnabled, draftCloudPending, syncState]);
+
+  const draftStatus = useMemo(() => {
+    if (isOffline) {
+      return {
+        label: language === "zh" ? "本机已保存 · 当前离线" : "Saved on this device · Currently offline",
+        warning: true,
+      };
+    }
+    if (cloudSyncEnabled && syncState === "error") {
+      return {
+        label: language === "zh" ? "本机已保存 · 云端同步失败" : "Saved on this device · Cloud sync failed",
+        warning: true,
+      };
+    }
+    if (cloudSyncEnabled && syncState === "syncing") {
+      return {
+        label: language === "zh" ? "本机已保存 · 正在同步" : "Saved on this device · Syncing",
+        warning: false,
+      };
+    }
+    if (cloudSyncEnabled && syncState === "ready") {
+      return {
+        label: draftCloudPending
+          ? (language === "zh" ? "本机已保存 · 等待云端同步" : "Saved on this device · Waiting to sync")
+          : (language === "zh" ? "本机已保存 · 云端同步已开启" : "Saved on this device · Cloud sync is on"),
+        warning: false,
+      };
+    }
+    if (user && syncState === "awaiting-consent") {
+      return {
+        label: language === "zh" ? "已保存到本机 · 选择同步方式后同步" : "Saved on this device · Choose a sync mode to sync",
+        warning: false,
+      };
+    }
+    return {
+      label: user ? (language === "zh" ? "仅保存在本机" : "Saved on this device only") : (language === "zh" ? "已保存到本机" : "Saved on this device"),
+      warning: false,
+    };
+  }, [cloudSyncEnabled, draftCloudPending, isOffline, language, syncState, user]);
+  const draftSavedLabel = draftSavedAt
+    ? new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-US", { hour: "2-digit", minute: "2-digit" }).format(draftSavedAt)
+    : null;
 
   const move = useCallback((next: number) => {
     const bounded = Math.max(0, Math.min(next, total - 1));
@@ -97,28 +211,45 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
     if (!isLast) window.setTimeout(() => move(currentQuestion + 1), 160);
   }, [currentQuestion, definition, isLast, move]);
 
-  const submit = useCallback(() => {
+  const submit = useCallback(async () => {
     if (!definition || answers.some((answer) => answer === null) || submitting) return;
     setSubmitting(true);
-    setSubmitError(false);
+    setSubmitError("");
     try {
       const numericAnswers = answers as number[];
-      const result = scoreQuiz(definition, numericAnswers);
-      const attempt = saveAttempt({
-        testId,
-        result,
-        answers: numericAnswers,
-        testName: definition.title.zh,
-        testNameEn: definition.title.en,
-        timestamp: Date.now(),
-      });
+      const cloudSyncEnabled = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+      let cloudFailed = false;
+      let attempt;
+
+      if (cloudSyncEnabled) {
+        try {
+          const response = await submitCloudQuiz(testId, numericAnswers);
+          attempt = saveAttempt({ ...response.attempt, answers: numericAnswers });
+        } catch {
+          cloudFailed = true;
+        }
+      }
+
+      if (!attempt) {
+        const result = scoreQuiz(definition, numericAnswers);
+        attempt = saveAttempt({
+          testId,
+          result,
+          answers: numericAnswers,
+          testName: definition.title.zh,
+          testNameEn: definition.title.en,
+          timestamp: Date.now(),
+        });
+      }
       clearQuizSession(testId);
-      window.setTimeout(() => router.push(`/result/${testId}/?attempt=${encodeURIComponent(attempt.id)}`), 250);
+      const params = new URLSearchParams({ attempt: attempt.id });
+      if (cloudFailed) params.set("sync", "failed");
+      router.push(`/result/${testId}/?${params}`);
     } catch {
       setSubmitting(false);
-      setSubmitError(true);
+      setSubmitError(language === "zh" ? "结果暂时无法保存，请再试一次。" : "Your result could not be saved. Please try again.");
     }
-  }, [answers, definition, router, submitting, testId]);
+  }, [answers, definition, language, router, submitting, syncChoice, testId, user]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -179,7 +310,7 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
 
   if (resumeSession) {
     const answeredInSession = resumeSession.answers.filter((answer) => answer !== null).length;
-    return <div className="atlas-page min-h-screen"><AppHeader narrow backHref={`/test/${testId}/`} backLabel={language === "zh" ? "测评说明" : "Assessment details"} /><main id="main-content" tabIndex={-1} className="mx-auto flex min-h-[70vh] max-w-lg items-center px-5 py-16"><div className="atlas-resume-panel w-full"><span className="atlas-resume-symbol" aria-hidden="true">↗</span><h1 className="mt-6 text-3xl font-semibold tracking-[-0.03em]">{language === "zh" ? "你有一段未完成的回答。" : "You have an unfinished assessment."}</h1><p className="mt-4 text-sm leading-6 text-ink/58 dark:text-white/58">{language === "zh" ? `已经回答 ${answeredInSession} 题，可以从第 ${resumeSession.currentQuestion + 1} 题继续。` : `${answeredInSession} answered. Continue from question ${resumeSession.currentQuestion + 1}.`}</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => { shouldFocusQuestion.current = true; clearQuizSession(testId); setResumeSession(null); setAnswers(new Array(total).fill(null)); setCurrentQuestion(0); }} className="atlas-secondary-action flex-1 justify-center"><RotateCcw className="size-4" aria-hidden="true" />{language === "zh" ? "重新开始" : "Start fresh"}</button><button type="button" onClick={() => { shouldFocusQuestion.current = true; setAnswers(resumeSession.answers); setCurrentQuestion(resumeSession.currentQuestion); setResumeSession(null); }} className="atlas-primary-action flex-1 justify-center"><ArrowRight className="size-4" aria-hidden="true" />{language === "zh" ? "继续回答" : "Continue"}</button></div></div></main></div>;
+    return <div className="atlas-page min-h-screen"><AppHeader narrow backHref={`/test/${testId}/`} backLabel={language === "zh" ? "测评说明" : "Assessment details"} /><main id="main-content" tabIndex={-1} className="mx-auto flex min-h-[70vh] max-w-lg items-center px-5 py-16"><div className="atlas-resume-panel w-full"><span className="atlas-resume-symbol" aria-hidden="true">↗</span><h1 className="mt-6 text-3xl font-semibold tracking-[-0.03em]">{language === "zh" ? "你有一段未完成的回答。" : "You have an unfinished assessment."}</h1><p className="mt-4 text-sm leading-6 text-ink/58 dark:text-white/58">{language === "zh" ? `已经回答 ${answeredInSession} 题，可以从第 ${resumeSession.currentQuestion + 1} 题继续。` : `${answeredInSession} answered. Continue from question ${resumeSession.currentQuestion + 1}.`}</p><DraftSaveStatus language={language} savedAt={draftSavedLabel} label={draftStatus.label} warning={draftStatus.warning} /><div className="mt-8 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => { shouldFocusQuestion.current = true; clearQuizSession(testId); setResumeSession(null); setDraftSavedAt(null); setDraftCloudPending(false); setAnswers(new Array(total).fill(null)); setCurrentQuestion(0); }} className="atlas-secondary-action flex-1 justify-center"><RotateCcw className="size-4" aria-hidden="true" />{language === "zh" ? "重新开始" : "Start fresh"}</button><button type="button" onClick={() => { shouldFocusQuestion.current = true; setAnswers(resumeSession.answers); setCurrentQuestion(resumeSession.currentQuestion); setResumeSession(null); }} className="atlas-primary-action flex-1 justify-center"><ArrowRight className="size-4" aria-hidden="true" />{language === "zh" ? "继续回答" : "Continue"}</button></div></div></main></div>;
   }
 
   return (
@@ -190,6 +321,7 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
         <div className="quiz-progress-block">
           <div className="atlas-progress-route" role="progressbar" aria-label={language === "zh" ? "答题进度" : "Quiz progress"} aria-valuemin={1} aria-valuemax={total} aria-valuenow={currentQuestion + 1} aria-valuetext={language === "zh" ? `第 ${currentQuestion + 1} 题，共 ${total} 题` : `Question ${currentQuestion + 1} of ${total}`}><span style={{ "--progress": progress / 100 } as React.CSSProperties} /></div>
           <div className="quiz-progress-meta"><span>{answered} {language === "zh" ? "题已回答" : "answered"}</span><span>{language === "zh" ? "可以随时返回" : "You can go back anytime"}</span></div>
+          <DraftSaveStatus language={language} savedAt={hasDraft ? draftSavedLabel : null} label={draftStatus.label} warning={draftStatus.warning} />
         </div>
 
         <div {...touchHandlers} className="quiz-question-area">
@@ -209,7 +341,7 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
         </div>
 
         <div className="quiz-actions"><button type="button" onClick={() => move(currentQuestion - 1)} disabled={currentQuestion === 0} className="atlas-secondary-action disabled:cursor-not-allowed disabled:opacity-30"><ArrowLeft className="size-4" aria-hidden="true" />{language === "zh" ? "上一题" : "Previous"}</button>{isLast ? <button type="button" onClick={submit} disabled={currentAnswer === null || submitting || answered !== total} className="atlas-primary-action disabled:cursor-not-allowed disabled:opacity-35">{submitting ? (language === "zh" ? "正在整理……" : "Reading…") : (language === "zh" ? "查看结果" : "See result")}<ArrowRight className="size-4" aria-hidden="true" /></button> : <button type="button" onClick={() => move(currentQuestion + 1)} disabled={currentAnswer === null} className="atlas-primary-action disabled:cursor-not-allowed disabled:opacity-35">{language === "zh" ? "下一题" : "Next"}<ArrowRight className="size-4" aria-hidden="true" /></button>}</div>
-        <div className="mt-4 min-h-5 text-center text-xs" role="status" aria-live="polite">{submitError && (language === "zh" ? "结果暂时无法保存，请再试一次。" : "Your result could not be saved. Please try again.")}</div>
+        <div className="mt-4 min-h-5 text-center text-xs" role="status" aria-live="polite">{submitError}</div>
         <p className="mt-5 text-center text-[11px] text-ink/35 dark:text-white/35">{language === "zh" ? "提示：使用 1–9 选择，← → 移动" : "Tip: use 1–9 to choose, ← → to move"}</p>
       </main>
     </div>

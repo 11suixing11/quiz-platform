@@ -1,8 +1,11 @@
 # VPS deployment
 
-The production site is a Next.js static export served by Caddy. Releases live
-under `/srv/quiz-platform/releases/`, and `/srv/quiz-platform/releases/current`
-points to the active release. Caddy reads only that `releases/current` link.
+The production service is a self-hosted Next.js standalone application. The
+Node server handles rendered pages and `/api/*`; Caddy terminates TLS and
+reverse-proxies to `127.0.0.1:3333`. Releases live under
+`/srv/quiz-platform/releases/`, and `releases/current` points to the active
+standalone release. User data is kept outside release directories at
+`/var/lib/quiz-platform/app.sqlite3`.
 
 ## Build and verify
 
@@ -17,65 +20,106 @@ npm test
 npm run audit:flagship
 npm run audit:a11y
 npm run build
+npm run package:standalone
 ```
 
-The deployable artifact is the generated `out/` directory.
+The deployable artifact is `.next/standalone/`. It must contain:
 
-## Publish a release
+- `server.js`
+- `public/`
+- `.next/static/`
+- `node_modules/better-sqlite3/build/Release/better_sqlite3.node`
 
-Keep the SSH host, user, and key outside the repository:
+The last file is a native Linux addon. This VPS is `linux-x64`, so the
+standalone release must be built on a Linux x86_64 runner with Node 22. The
+recommended path is the repository's GitHub Actions workflow: pushes to
+`main` build on Ubuntu 24.04 and deploy that exact artifact. A standalone
+directory produced by Windows or macOS `npm install` contains a PE/Mach-O
+addon and must not be uploaded to this Ubuntu host.
+
+Run locally with `NODE_ENV=production PORT=3333 DATABASE_PATH=$PWD/.data/test.sqlite npm start`.
+
+## Server prerequisites
+
+Install Node.js 22 (the same major version used by CI), create the restricted
+`quizdeploy` user, and prepare durable directories:
+
+```bash
+install -d -o quizdeploy -g quizdeploy -m 0750 /var/lib/quiz-platform
+install -d -o quizdeploy -g quizdeploy -m 0755 /srv/quiz-platform/releases/.incoming
+install -d -o root -g root -m 0755 /etc/quiz-platform
+```
+
+Install [deploy/quiz-platform.service](./quiz-platform.service) as
+`/etc/systemd/system/quiz-platform.service`. Optional secrets or runtime
+overrides belong in `/etc/quiz-platform/quiz-platform.env` (mode `0640`, owned
+by root and readable by `quizdeploy`). The unit sets `DATABASE_PATH` to the
+durable path above and does not grant the app user shell or sudo access beyond
+the two commands in [deploy/quiz-platform.sudoers](./quiz-platform.sudoers).
+
+The environment file must define a strong random `BETTER_AUTH_SECRET` and the
+canonical `BETTER_AUTH_URL=https://loveyourself.cc.cd`. Do not commit either
+value. Generate the secret on the server, for example with `openssl rand -base64 32`.
+
+```bash
+systemctl daemon-reload
+systemctl enable quiz-platform
+# Start or restart only after a validated standalone release is active.
+systemctl restart quiz-platform
+systemctl is-active quiz-platform
+```
+
+## Publish a release manually (Linux artifact only)
+
+Keep the SSH host, user, and key outside the repository. Prefer GitHub Actions
+for a reproducible Linux build. For a manual release, run `npm ci`, `npm run
+build`, and `npm run package:standalone` on Linux x86_64 (a Linux CI runner,
+WSL with Linux Node/npm and a fresh Linux `npm ci`, or the VPS in a separate
+build directory), then transfer the resulting archive. WSL must not use the
+Windows Node executable or Windows `node_modules`. The PowerShell snippet below
+is only a transfer step; it does not
+make a Windows-built standalone directory safe to deploy:
 
 ```powershell
-$release = (Get-Date).ToUniversalTime().ToString("yyyyMMddHHmmss")
-$archive = Join-Path $env:TEMP "quiz-platform-$release.tar"
+$release = (git rev-parse HEAD)
+$archive = "C:\path\to\linux-built-quiz-platform-$release.tar.gz"
 $remote = "$env:DEPLOY_USER@$env:DEPLOY_HOST"
 
-tar -C out -cf $archive .
-scp -i $env:DEPLOY_KEY $archive "${remote}:/tmp/quiz-platform-$release.tar"
-
-ssh -i $env:DEPLOY_KEY $remote @"
-set -e
-target=/srv/quiz-platform/releases/$release
-install -d -m 0755 "`$target"
-tar -xf /tmp/quiz-platform-$release.tar -C "`$target"
-find "`$target" -type d -exec chmod 0755 {} +
-find "`$target" -type f -exec chmod 0644 {} +
-rm -f /srv/quiz-platform/releases/.current-$release
-ln -s "`$target" /srv/quiz-platform/releases/.current-$release
-mv -Tf /srv/quiz-platform/releases/.current-$release /srv/quiz-platform/releases/current
-rm -f /tmp/quiz-platform-$release.tar
-"@
-
-Remove-Item -LiteralPath $archive
+scp -i $env:DEPLOY_KEY $archive "${remote}:/srv/quiz-platform/releases/.incoming/$release.tar.gz"
 ```
 
-The permission normalization is required because files copied from Windows can
-otherwise retain overly broad modes.
+On the server, extract to a SHA-named directory, validate the required files,
+atomically switch `releases/current`, and restart the service:
 
-The production SSH key should belong to the dedicated `quizdeploy` account. That
-account owns only `/srv/quiz-platform/releases/` and has no sudo access; Caddy
-reads the release tree but is reloaded manually when its configuration changes.
+```bash
+set -euo pipefail
+release=<40-character-commit-sha>
+releases=/srv/quiz-platform/releases
+archive="$releases/.incoming/$release.tar.gz"
+staging="$releases/.incoming/$release"
+target="$releases/$release"
+rm -rf "$staging"
+mkdir "$staging"
+tar -xzf "$archive" -C "$staging"
+test -f "$staging/server.js"
+test -d "$staging/public" && test -d "$staging/.next/static"
+test -f "$staging/node_modules/better-sqlite3/build/Release/better_sqlite3.node"
+mv "$staging" "$target"
+ln -s "$target" "$releases/.current-$release"
+mv -Tf "$releases/.current-$release" "$releases/current"
+rm -f "$archive"
+sudo -n systemctl restart quiz-platform
+sudo -n systemctl is-active quiz-platform
+```
 
-## GitHub Actions deployment
+The GitHub Actions workflow performs these checks, records the previous
+release, and automatically restores it if the restart or origin smoke tests
+fail. Keep several old SHA directories for manual rollback.
 
-Pushes to `main` run the full validation suite, package the resulting `out/`
-directory, and deploy that exact artifact to the `production` environment. Pull
-requests only run validation. Configure these **environment-scoped** values in
-GitHub (never commit them):
+## Caddy
 
-- Variables: `VPS_HOST` and `VPS_USER=quizdeploy`
-- Secrets: `VPS_DEPLOY_SSH_KEY` (the dedicated private key) and
-  `VPS_KNOWN_HOSTS` (the manually verified SSH host-key line)
-
-Each release directory is named with the 40-character commit SHA. The workflow
-validates required files before atomically moving
-`/srv/quiz-platform/releases/current`; failed uploads leave the previous
-release active. Keep several old release directories for rollback.
-
-## Install Caddy configuration
-
-This step requires the existing administrator SSH account. The restricted
-`quizdeploy` account used by GitHub Actions intentionally cannot run `sudo`.
+Install [deploy/Caddyfile](./Caddyfile) as `/etc/caddy/Caddyfile` with the
+administrator account whenever proxy rules change:
 
 ```powershell
 $remote = "$env:ADMIN_USER@$env:DEPLOY_HOST"
@@ -89,24 +133,23 @@ sudo systemctl is-active caddy
 "@
 ```
 
-Run the Caddy installation step only when `deploy/Caddyfile` changes. Static
-release publishes do not require a Caddy reload.
+The `beta.loveuu.xyz` and `quiz.107-151-246-167.sslip.io` hosts remain
+no-index origin probes. Legacy `loveuu.xyz` hosts permanently redirect to the
+canonical `loveyourself.cc.cd` host.
 
-## DNS
+## GitHub Actions deployment
 
-For `loveyourself.cc.cd`, add these records at its authoritative DNS provider
-(currently DNSHE) while preserving unrelated records, especially MX records:
+Pushes to `main` run the full validation suite, package the standalone
+directory, and deploy that exact artifact to the `production` environment.
+Pull requests only run validation. Configure these environment-scoped values
+in GitHub, never in the repository:
 
-- Apex `A` record points to the VPS public IPv4 address.
-- `www` is a `CNAME` to `loveyourself.cc.cd`.
-- The existing `beta.loveuu.xyz` record may remain as a DNS-only `A` record for
-  direct-origin smoke checks. It serves the active production release and
-  sends `X-Robots-Tag: noindex, nofollow`; it is not a separate staging
-  environment.
+- Variables: `VPS_HOST` and `VPS_USER=quizdeploy`
+- Secrets: `VPS_DEPLOY_SSH_KEY` and `VPS_KNOWN_HOSTS`
 
-During the DNS transition, `loveuu.xyz` remains available as a compatibility
-origin and now permanently redirects to `loveyourself.cc.cd`; the old beta
-host remains available for no-index origin smoke checks.
+The remote deploy account needs read/write access to the release tree and the
+minimal sudoers entry described above. It does not need permission to reload
+Caddy.
 
 ## Verify and roll back
 
@@ -116,19 +159,22 @@ curl.exe -fsSI https://www.loveyourself.cc.cd/
 curl.exe -sSI https://beta.loveuu.xyz/
 curl.exe -sSI https://loveyourself.cc.cd/does-not-exist
 curl.exe -fsS https://loveyourself.cc.cd/healthz
+curl.exe -fsS https://loveyourself.cc.cd/api/auth/get-session
 ```
 
-The beta response must include `X-Robots-Tag: noindex, nofollow`. The missing
-path must return the branded page with status `404`, not a successful fallback.
+The beta response must include `X-Robots-Tag: noindex, nofollow`; missing paths
+must return the branded 404 with status `404`; `/healthz` must return `ok`; and
+the unauthenticated session probe must return JSON `null`.
 
-To roll back, atomically repoint `releases/current` to a known-good release and reload
-Caddy only if its configuration also changed. Replace `<release>` locally before
-running the commands:
+To roll back to a known-good release:
 
 ```bash
-ln -s /srv/quiz-platform/releases/<release> /srv/quiz-platform/releases/.rollback
+release=<known-good-sha>
+ln -s /srv/quiz-platform/releases/$release /srv/quiz-platform/releases/.rollback
 mv -Tf /srv/quiz-platform/releases/.rollback /srv/quiz-platform/releases/current
+sudo -n systemctl restart quiz-platform
+sudo -n systemctl is-active quiz-platform
 ```
 
-Caddy access logging is intentionally not enabled. Operational service events
-remain available through `journalctl -u caddy`.
+Operational service events remain available through
+`journalctl -u quiz-platform` and `journalctl -u caddy`.

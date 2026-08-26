@@ -15,9 +15,10 @@
 	}
 }
 
+# The Next.js standalone server owns both rendered pages and /api routes.
+# Caddy remains the public TLS endpoint and reverse proxy.
 loveyourself.cc.cd, beta.loveuu.xyz {
 	import tls_compat
-	root * /srv/quiz-platform/releases/current
 	encode gzip
 	import security_headers
 
@@ -27,17 +28,13 @@ loveyourself.cc.cd, beta.loveuu.xyz {
 	@immutable path /_next/static/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
-	@health path /healthz
-	respond @health "ok" 200
+	# Keep the origin health probe independent of application state.
+	handle /healthz {
+		respond "ok" 200
+	}
 
-	try_files {path} {path}/ {path}.html
-	file_server
-
-	handle_errors {
-		import security_headers
-		header X-Robots-Tag "noindex, nofollow"
-		rewrite * /404.html
-		file_server
+	handle {
+		reverse_proxy 127.0.0.1:3333
 	}
 }
 
@@ -53,9 +50,11 @@ loveuu.xyz, www.loveuu.xyz {
 	redir https://loveyourself.cc.cd{uri} permanent
 }
 
+# A DNS-only maintenance hostname used for origin smoke tests. It is never
+# indexed and intentionally does not redirect, so deploy checks can bypass
+# public DNS propagation while retaining the production host configuration.
 quiz.107-151-246-167.sslip.io {
 	import tls_compat
-	root * /srv/quiz-platform/releases/current
 	encode gzip
 	import security_headers
 	header X-Robots-Tag "noindex, nofollow"
@@ -63,16 +62,11 @@ quiz.107-151-246-167.sslip.io {
 	@immutable path /_next/static/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
-	@health path /healthz
-	respond @health "ok" 200
+	handle /healthz {
+		respond "ok" 200
+	}
 
-	try_files {path} {path}/ {path}.html
-	file_server
-
-	handle_errors {
-		import security_headers
-		header X-Robots-Tag "noindex, nofollow"
-		rewrite * /404.html
-		file_server
+	handle {
+		reverse_proxy 127.0.0.1:3333
 	}
 }

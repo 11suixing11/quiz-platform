@@ -5,7 +5,8 @@
     "scripts": {
         "dev": "next dev -p 3333",
         "build": "next build",
-        "start": "node scripts/serve-static.mjs",
+        "package:standalone": "node scripts/package-standalone.mjs",
+        "start": "node .next/standalone/server.js",
         "lint": "eslint",
         "typecheck": "tsc --noEmit",
         "audit:a11y": "node scripts/audit-accessibility.mjs",
@@ -16,16 +17,20 @@
         "test": "npm run check:registry && npm run test:scoring && npm run test:storage"
     },
     "dependencies": {
+        "better-auth": "^1.7.1",
+        "better-sqlite3": "^12.11.1",
         "clsx": "^2.1.1",
         "lucide-react": "^1.16.0",
         "next": "16.3.1",
         "react": "19.2.4",
         "react-dom": "19.2.4",
-        "tailwind-merge": "^3.6.0"
+        "tailwind-merge": "^3.6.0",
+        "zod": "^4.1.12"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4",
-        "@types/node": "^20",
+        "@types/better-sqlite3": "^7.6.13",
+        "@types/node": "^22.20.1",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "eslint": "^9",

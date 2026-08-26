@@ -1,0 +1,3 @@
+# Install as /etc/sudoers.d/quiz-platform with mode 0440. This is the only
+# privileged operation required by the GitHub Actions deployment account.
+quizdeploy ALL=(root) NOPASSWD: /usr/bin/systemctl restart quiz-platform, /usr/bin/systemctl is-active quiz-platform

@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, RefreshCw, Share2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Cloud, RefreshCw, Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { loadQuizDefinition, getQuizEntry, getResultKey, getResultScore, getScoreBand, type QuizDefinition, type QuizResult } from "@/core/quiz";
+import { useAccount } from "@/components/account-provider";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { NarrativeSection } from "@/components/result/narrative-section";
 import { ReflectionGuide } from "@/components/result/reflection-guide";
@@ -343,11 +344,13 @@ function getResultDetails(
 export default function ResultClient({ testId }: { testId: string }) {
   const router = useRouter();
   const { language } = useLanguage();
+  const { user, syncChoice, syncState } = useAccount();
   const [definition, setDefinition] = useState<QuizDefinition | null>(null);
   const [result, setResult] = useState<QuizResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [shareError, setShareError] = useState(false);
+  const [syncWarning, setSyncWarning] = useState(false);
   const entry = getQuizEntry(testId);
 
   useEffect(() => {
@@ -356,6 +359,7 @@ export default function ResultClient({ testId }: { testId: string }) {
       if (cancelled) return;
       setDefinition(loaded);
       const queryAttempt = new URLSearchParams(window.location.search).get("attempt");
+      setSyncWarning(new URLSearchParams(window.location.search).get("sync") === "failed");
       const attempt = queryAttempt ? getAttemptById(queryAttempt) : getLatestAttempt(testId);
       if (attempt?.testId === testId) {
         setResult(attempt.result);
@@ -439,17 +443,45 @@ export default function ResultClient({ testId }: { testId: string }) {
 
   if (loading) return <Loading language={language} />;
   if (!definition || !entry || !result || !content) {
-    return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state mx-auto mt-16 max-w-lg"><h1 className="text-2xl font-semibold">{language === "zh" ? "还没有找到这次结果" : "No result found yet"}</h1><p className="mt-3 max-w-md text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? "先完成一次测评，结果会保存在当前浏览器中。" : "Complete the assessment once. Results stay in this browser."}</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><Link href={`/test/${testId}/`} className="atlas-primary-action justify-center">{language === "zh" ? "查看测评说明" : "View assessment details"}<ArrowRight className="size-4" /></Link><Link href="/" className="atlas-secondary-action justify-center">{language === "zh" ? "返回首页" : "Back home"}</Link></div></div></PageContainer></div>;
+    return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state mx-auto mt-16 max-w-lg"><h1 className="text-2xl font-semibold">{language === "zh" ? "还没有找到这次结果" : "No result found yet"}</h1><p className="mt-3 max-w-md text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? "先完成一次测评。游客结果保存在本机，开启同步后也能在其他登录设备查看。" : "Complete the assessment once. Guest results stay on this device; synced results are available on your other signed-in devices."}</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><Link href={`/test/${testId}/`} className="atlas-primary-action justify-center">{language === "zh" ? "查看测评说明" : "View assessment details"}<ArrowRight className="size-4" /></Link><Link href="/" className="atlas-secondary-action justify-center">{language === "zh" ? "返回首页" : "Back home"}</Link></div></div></PageContainer></div>;
   }
 
   const pattern = definition.kind;
   const accent = definition.accent;
   const testName = language === "zh" ? entry.title.zh : entry.title.en;
+  const cloudSyncEnabled = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+  const saveStatus = syncWarning
+    ? {
+        title: language === "zh" ? "已保存在本机，云端同步失败" : "Saved on this device; cloud sync failed",
+        description: language === "zh" ? "结果不会丢失，但这次记录尚未写入你的账号。" : "Your result is safe here, but this attempt was not added to your account.",
+        warning: true,
+      }
+    : cloudSyncEnabled
+      ? {
+          title: language === "zh" ? "已同步到账号" : "Synced to your account",
+          description: language === "zh" ? "可以在其他已登录设备查看这次结果。" : "You can view this result on your other signed-in devices.",
+          warning: false,
+        }
+      : {
+          title: language === "zh" ? "已保存在本机" : "Saved on this device",
+          description: user
+            ? (language === "zh" ? "当前未开启云同步，这次结果只保存在这台设备。" : "Cloud sync is off, so this result stays on this device.")
+            : (language === "zh" ? "这次结果可以继续在当前设备查看。" : "You can return to this result on this device."),
+          warning: false,
+        };
+  const showGuestAccountAction = !user && syncState === "guest";
 
   return (
     <div className="atlas-page min-h-screen">
       <AppHeader narrow backHref="/" backLabel={language === "zh" ? "返回首页" : "Back home"} section={testName} />
       <PageContainer className="max-w-3xl">
+        <section className={`atlas-result-save-status${saveStatus.warning ? " atlas-result-save-status--warning" : ""}`} aria-label={language === "zh" ? "保存状态" : "Save status"}>
+          <div className="atlas-result-save-status-copy" role="status">
+            {saveStatus.warning ? <AlertTriangle aria-hidden="true" /> : cloudSyncEnabled ? <Cloud aria-hidden="true" /> : <Check aria-hidden="true" />}
+            <div><strong>{saveStatus.title}</strong><p>{saveStatus.description}</p></div>
+          </div>
+          {showGuestAccountAction && <Link href="/account/" className="atlas-text-link shrink-0">{language === "zh" ? "登录后跨设备查看" : "Sign in for access across devices"}<ArrowRight className="size-3.5" aria-hidden="true" /></Link>}
+        </section>
         <div className="atlas-result-intro-block" style={{ "--result-accent": accent } as React.CSSProperties}>
           <p className="atlas-result-question">{content.lead}</p>
           <div className="atlas-result-identity mt-6">
