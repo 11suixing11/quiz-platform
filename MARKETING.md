@@ -100,7 +100,7 @@ https://github.com/11suixing11/quiz-platform
 - Languages: Simplified Chinese and English
 - Scoring families: type, dimensions, score
 - Storage: browser-local `know-yourself:v3` snapshot
-- Deployment: Next.js static export served by Caddy on a self-hosted VPS at `https://loveuu.xyz/`; GitHub Actions validates and publishes releases
+- Deployment: Next.js static export served by Caddy on a self-hosted VPS at `https://loveyourself.cc.cd/`; GitHub Actions validates and publishes releases
 - License: MIT
 
 ## Claims to avoid

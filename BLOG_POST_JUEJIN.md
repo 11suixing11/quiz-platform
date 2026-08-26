@@ -14,7 +14,7 @@
 
 **「认识你自己」** —— 一个有 100+ 个自我探索测试的平台，零广告、零追踪、零后端，所有数据都存在你自己的浏览器里。它用于自我反思，不是临床诊断工具。
 
-🔗 **在线体验**：https://loveuu.xyz/
+🔗 **在线体验**：https://loveyourself.cc.cd/
 ⭐ **GitHub**：https://github.com/11suixing11/quiz-platform
 
 ---
@@ -480,7 +480,7 @@ export default async function ResultPage({ params }: { params: Promise<{ type: s
 
 ## 试试看
 
-🔗 **https://loveuu.xyz/**
+🔗 **https://loveyourself.cc.cd/**
 
 推荐从这几个开始：
 - **大五人格测试**：人格科学的金标准

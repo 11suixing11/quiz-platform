@@ -94,23 +94,29 @@ release publishes do not require a Caddy reload.
 
 ## DNS
 
-Cloudflare should contain these web records while preserving unrelated records,
-especially MX records:
+For `loveyourself.cc.cd`, add these records at its authoritative DNS provider
+(currently DNSHE) while preserving unrelated records, especially MX records:
 
 - Apex `A` record points to the VPS public IPv4 address.
-- `www` is a `CNAME` to `loveuu.xyz`.
-- `beta` may remain as a DNS-only `A` record for direct-origin smoke checks. It
-  serves the active production release and sends `X-Robots-Tag: noindex,
-  nofollow`; it is not a separate staging environment.
+- `www` is a `CNAME` to `loveyourself.cc.cd`.
+- The existing `beta.loveuu.xyz` record may remain as a DNS-only `A` record for
+  direct-origin smoke checks. It serves the active production release and
+  sends `X-Robots-Tag: noindex, nofollow`; it is not a separate staging
+  environment.
+
+During the DNS transition, `loveuu.xyz` remains available as a compatibility
+origin. Once the new apex and `www` records resolve and Caddy has obtained both
+certificates, the old apex can be changed to a permanent redirect in
+`deploy/Caddyfile` if desired.
 
 ## Verify and roll back
 
 ```powershell
-curl.exe -fsSI https://loveuu.xyz/
-curl.exe -fsSI https://www.loveuu.xyz/
+curl.exe -fsSI https://loveyourself.cc.cd/
+curl.exe -fsSI https://www.loveyourself.cc.cd/
 curl.exe -sSI https://beta.loveuu.xyz/
-curl.exe -sSI https://loveuu.xyz/does-not-exist
-curl.exe -fsS https://loveuu.xyz/healthz
+curl.exe -sSI https://loveyourself.cc.cd/does-not-exist
+curl.exe -fsS https://loveyourself.cc.cd/healthz
 ```
 
 The beta response must include `X-Robots-Tag: noindex, nofollow`. The missing

@@ -7,7 +7,7 @@ body:
     id: url
     attributes:
       label: Page URL
-      placeholder: https://loveuu.xyz/...
+      placeholder: https://loveyourself.cc.cd/...
     validations:
       required: false
   - type: textarea

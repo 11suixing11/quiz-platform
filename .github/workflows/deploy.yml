@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://loveuu.xyz/
+      url: https://loveyourself.cc.cd/
     steps:
       - name: Download static export
         uses: actions/download-artifact@v4
@@ -118,15 +118,15 @@ jobs:
           ln -s "$target" "$releases/.current-$release"
           mv -Tf "$releases/.current-$release" "$releases/current"
           rm -f "$archive"
-          curl --fail --silent --show-error --resolve loveuu.xyz:443:127.0.0.1 https://loveuu.xyz/ -o /dev/null
-          curl --fail --silent --show-error --resolve loveuu.xyz:443:127.0.0.1 https://loveuu.xyz/test/big-five/ -o /dev/null
-          test "$(curl --fail --silent --show-error --resolve loveuu.xyz:443:127.0.0.1 https://loveuu.xyz/healthz)" = ok
+          curl --fail --silent --show-error --resolve loveyourself.cc.cd:443:127.0.0.1 https://loveyourself.cc.cd/ -o /dev/null
+          curl --fail --silent --show-error --resolve loveyourself.cc.cd:443:127.0.0.1 https://loveyourself.cc.cd/test/big-five/ -o /dev/null
+          test "$(curl --fail --silent --show-error --resolve loveyourself.cc.cd:443:127.0.0.1 https://loveyourself.cc.cd/healthz)" = ok
           REMOTE
       - name: Smoke test public origin
         env:
           VPS_HOST: ${{ vars.VPS_HOST }}
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveuu.xyz:443:$VPS_HOST" https://loveuu.xyz/ -o /dev/null
-          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveuu.xyz:443:$VPS_HOST" https://loveuu.xyz/test/big-five/ -o /dev/null
-          test "$(curl --fail --silent --show-error --resolve "loveuu.xyz:443:$VPS_HOST" https://loveuu.xyz/healthz)" = ok
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/ -o /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/test/big-five/ -o /dev/null
+          test "$(curl --fail --silent --show-error --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/healthz)" = ok

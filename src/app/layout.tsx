@@ -2,7 +2,7 @@
 import "./globals.css";
 import { MobileNav, PreferenceSync } from "@/components/shell/app-shell";
 
-const SITE_URL = "https://loveuu.xyz";
+const SITE_URL = "https://loveyourself.cc.cd";
 const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 export const metadata: Metadata = {

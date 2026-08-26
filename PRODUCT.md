@@ -32,7 +32,7 @@ The product is a local-first self-reflection companion: it opens with a small, r
 - 193 internal quiz modules remain available for staged content review but are not public routes by default.
 - Core product loop: discovery, test detail, answering, result, history, bookmarks, preferences, and data management.
 - Chinese and English only.
-- Static export must remain compatible with the custom-domain root path at `https://loveuu.xyz/`.
+- Static export must remain compatible with the custom-domain root path at `https://loveyourself.cc.cd/`.
 - The systematic refactor intentionally starts a new storage namespace and does not migrate old browser data or preserve old secondary URLs.
 - Analytics, dashboard, statistics, trends, comparison, and compatibility tools are outside the first refactored release.
 

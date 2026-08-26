@@ -1,3 +1,9 @@
+(tls_compat) {
+	tls {
+		curves x25519 secp256r1
+	}
+}
+
 (security_headers) {
 	header {
 		-Server
@@ -9,7 +15,8 @@
 	}
 }
 
-loveuu.xyz, beta.loveuu.xyz {
+loveyourself.cc.cd, loveuu.xyz, beta.loveuu.xyz {
+	import tls_compat
 	root * /srv/quiz-platform/releases/current
 	encode gzip
 	import security_headers
@@ -34,7 +41,38 @@ loveuu.xyz, beta.loveuu.xyz {
 	}
 }
 
+www.loveyourself.cc.cd {
+	import tls_compat
+	import security_headers
+	redir https://loveyourself.cc.cd{uri} permanent
+}
+
 www.loveuu.xyz {
+	import tls_compat
 	import security_headers
 	redir https://loveuu.xyz{uri} permanent
+}
+
+quiz.107-151-246-167.sslip.io {
+	import tls_compat
+	root * /srv/quiz-platform/releases/current
+	encode gzip
+	import security_headers
+	header X-Robots-Tag "noindex, nofollow"
+
+	@immutable path /_next/static/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	@health path /healthz
+	respond @health "ok" 200
+
+	try_files {path} {path}/ {path}.html
+	file_server
+
+	handle_errors {
+		import security_headers
+		header X-Robots-Tag "noindex, nofollow"
+		rewrite * /404.html
+		file_server
+	}
 }

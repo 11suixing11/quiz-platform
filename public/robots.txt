@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://loveuu.xyz/sitemap.xml
+Sitemap: https://loveyourself.cc.cd/sitemap.xml
