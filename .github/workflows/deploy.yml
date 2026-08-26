@@ -1,4 +1,4 @@
-name: Validate static site
+name: Validate and deploy static site
 
 on:
   push:
@@ -8,6 +8,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -36,3 +40,93 @@ jobs:
         run: npm run audit:a11y
       - name: Build static export
         run: npm run build
+      - name: Package static export
+        run: |
+          tar -C out -czf quiz-platform.tar.gz .
+          tar -tzf quiz-platform.tar.gz >/dev/null
+      - name: Upload static export
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-export
+          path: quiz-platform.tar.gz
+          retention-days: 7
+
+  deploy:
+    name: Deploy production release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://loveuu.xyz/
+    steps:
+      - name: Download static export
+        uses: actions/download-artifact@v4
+        with:
+          name: static-export
+      - name: Configure deployment SSH
+        env:
+          VPS_DEPLOY_SSH_KEY: ${{ secrets.VPS_DEPLOY_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$VPS_DEPLOY_SSH_KEY"
+          test -n "$VPS_KNOWN_HOSTS"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$VPS_DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+      - name: Upload and activate release
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_USER: ${{ vars.VPS_USER }}
+        run: |
+          set -euo pipefail
+          test -n "$VPS_HOST"
+          test -n "$VPS_USER"
+          [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]
+          ssh_options=(-i "$HOME/.ssh/id_ed25519" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes)
+          remote="$VPS_USER@$VPS_HOST"
+          ssh "${ssh_options[@]}" "$remote" "install -d -m 0755 /srv/quiz-platform/releases/.incoming"
+          scp "${ssh_options[@]}" quiz-platform.tar.gz "$remote:/srv/quiz-platform/releases/.incoming/$GITHUB_SHA.tar.gz"
+          ssh "${ssh_options[@]}" "$remote" "bash -s -- $GITHUB_SHA" <<'REMOTE'
+          set -euo pipefail
+          release="$1"
+          [[ "$release" =~ ^[0-9a-f]{40}$ ]]
+          releases=/srv/quiz-platform/releases
+          archive="$releases/.incoming/$release.tar.gz"
+          staging="$releases/.incoming/$release"
+          target="$releases/$release"
+
+          test -s "$archive"
+          rm -rf "$staging"
+          if [ -e "$target" ]; then
+            test -f "$target/index.html"
+            test -f "$target/404.html"
+            test -f "$target/sitemap.xml"
+          else
+            mkdir "$staging"
+            tar -xzf "$archive" -C "$staging"
+            test -f "$staging/index.html"
+            test -f "$staging/404.html"
+            test -f "$staging/sitemap.xml"
+            find "$staging" -type d -exec chmod 0755 {} +
+            find "$staging" -type f -exec chmod 0644 {} +
+            mv "$staging" "$target"
+          fi
+          rm -f "$releases/.current-$release"
+          ln -s "$target" "$releases/.current-$release"
+          mv -Tf "$releases/.current-$release" "$releases/current"
+          rm -f "$archive"
+          curl --fail --silent --show-error --resolve loveuu.xyz:443:127.0.0.1 https://loveuu.xyz/ -o /dev/null
+          curl --fail --silent --show-error --resolve loveuu.xyz:443:127.0.0.1 https://loveuu.xyz/test/big-five/ -o /dev/null
+          test "$(curl --fail --silent --show-error --resolve loveuu.xyz:443:127.0.0.1 https://loveuu.xyz/healthz)" = ok
+          REMOTE
+      - name: Smoke test public origin
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveuu.xyz:443:$VPS_HOST" https://loveuu.xyz/ -o /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveuu.xyz:443:$VPS_HOST" https://loveuu.xyz/test/big-five/ -o /dev/null
+          test "$(curl --fail --silent --show-error --resolve "loveuu.xyz:443:$VPS_HOST" https://loveuu.xyz/healthz)" = ok

@@ -10,7 +10,7 @@
 }
 
 loveuu.xyz, beta.loveuu.xyz {
-	root * /srv/quiz-platform/current
+	root * /srv/quiz-platform/releases/current
 	encode gzip
 	import security_headers
 

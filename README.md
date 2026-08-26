@@ -37,7 +37,7 @@
 - Tailwind CSS v4 + 原生 CSS tokens
 - Framer Motion（仅用于答题与结果中的必要过渡）
 - lucide-react
-- 自有 VPS + Caddy 静态托管；GitHub Actions 仅用于验证
+- 自有 VPS + Caddy 静态托管；GitHub Actions 验证后自动发布到 VPS
 
 ## 目录结构
 

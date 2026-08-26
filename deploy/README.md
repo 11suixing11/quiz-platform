@@ -1,8 +1,8 @@
 # VPS deployment
 
 The production site is a Next.js static export served by Caddy. Releases live
-under `/srv/quiz-platform/releases/`, and `/srv/quiz-platform/current` points to
-the active release.
+under `/srv/quiz-platform/releases/`, and `/srv/quiz-platform/releases/current`
+points to the active release. Caddy reads only that `releases/current` link.
 
 ## Build and verify
 
@@ -36,14 +36,14 @@ scp -i $env:DEPLOY_KEY $archive "${remote}:/tmp/quiz-platform-$release.tar"
 ssh -i $env:DEPLOY_KEY $remote @"
 set -e
 target=/srv/quiz-platform/releases/$release
-sudo install -d -o root -g root -m 0755 "`$target"
-sudo tar -xf /tmp/quiz-platform-$release.tar -C "`$target"
-sudo chown -R root:root "`$target"
-sudo find "`$target" -type d -exec chmod 0755 {} +
-sudo find "`$target" -type f -exec chmod 0644 {} +
-sudo ln -s "`$target" /srv/quiz-platform/.current-$release
-sudo mv -Tf /srv/quiz-platform/.current-$release /srv/quiz-platform/current
-sudo rm -f /tmp/quiz-platform-$release.tar
+install -d -m 0755 "`$target"
+tar -xf /tmp/quiz-platform-$release.tar -C "`$target"
+find "`$target" -type d -exec chmod 0755 {} +
+find "`$target" -type f -exec chmod 0644 {} +
+rm -f /srv/quiz-platform/releases/.current-$release
+ln -s "`$target" /srv/quiz-platform/releases/.current-$release
+mv -Tf /srv/quiz-platform/releases/.current-$release /srv/quiz-platform/releases/current
+rm -f /tmp/quiz-platform-$release.tar
 "@
 
 Remove-Item -LiteralPath $archive
@@ -51,6 +51,26 @@ Remove-Item -LiteralPath $archive
 
 The permission normalization is required because files copied from Windows can
 otherwise retain overly broad modes.
+
+The production SSH key should belong to the dedicated `quizdeploy` account. That
+account owns only `/srv/quiz-platform/releases/` and has no sudo access; Caddy
+reads the release tree but is reloaded manually when its configuration changes.
+
+## GitHub Actions deployment
+
+Pushes to `main` run the full validation suite, package the resulting `out/`
+directory, and deploy that exact artifact to the `production` environment. Pull
+requests only run validation. Configure these **environment-scoped** values in
+GitHub (never commit them):
+
+- Variables: `VPS_HOST` and `VPS_USER=quizdeploy`
+- Secrets: `VPS_DEPLOY_SSH_KEY` (the dedicated private key) and
+  `VPS_KNOWN_HOSTS` (the manually verified SSH host-key line)
+
+Each release directory is named with the 40-character commit SHA. The workflow
+validates required files before atomically moving
+`/srv/quiz-platform/releases/current`; failed uploads leave the previous
+release active. Keep several old release directories for rollback.
 
 ## Install Caddy configuration
 
@@ -65,6 +85,9 @@ sudo systemctl reload caddy
 sudo systemctl is-active caddy
 "@
 ```
+
+Run the Caddy installation step only when `deploy/Caddyfile` changes. Static
+release publishes do not require a Caddy reload.
 
 ## DNS
 
@@ -95,8 +118,8 @@ Caddy only if its configuration also changed. Replace `<release>` locally before
 running the commands:
 
 ```bash
-sudo ln -s /srv/quiz-platform/releases/<release> /srv/quiz-platform/.rollback
-sudo mv -Tf /srv/quiz-platform/.rollback /srv/quiz-platform/current
+ln -s /srv/quiz-platform/releases/<release> /srv/quiz-platform/releases/.rollback
+mv -Tf /srv/quiz-platform/releases/.rollback /srv/quiz-platform/releases/current
 ```
 
 Caddy access logging is intentionally not enabled. Operational service events

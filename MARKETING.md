@@ -36,7 +36,7 @@ A calm, bilingual self-reflection platform with 16 curated routes and browser-lo
 - type、dimensions、score 三类评分统一到同一套模型
 - 无账号、无后端、无云同步，回答和结果保存在当前浏览器
 - 支持未完成会话恢复，以及 v3 JSON 导入、导出、合并与替换
-- Next.js 静态导出，由自有 VPS 上的 Caddy 托管；GitHub Actions 仅做验证
+- Next.js 静态导出，由自有 VPS 上的 Caddy 托管；GitHub Actions 验证后自动发布
 
 结果被设计成反思的起点，而不是诊断或固定身份。
 
@@ -60,7 +60,7 @@ Highlights:
 - one model for type, dimensions, and score-based results
 - no account, backend, or cloud sync; answers and results stay in the current browser
 - unfinished-session recovery plus v3 JSON export, import, merge, and replace
-- static Next.js export served by Caddy on a self-hosted VPS; GitHub Actions is used for validation only
+- static Next.js export served by Caddy on a self-hosted VPS; GitHub Actions validates and publishes releases
 
 Results are framed as prompts for reflection, not diagnoses or fixed identities.
 
@@ -100,7 +100,7 @@ https://github.com/11suixing11/quiz-platform
 - Languages: Simplified Chinese and English
 - Scoring families: type, dimensions, score
 - Storage: browser-local `know-yourself:v3` snapshot
-- Deployment: Next.js static export served by Caddy on a self-hosted VPS at `https://loveuu.xyz/`; GitHub Actions is used for validation only
+- Deployment: Next.js static export served by Caddy on a self-hosted VPS at `https://loveuu.xyz/`; GitHub Actions validates and publishes releases
 - License: MIT
 
 ## Claims to avoid
