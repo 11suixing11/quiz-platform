@@ -82,8 +82,13 @@ especially MX records:
 ```powershell
 curl.exe -fsSI https://loveuu.xyz/
 curl.exe -fsSI https://www.loveuu.xyz/
+curl.exe -sSI https://beta.loveuu.xyz/
+curl.exe -sSI https://loveuu.xyz/does-not-exist
 curl.exe -fsS https://loveuu.xyz/healthz
 ```
+
+The beta response must include `X-Robots-Tag: noindex, nofollow`. The missing
+path must return the branded page with status `404`, not a successful fallback.
 
 To roll back, atomically repoint `current` to a known-good release and reload
 Caddy only if its configuration also changed. Replace `<release>` locally before

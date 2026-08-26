@@ -1,7 +1,4 @@
-loveuu.xyz, beta.loveuu.xyz {
-	root * /srv/quiz-platform/current
-	encode gzip
-
+(security_headers) {
 	header {
 		-Server
 		X-Content-Type-Options "nosniff"
@@ -10,6 +7,12 @@ loveuu.xyz, beta.loveuu.xyz {
 		Strict-Transport-Security "max-age=31536000"
 		X-Frame-Options "DENY"
 	}
+}
+
+loveuu.xyz, beta.loveuu.xyz {
+	root * /srv/quiz-platform/current
+	encode gzip
+	import security_headers
 
 	@beta host beta.loveuu.xyz
 	header @beta X-Robots-Tag "noindex, nofollow"
@@ -24,11 +27,14 @@ loveuu.xyz, beta.loveuu.xyz {
 	file_server
 
 	handle_errors {
+		import security_headers
+		header X-Robots-Tag "noindex, nofollow"
 		rewrite * /404.html
 		file_server
 	}
 }
 
 www.loveuu.xyz {
+	import security_headers
 	redir https://loveuu.xyz{uri} permanent
 }
