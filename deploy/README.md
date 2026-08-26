@@ -73,7 +73,9 @@ especially MX records:
 
 - Apex `A` record points to the VPS public IPv4 address.
 - `www` is a `CNAME` to `loveuu.xyz`.
-- `beta` may remain as an `A` record for pre-production checks.
+- `beta` may remain as a DNS-only `A` record for direct-origin smoke checks. It
+  serves the active production release and sends `X-Robots-Tag: noindex,
+  nofollow`; it is not a separate staging environment.
 
 ## Verify and roll back
 
