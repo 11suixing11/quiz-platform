@@ -74,10 +74,13 @@ release active. Keep several old release directories for rollback.
 
 ## Install Caddy configuration
 
+This step requires the existing administrator SSH account. The restricted
+`quizdeploy` account used by GitHub Actions intentionally cannot run `sudo`.
+
 ```powershell
-$remote = "$env:DEPLOY_USER@$env:DEPLOY_HOST"
-scp -i $env:DEPLOY_KEY deploy/Caddyfile "${remote}:/tmp/quiz-platform-Caddyfile"
-ssh -i $env:DEPLOY_KEY $remote @"
+$remote = "$env:ADMIN_USER@$env:DEPLOY_HOST"
+scp -i $env:ADMIN_KEY deploy/Caddyfile "${remote}:/tmp/quiz-platform-Caddyfile"
+ssh -i $env:ADMIN_KEY $remote @"
 set -e
 sudo install -o root -g root -m 0644 /tmp/quiz-platform-Caddyfile /etc/caddy/Caddyfile
 sudo caddy validate --config /etc/caddy/Caddyfile
@@ -113,7 +116,7 @@ curl.exe -fsS https://loveuu.xyz/healthz
 The beta response must include `X-Robots-Tag: noindex, nofollow`. The missing
 path must return the branded page with status `404`, not a successful fallback.
 
-To roll back, atomically repoint `current` to a known-good release and reload
+To roll back, atomically repoint `releases/current` to a known-good release and reload
 Caddy only if its configuration also changed. Replace `<release>` locally before
 running the commands:
 
