@@ -4,19 +4,19 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import {
   getAccount,
   getCloudSnapshot,
-  getCloudSummary,
   importCloudSnapshot,
+  isSyncRevisionConflict,
   logoutAccount,
-  saveCloudSnapshot,
   type AccountUser,
   type SyncChoice,
 } from "@/lib/account";
+import { mergeAccountSnapshots, readSyncBaseline, writeSyncBaseline } from "@/lib/account-sync";
 import { AUTH_SESSION_EVENT, useSession } from "@/lib/auth-client";
-import { STORAGE_EVENT, readSnapshot, writeSnapshot, type StorageSnapshot } from "@/lib/storage";
+import { STORAGE_EVENT, activateStorageScope, isStorageAvailable, isStorageScopeActive, readSnapshot, writeAccountSnapshot, writeSnapshot, type StorageSnapshot } from "@/lib/storage";
 
 export type { SyncChoice } from "@/lib/account";
 
-type SyncState = "guest" | "loading" | "awaiting-consent" | "ready" | "syncing" | "paused" | "error";
+type SyncState = "guest" | "loading" | "ready" | "syncing" | "error";
 
 export interface SyncSummary {
   attempts: number;
@@ -29,53 +29,14 @@ interface AccountContextValue {
   syncState: SyncState;
   syncError: string;
   syncChoice: SyncChoice | null;
-  /** Counts from the last authorized cloud read; null before consent. */
+  /** Counts from the last successful cloud synchronization. */
   cloudSummary: SyncSummary | null;
   refreshAccount(): Promise<void>;
-  /** Apply an explicit first-login choice. */
-  chooseSync(choice: SyncChoice): Promise<void>;
-  /** Alias kept for account/settings surfaces that use a setter-shaped name. */
-  setSyncChoice(choice: SyncChoice): Promise<void>;
   syncNow(): Promise<void>;
   signOut(): Promise<void>;
 }
 
 const AccountContext = createContext<AccountContextValue | null>(null);
-const CONSENT_PREFIX = "know-yourself:sync-consent:";
-
-function consentKey(userId: string) {
-  return `${CONSENT_PREFIX}${encodeURIComponent(userId)}`;
-}
-
-function readConsent(userId: string): SyncChoice | null {
-  try {
-    const value = window.localStorage.getItem(consentKey(userId));
-    return value === "merge" || value === "cloud" || value === "local" ? value : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeConsent(userId: string, choice: SyncChoice) {
-  try {
-    window.localStorage.setItem(consentKey(userId), choice);
-  } catch {
-    // Private windows and exhausted storage must not block account access.
-  }
-}
-
-function mergeSnapshotsForImport(local: StorageSnapshot, remote: StorageSnapshot): StorageSnapshot {
-  const localIds = new Set(local.attempts.map((attempt) => attempt.id));
-  return {
-    version: local.version,
-    // Keep this device's preference when importing; the user can change it
-    // afterwards and the mutable sync path will persist that choice.
-    preferences: local.preferences,
-    attempts: [...local.attempts, ...remote.attempts.filter((attempt) => !localIds.has(attempt.id))].sort((a, b) => a.timestamp - b.timestamp),
-    bookmarks: Array.from(new Set([...local.bookmarks, ...remote.bookmarks])),
-    sessions: { ...remote.sessions, ...local.sessions },
-  };
-}
 
 function reconcileCloudSnapshot(local: StorageSnapshot, remote: StorageSnapshot): StorageSnapshot {
   const localById = new Map(local.attempts.map((attempt) => [attempt.id, attempt]));
@@ -113,6 +74,8 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const [syncError, setSyncError] = useState("");
   const timer = useRef<number | null>(null);
   const applyingRemote = useRef(false);
+  const syncing = useRef(false);
+  const syncQueued = useRef(false);
   const userRef = useRef<AccountUser | null>(null);
   const choiceRef = useRef<SyncChoice | null>(null);
   const refreshVersion = useRef(0);
@@ -124,86 +87,104 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   const writeRemoteSafely = useCallback((snapshot: StorageSnapshot) => {
     applyingRemote.current = true;
-    writeSnapshot(snapshot);
-    // writeSnapshot dispatches synchronously; release the guard on the next
-    // turn so a listener installed by another component cannot echo it.
-    window.setTimeout(() => { applyingRemote.current = false; }, 0);
+    try {
+      writeSnapshot(snapshot);
+    } finally {
+      applyingRemote.current = false;
+    }
   }, []);
+
+  const activateScopeSafely = useCallback((userId: string | null) => {
+    applyingRemote.current = true;
+    try {
+      return activateStorageScope(userId);
+    } finally {
+      applyingRemote.current = false;
+    }
+  }, []);
+
+  const isCurrentSync = useCallback((userId: string, version: number) =>
+    version === refreshVersion.current
+      && userRef.current?.id === userId
+      && isStorageScopeActive(userId), []);
+
+  const performSync = useCallback(async (currentUser: AccountUser, version: number) => {
+    setSyncState("syncing");
+    setSyncError("");
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      if (!isCurrentSync(currentUser.id, version)) return false;
+      const { snapshot: remote, revision } = await getCloudSnapshot(currentUser.id);
+      if (!isCurrentSync(currentUser.id, version)) return false;
+      const local = readSnapshot();
+      const localFingerprint = JSON.stringify(local);
+      const merged = mergeAccountSnapshots(local, remote, readSyncBaseline(currentUser.id));
+      try {
+        const { snapshot } = await importCloudSnapshot(currentUser.id, merged, revision, "merge");
+        if (!isCurrentSync(currentUser.id, version)) return false;
+        const next = reconcileCloudSnapshot(merged, snapshot);
+        writeSyncBaseline(currentUser.id, next);
+        setCloudSummary(summarizeSnapshot(next));
+
+        const latestLocal = readSnapshot();
+        if (JSON.stringify(latestLocal) === localFingerprint) {
+          writeAccountSnapshot(currentUser.id, next);
+          writeRemoteSafely(next);
+        } else {
+          writeAccountSnapshot(currentUser.id, latestLocal);
+          syncQueued.current = true;
+        }
+        setSyncState("ready");
+        return true;
+      } catch (error) {
+        if (isSyncRevisionConflict(error)) continue;
+        throw error;
+      }
+    }
+    throw new Error("云端数据持续更新，请稍后重试");
+  }, [isCurrentSync, writeRemoteSafely]);
 
   const syncNow = useCallback(async () => {
     const currentUser = userRef.current;
-    const choice = choiceRef.current;
-    if (!currentUser || (choice !== "merge" && choice !== "cloud") || applyingRemote.current) return;
-    const version = refreshVersion.current;
-    setSyncState("syncing");
-    setSyncError("");
-    try {
-      const local = readSnapshot();
-      const { snapshot } = await saveCloudSnapshot(local, "replace");
-      if (version !== refreshVersion.current || userRef.current?.id !== currentUser.id) return;
-      setCloudSummary(summarizeSnapshot(snapshot));
-      writeRemoteSafely(reconcileCloudSnapshot(local, snapshot));
-      setSyncState("ready");
-    } catch (error) {
-      if (version !== refreshVersion.current || userRef.current?.id !== currentUser.id) return;
-      setSyncError(error instanceof Error ? error.message : "同步失败");
-      setSyncState("error");
+    if (!currentUser || choiceRef.current !== "merge" || applyingRemote.current || !isStorageScopeActive(currentUser.id)) return;
+    if (syncing.current) {
+      syncQueued.current = true;
+      return;
     }
-  }, [writeRemoteSafely]);
-
-  const chooseSync = useCallback(async (choice: SyncChoice) => {
-    const currentUser = userRef.current;
-    if (!currentUser) return;
-    const version = refreshVersion.current;
-    setSyncError("");
-    setSyncState("syncing");
+    syncing.current = true;
     try {
-      if (choice === "local") {
-        writeConsent(currentUser.id, choice);
-        setChoice(choice);
-        setCloudSummary(null);
-        setSyncState("paused");
-        return;
-      }
-
-      const { snapshot: remote } = await getCloudSnapshot();
-      if (version !== refreshVersion.current || userRef.current?.id !== currentUser.id) return;
-      if (choice === "cloud") {
-        writeConsent(currentUser.id, choice);
-        setChoice(choice);
-        setCloudSummary(summarizeSnapshot(remote));
-        // "Only use cloud" is an explicit replacement: local history and
-        // mutable state are discarded in this browser, never uploaded.
-        writeRemoteSafely(remote);
-        setSyncState("ready");
-        return;
-      }
-
-      // `merge` is the only path allowed to upload existing local attempts.
-      const merged = mergeSnapshotsForImport(readSnapshot(), remote);
-      const { snapshot: imported } = await importCloudSnapshot(merged, "merge");
-      if (version !== refreshVersion.current || userRef.current?.id !== currentUser.id) return;
-      setCloudSummary(summarizeSnapshot(imported));
-      writeConsent(currentUser.id, choice);
-      setChoice(choice);
-      // Keep local attempt answers for the local result view. The server's
-      // imported copy is canonical for cloud storage and has answers stripped.
-      writeRemoteSafely(reconcileCloudSnapshot(merged, imported));
-      setSyncState("ready");
-    } catch (error) {
-      if (version !== refreshVersion.current || userRef.current?.id !== currentUser.id) return;
-      setSyncError(error instanceof Error ? error.message : "同步失败");
-      setSyncState("error");
+      do {
+        syncQueued.current = false;
+        const nextUser = userRef.current;
+        if (!nextUser || choiceRef.current !== "merge" || applyingRemote.current || !isStorageScopeActive(nextUser.id)) break;
+        const version = refreshVersion.current;
+        try {
+          const completed = await performSync(nextUser, version);
+          if (!completed && !syncQueued.current) break;
+        } catch (error) {
+          if (!isCurrentSync(nextUser.id, version)) {
+            if (syncQueued.current) continue;
+            break;
+          }
+          setSyncError(error instanceof Error ? error.message : "同步失败");
+          setSyncState("error");
+          syncQueued.current = false;
+          break;
+        }
+      } while (syncQueued.current);
+    } finally {
+      syncing.current = false;
     }
-  }, [setChoice, writeRemoteSafely]);
+  }, [isCurrentSync, performSync]);
 
   const refreshAccount = useCallback(async () => {
     const version = ++refreshVersion.current;
+    setChoice(null);
     setSyncState("loading");
     setSyncError("");
     try {
       const account = await getAccount();
       if (version !== refreshVersion.current) return;
+      activateScopeSafely(account.user?.id ?? null);
       userRef.current = account.user;
       setUser(account.user);
       if (!account.user) {
@@ -213,46 +194,22 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const remembered = readConsent(account.user.id);
-      setChoice(remembered);
-      if (!remembered) {
-        // A read-only preview makes the three choices concrete. No local data
-        // is uploaded until the user explicitly selects a sync mode.
-        try {
-          const { summary } = await getCloudSummary();
-          if (version !== refreshVersion.current || userRef.current?.id !== account.user.id) return;
-          setCloudSummary(summary);
-        } catch {
-          // A network hiccup must not block the local-only choice.
-          setCloudSummary(null);
-        }
-        if (version !== refreshVersion.current) return;
-        setSyncState("awaiting-consent");
-        return;
-      }
-
-      if (remembered === "local") {
+      setChoice("merge");
+      // Private browsing and hardened browser policies can disable localStorage.
+      // Keep the signed-in account usable with cloud-only reads in that case
+      // instead of leaving the provider in its loading state forever.
+      if (!isStorageAvailable()) {
         setCloudSummary(null);
-        setSyncState("paused");
+        setSyncState("ready");
         return;
       }
-
-      // Cloud history is authoritative for server-created records. Keep raw
-      // answers only from this device and retain local fallback records that
-      // have never reached the server.
-      const { snapshot } = await getCloudSnapshot();
-      if (version !== refreshVersion.current) return;
-      setCloudSummary(summarizeSnapshot(snapshot));
-      const local = readSnapshot();
-      const next = remembered === "merge" ? reconcileCloudSnapshot(local, snapshot) : snapshot;
-      writeRemoteSafely(next);
-      setSyncState("ready");
+      await syncNow();
     } catch (error) {
       if (version !== refreshVersion.current) return;
       setSyncError(error instanceof Error ? error.message : "账号状态加载失败");
       setSyncState("error");
     }
-  }, [setChoice, writeRemoteSafely]);
+  }, [activateScopeSafely, setChoice, syncNow]);
 
   const signOut = useCallback(async () => {
     try {
@@ -263,13 +220,16 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     refreshVersion.current += 1;
+    activateScopeSafely(null);
     userRef.current = null;
+    syncing.current = false;
+    syncQueued.current = false;
     setUser(null);
     setChoice(null);
     setCloudSummary(null);
     setSyncState("guest");
     setSyncError("");
-  }, [setChoice]);
+  }, [activateScopeSafely, setChoice]);
 
   useEffect(() => {
     if (authSessionPending) return;
@@ -286,7 +246,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   }, [refetchAuthSession]);
 
   useEffect(() => {
-    if (!user || (syncChoice !== "merge" && syncChoice !== "cloud")) return;
+    if (!user || syncChoice !== "merge") return;
     const onStorageChange = () => {
       if (applyingRemote.current) return;
       if (timer.current !== null) window.clearTimeout(timer.current);
@@ -306,11 +266,9 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     syncChoice,
     cloudSummary,
     refreshAccount,
-    chooseSync,
-    setSyncChoice: chooseSync,
     syncNow,
     signOut,
-  }), [chooseSync, cloudSummary, refreshAccount, signOut, syncError, syncChoice, syncNow, syncState, user]);
+  }), [cloudSummary, refreshAccount, signOut, syncError, syncChoice, syncNow, syncState, user]);
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;
 }
 

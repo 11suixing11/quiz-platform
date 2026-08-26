@@ -57,6 +57,14 @@ function migrate(database: SQLiteDatabase) {
       updated_at INTEGER NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS profiles (
+      user_id TEXT PRIMARY KEY NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      avatar TEXT NOT NULL DEFAULT '',
+      bio TEXT NOT NULL DEFAULT '',
+      tags_json TEXT NOT NULL DEFAULT '[]',
+      updated_at INTEGER NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS quiz_sessions (
       user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
       test_id TEXT NOT NULL,
@@ -69,6 +77,11 @@ function migrate(database: SQLiteDatabase) {
 
     CREATE INDEX IF NOT EXISTS quiz_sessions_expiry_idx
       ON quiz_sessions(user_id, expires_at);
+
+    CREATE TABLE IF NOT EXISTS sync_revisions (
+      user_id TEXT PRIMARY KEY NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      revision INTEGER NOT NULL DEFAULT 0
+    );
   `);
 
   // Better Auth creates its `user` table on first start, after this module is
@@ -127,6 +140,30 @@ export function withTransaction<T>(callback: () => T) {
   }
 }
 
+export function getSyncRevision(userId: string) {
+  const row = asRow(getDatabase().prepare("SELECT revision FROM sync_revisions WHERE user_id = ?").get(userId));
+  const revision = Number(row?.revision ?? 0);
+  return Number.isSafeInteger(revision) && revision >= 0 ? revision : 0;
+}
+
+export function bumpSyncRevision(userId: string) {
+  const database = getDatabase();
+  database.prepare(`
+    INSERT INTO sync_revisions (user_id, revision)
+    VALUES (?, 1)
+    ON CONFLICT(user_id) DO UPDATE SET revision = sync_revisions.revision + 1
+  `).run(userId);
+  return getSyncRevision(userId);
+}
+
 export function pruneExpiredSessions(now = Date.now()) {
-  getDatabase().prepare("DELETE FROM quiz_sessions WHERE expires_at <= ?").run(now);
+  return withTransaction(() => {
+    const database = getDatabase();
+    const rows = database.prepare("SELECT DISTINCT user_id FROM quiz_sessions WHERE expires_at <= ?").all(now) as Array<Record<string, unknown>>;
+    database.prepare("DELETE FROM quiz_sessions WHERE expires_at <= ?").run(now);
+    for (const row of rows) {
+      if (typeof row.user_id === "string") bumpSyncRevision(row.user_id);
+    }
+    return rows.length;
+  });
 }

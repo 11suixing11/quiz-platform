@@ -22,18 +22,9 @@ interface SessionResponse {
   user: BetterAuthUser;
 }
 
-interface DataResponse {
+export interface DataResponse {
   snapshot: StorageSnapshot;
-}
-
-export interface CloudDataSummary {
-  attempts: number;
-  bookmarks: number;
-  sessions: number;
-}
-
-interface SummaryResponse {
-  summary: CloudDataSummary;
+  revision: number;
 }
 
 interface QuizResponse {
@@ -51,7 +42,40 @@ export interface ChangePasswordResponse {
   user: AccountUser;
 }
 
-export type SyncChoice = "merge" | "cloud" | "local";
+export class AccountApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code?: string,
+    public readonly revision?: number,
+  ) {
+    super(message);
+    this.name = "AccountApiError";
+  }
+}
+
+export function isSyncRevisionConflict(error: unknown): error is AccountApiError {
+  return error instanceof AccountApiError && error.status === 409 && error.code === "SYNC_REVISION_CONFLICT";
+}
+
+export type SyncChoice = "merge";
+export interface RemoteProfile { avatar: string; bio: string; tags: string[]; updatedAt: number; }
+
+function accountHeaders(userId: string, json = false) {
+  return {
+    Accept: "application/json",
+    "X-Expected-User-Id": userId,
+    ...(json ? { "Content-Type": "application/json" } : {}),
+  };
+}
+
+export async function getRemoteProfile(userId: string) {
+  return responseJson<{ userId: string; profile: RemoteProfile }>(await fetch("/api/me/profile", { credentials: "include", cache: "no-store", headers: accountHeaders(userId) }));
+}
+
+export async function saveRemoteProfile(userId: string, profile: RemoteProfile) {
+  return responseJson<{ userId: string; profile: RemoteProfile }>(await fetch("/api/me/profile", { method: "PUT", credentials: "include", headers: accountHeaders(userId, true), body: JSON.stringify({ avatar: profile.avatar, bio: profile.bio, tags: profile.tags }) }));
+}
 
 function mapUser(value: BetterAuthUser | null | undefined): AccountUser | null {
   if (!value || typeof value.id !== "string" || typeof value.email !== "string" || typeof value.name !== "string") return null;
@@ -65,10 +89,11 @@ function mapUser(value: BetterAuthUser | null | undefined): AccountUser | null {
 }
 
 async function responseJson<T>(response: Response): Promise<T> {
-  const payload = await response.json().catch(() => null) as (T & { error?: string; message?: string; code?: string }) | null;
+  const payload = await response.json().catch(() => null) as (T & { error?: string; message?: string; code?: string; revision?: number }) | null;
   if (!response.ok) {
     const message = payload && typeof payload === "object" && (payload.error || payload.message);
-    throw new Error(typeof message === "string" ? message : "请求失败");
+    const revision = payload && typeof payload.revision === "number" && Number.isSafeInteger(payload.revision) ? payload.revision : undefined;
+    throw new AccountApiError(typeof message === "string" ? message : "请求失败", response.status, payload?.code, revision);
   }
   return payload as T;
 }
@@ -137,25 +162,17 @@ export async function changePassword(input: ChangePasswordInput): Promise<Change
   return { user };
 }
 
-export async function getCloudSnapshot() {
+export async function getCloudSnapshot(userId: string) {
   return responseJson<DataResponse>(await fetch("/api/me/data", {
     credentials: "include",
     cache: "no-store",
-    headers: { Accept: "application/json" },
+    headers: accountHeaders(userId),
   }));
 }
 
-/** Read counts only before the user chooses whether to sync. */
-export async function getCloudSummary() {
-  return responseJson<SummaryResponse>(await fetch("/api/me/data?view=summary", {
-    credentials: "include",
-    cache: "no-store",
-    headers: { Accept: "application/json" },
-  }));
-}
-
-/** Save mutable account state only; completed attempts require explicit import. */
-export async function saveCloudSnapshot(snapshot: StorageSnapshot, mode: "merge" | "replace" = "merge") {
+/** Read cloud counts without downloading the complete result payload. */
+/** Save mutable account state only; completed attempts use the history sync path. */
+export async function saveCloudSnapshot(userId: string, snapshot: StorageSnapshot, baseRevision: number, mode: "merge" | "replace" = "merge") {
   const mutableSnapshot = {
     version: snapshot.version,
     preferences: snapshot.preferences,
@@ -165,53 +182,53 @@ export async function saveCloudSnapshot(snapshot: StorageSnapshot, mode: "merge"
   return responseJson<DataResponse>(await fetch("/api/me/data", {
     method: "PUT",
     credentials: "include",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ snapshot: mutableSnapshot, mode }),
+    headers: accountHeaders(userId, true),
+    body: JSON.stringify({ snapshot: mutableSnapshot, baseRevision, mode }),
   }));
 }
 
-/** One-time, user-authorized import of existing browser history. */
-export async function importCloudSnapshot(snapshot: StorageSnapshot, mode: "merge" | "replace" = "merge") {
+/** Merge browser history while replacing the account's current mutable state. */
+export async function importCloudSnapshot(userId: string, snapshot: StorageSnapshot, baseRevision: number, mode: "merge" | "replace" = "merge") {
   return responseJson<DataResponse>(await fetch("/api/me/data/import", {
     method: "PUT",
     credentials: "include",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ snapshot, mode }),
+    headers: accountHeaders(userId, true),
+    body: JSON.stringify({ snapshot, baseRevision, mode }),
   }));
 }
 
 /** Submit only answers; the server loads the canonical quiz and scores it. */
-export async function submitCloudQuiz(testId: string, answers: number[]) {
+export async function submitCloudQuiz(userId: string, testId: string, answers: number[]) {
   return responseJson<QuizResponse>(await fetch("/api/me/quiz", {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    headers: accountHeaders(userId, true),
     body: JSON.stringify({ testId, answers }),
   }));
 }
 
-export async function deleteCloudAttempt(id: string) {
+export async function deleteCloudAttempt(userId: string, id: string) {
   const query = new URLSearchParams({ id });
   return responseJson<{ ok: true }>(await fetch(`/api/me/quiz?${query}`, {
     method: "DELETE",
     credentials: "include",
-    headers: { Accept: "application/json" },
+    headers: accountHeaders(userId),
   }));
 }
 
-export async function clearCloudAttempts() {
+export async function clearCloudAttempts(userId: string) {
   return responseJson<{ ok: true }>(await fetch("/api/me/quiz", {
     method: "DELETE",
     credentials: "include",
-    headers: { Accept: "application/json" },
+    headers: accountHeaders(userId),
   }));
 }
 
-export async function deleteCloudData() {
+export async function deleteCloudData(userId: string) {
   return responseJson<{ ok: true }>(await fetch("/api/me/data", {
     method: "DELETE",
     credentials: "include",
-    headers: { Accept: "application/json" },
+    headers: accountHeaders(userId),
   }));
 }
 

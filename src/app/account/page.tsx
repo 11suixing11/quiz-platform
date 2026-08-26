@@ -1,25 +1,23 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
-  Check,
-  Cloud,
-  CloudOff,
-  DatabaseBackup,
   KeyRound,
   LogIn,
   LogOut,
   RefreshCw,
   ShieldCheck,
-  Trash2,
   UserPlus,
 } from "lucide-react";
-import { useAccount, type SyncChoice } from "@/components/account-provider";
+import { useAccount } from "@/components/account-provider";
+import { ProfileEditor } from "@/components/profile-editor";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
-import { useAttempts, useBookmarks, useLanguage } from "@/hooks/use-local-storage";
-import { readSnapshot, STORAGE_EVENT } from "@/lib/storage";
-import { changePassword, deleteAccount, deleteCloudData, loginAccount, registerAccount } from "@/lib/account";
+import { useLanguage } from "@/hooks/use-local-storage";
+import { changePassword, deleteAccount, loginAccount, registerAccount } from "@/lib/account";
+import { clearSyncBaseline } from "@/lib/account-sync";
+import { clearLocalProfile } from "@/lib/local-profile";
+import { adoptSnapshotAsGuest, readSnapshot } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register";
@@ -46,15 +44,10 @@ export default function AccountPage() {
     syncState,
     syncError,
     syncChoice,
-    cloudSummary,
     refreshAccount,
-    chooseSync,
     syncNow,
     signOut,
   } = useAccount();
-  const { attempts } = useAttempts();
-  const { bookmarks } = useBookmarks();
-  const [localSessions, setLocalSessions] = useState(0);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -66,48 +59,11 @@ export default function AccountPage() {
   const [deletePassword, setDeletePassword] = useState("");
   const [action, setAction] = useState<string | null>(null);
   const [feedback, setFeedback] = useState("");
-  const [confirmCloudClear, setConfirmCloudClear] = useState(false);
   const [confirmAccountDelete, setConfirmAccountDelete] = useState(false);
 
   const zh = language === "zh";
   const busy = action !== null;
-  const cloudSyncEnabled = syncChoice === "merge" || syncChoice === "cloud";
-  useEffect(() => {
-    const update = () => setLocalSessions(Object.keys(readSnapshot().sessions).length);
-    const timer = window.setTimeout(update, 0);
-    window.addEventListener(STORAGE_EVENT, update);
-    window.addEventListener("storage", update);
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener(STORAGE_EVENT, update);
-      window.removeEventListener("storage", update);
-    };
-  }, []);
-  const localSummary = { attempts: attempts.length, bookmarks: bookmarks.length, sessions: localSessions };
-  const counts = (summary: typeof localSummary) => zh
-    ? `${summary.attempts} 条记录 · ${summary.bookmarks} 个收藏 · ${summary.sessions} 个未完成进度`
-    : `${summary.attempts} results · ${summary.bookmarks} saved · ${summary.sessions} unfinished`;
-  const syncOptions: Array<{ id: SyncChoice; icon: typeof Cloud; title: string; description: string }> = [
-    {
-      id: "merge",
-      icon: DatabaseBackup,
-      title: zh ? "合并本机与云端" : "Merge device and cloud",
-      description: zh ? "保留两边的数据；同一条记录只保留一份。" : "Keep data from both sides; duplicate records stay single.",
-    },
-    {
-      id: "cloud",
-      icon: Cloud,
-      title: zh ? "只使用云端" : "Use cloud only",
-      description: zh ? "用账号中的数据替换这台设备的数据，本机独有记录不会上传。" : "Replace this device with the account copy; device-only records are not uploaded.",
-    },
-    {
-      id: "local",
-      icon: CloudOff,
-      title: zh ? "暂不同步" : "Pause sync",
-      description: zh ? "继续只在这台设备保存，之后可以再开启。" : "Keep saving on this device and enable sync later.",
-    },
-  ];
-
+  const cloudSyncEnabled = Boolean(user && syncChoice === "merge");
   const submitAuth = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFeedback("");
@@ -128,32 +84,6 @@ export default function AccountPage() {
       }
       setPassword("");
       await refreshAccount();
-    } catch (error) {
-      setFeedback(readableError(error, language));
-    } finally {
-      setAction(null);
-    }
-  };
-
-  const selectSync = async (choice: SyncChoice) => {
-    setFeedback("");
-    setAction(`sync-${choice}`);
-    await chooseSync(choice);
-    setAction(null);
-  };
-
-  const clearCloud = async () => {
-    if (!confirmCloudClear) {
-      setConfirmCloudClear(true);
-      return;
-    }
-    setFeedback("");
-    setAction("clear-cloud");
-    try {
-      await deleteCloudData();
-      await chooseSync("local");
-      setConfirmCloudClear(false);
-      setFeedback(zh ? "云端数据已清空，同步已暂停。本机数据仍然保留。" : "Cloud data was cleared and sync is paused. This device's data remains.");
     } catch (error) {
       setFeedback(readableError(error, language));
     } finally {
@@ -194,6 +124,7 @@ export default function AccountPage() {
   };
 
   const removeAccount = async () => {
+    if (!user) return;
     if (!confirmAccountDelete) {
       setConfirmAccountDelete(true);
       return;
@@ -205,11 +136,16 @@ export default function AccountPage() {
     setFeedback("");
     setAction("delete-account");
     try {
+      const localCopy = readSnapshot();
+      const deletedUserId = user.id;
       await deleteAccount(deletePassword);
+      clearSyncBaseline(deletedUserId);
+      clearLocalProfile(deletedUserId);
+      adoptSnapshotAsGuest(localCopy, deletedUserId);
       setDeletePassword("");
       setConfirmAccountDelete(false);
       await refreshAccount();
-      setFeedback(zh ? "账号和云端数据已删除，本机数据仍然保留。" : "The account and cloud data were deleted. This device's data remains.");
+      setFeedback(zh ? "账号和云端资料已删除，本机测评数据已转为游客副本。" : "The account and cloud profile were deleted. Assessment data on this device now remains as a guest copy.");
     } catch (error) {
       setFeedback(readableError(error, language));
     } finally {
@@ -227,7 +163,7 @@ export default function AccountPage() {
       <PageContainer className="max-w-3xl">
         <div className="max-w-2xl">
           <h1 className="atlas-section-title">{zh ? "账号与同步" : "Account and sync"}</h1>
-          <p className="mt-4 text-base leading-7 text-ink/60 dark:text-white/60">{zh ? "游客数据默认留在本机。登录后，你可以决定是否在自己的设备之间同步。" : "Guest data stays on this device by default. After signing in, you decide whether to sync across your devices."}</p>
+          <p className="mt-4 text-base leading-7 text-ink/60 dark:text-white/60">{zh ? "游客数据默认留在本机。登录后，本机与云端数据会自动合并并在设备之间同步。" : "Guest data stays on this device by default. After signing in, device and cloud data merge automatically and stay synced across devices."}</p>
         </div>
 
         {!user ? (
@@ -235,7 +171,7 @@ export default function AccountPage() {
             <div className="grid gap-8 md:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <h2 id="auth-heading" className="text-2xl font-semibold">{authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</h2>
-                <p className="mt-3 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "登录不会自动上传本机数据。首次登录后会先让你选择同步方式。" : "Signing in does not upload device data automatically. You choose a sync mode first."}</p>
+                <p className="mt-3 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "登录后会自动合并本机与云端数据，并保持跨设备同步。" : "Signing in automatically merges device and cloud data and keeps it synced across devices."}</p>
                 <div className="mt-6 inline-grid grid-cols-2 rounded-lg border border-ink/12 p-1 dark:border-white/12" role="tablist" aria-label={zh ? "账号操作" : "Account action"}>
                   <button type="button" role="tab" aria-selected={authMode === "login"} onClick={() => { setAuthMode("login"); setFeedback(""); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "login" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "登录" : "Sign in"}</button>
                   <button type="button" role="tab" aria-selected={authMode === "register"} onClick={() => { setAuthMode("register"); setFeedback(""); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "register" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "注册" : "Register"}</button>
@@ -252,27 +188,14 @@ export default function AccountPage() {
           </section>
         ) : (
           <>
-            <section className="mt-12 flex flex-col gap-5 border-y border-ink/12 py-7 dark:border-white/12 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <p className="text-xl font-semibold">{user.displayName}</p>
-                <p className="mt-1 truncate text-sm text-ink/50 dark:text-white/50">{user.email}</p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-ink/55 dark:text-white/55"><span className={cn("size-2 rounded-full", syncState === "ready" ? "bg-accent" : syncState === "paused" || syncState === "awaiting-consent" ? "bg-[#b38a54]" : syncState === "error" ? "bg-[#a53f3f]" : "bg-ink/25 dark:bg-white/25")} aria-hidden="true" /><span>{syncState === "ready" ? (zh ? "同步已开启" : "Sync on") : syncState === "syncing" ? (zh ? "正在同步" : "Syncing") : syncState === "paused" ? (zh ? "仅保存在本机" : "Device only") : syncState === "awaiting-consent" ? (zh ? "等待选择同步方式" : "Choose a sync mode") : (zh ? "同步需要处理" : "Sync needs attention")}</span></div>
-            </section>
+            <ProfileEditor key={user.id} userId={user.id} displayName={user.displayName} email={user.email} zh={zh} syncMode="merge" />
 
             <section className="atlas-settings-section mt-10" aria-labelledby="sync-heading">
-              <h2 id="sync-heading" className="text-2xl font-semibold">{syncState === "awaiting-consent" ? (zh ? "选择同步方式" : "Choose a sync mode") : (zh ? "同步方式" : "Sync mode")}</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "云端保存结果、收藏、偏好和 24 小时内的未完成进度；已完成测评的原始答案只留在本机。" : "The cloud stores results, bookmarks, preferences, and unfinished progress for 24 hours. Completed raw answers stay on this device."}</p>
-              {syncState === "awaiting-consent" && <div className="mt-5 grid gap-3 sm:grid-cols-2" aria-label={zh ? "同步前数据摘要" : "Data summary before syncing"}>
-                <div className="atlas-sync-summary"><span>{zh ? "这台设备" : "This device"}</span><strong>{counts(localSummary)}</strong></div>
-                <div className="atlas-sync-summary"><span>{zh ? "账号云端" : "Account cloud"}</span><strong>{cloudSummary ? counts(cloudSummary) : (zh ? "暂时无法读取，可选择暂不同步" : "Unavailable now; you can keep sync paused")}</strong></div>
-              </div>}
-              <div className="mt-6 grid gap-3 md:grid-cols-3">
-                {syncOptions.map(({ id, icon: Icon, title, description }) => {
-                  const selected = syncChoice === id;
-                  return <button key={id} type="button" onClick={() => void selectSync(id)} disabled={busy} aria-pressed={selected} className={cn("flex min-h-40 flex-col justify-between rounded-lg border p-4 text-left transition disabled:cursor-not-allowed disabled:opacity-45", selected ? "border-accent bg-accent/8" : "border-ink/12 hover:border-ink/30 dark:border-white/12 dark:hover:border-white/30")}><span className="flex items-center justify-between"><Icon className="size-5 text-accent" aria-hidden="true" />{selected && <Check className="size-4 text-accent" aria-hidden="true" />}</span><span><strong className="block text-sm">{action === `sync-${id}` ? (zh ? "正在处理…" : "Working…") : title}</strong><span className="mt-2 block text-xs font-normal leading-5 text-ink/50 dark:text-white/50">{description}</span></span></button>;
-                })}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 id="sync-heading" className="text-2xl font-semibold">{zh ? "自动同步" : "Automatic sync"}</h2>
+                <div className="flex items-center gap-2 text-xs font-semibold text-ink/55 dark:text-white/55"><span className={cn("size-2 rounded-full", syncState === "ready" ? "bg-accent" : syncState === "error" ? "bg-[#a53f3f]" : "bg-ink/25 dark:bg-white/25")} aria-hidden="true" /><span>{syncState === "ready" ? (zh ? "同步已开启" : "Sync on") : syncState === "syncing" ? (zh ? "正在同步" : "Syncing") : (zh ? "需要处理" : "Needs attention")}</span></div>
               </div>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "登录后会自动合并本机与云端的结果、收藏、偏好、未完成进度和个人资料；已完成测评的原始答案只留在本机。" : "After signing in, device and cloud results, bookmarks, preferences, unfinished progress, and profile are merged automatically. Completed raw answers stay on this device."}</p>
               {(syncError || (feedback && !confirmAccountDelete)) && <p className={cn("mt-4 text-sm leading-6", syncError ? "text-[#a53f3f] dark:text-red-200" : "text-accent")} role={syncError ? "alert" : "status"}>{syncError || feedback}</p>}
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 {cloudSyncEnabled && <button type="button" onClick={() => void syncNow()} disabled={busy || syncState === "syncing"} className="atlas-secondary-action justify-center disabled:opacity-45"><RefreshCw className={cn("size-4", syncState === "syncing" && "animate-spin")} aria-hidden="true" />{zh ? "立即同步" : "Sync now"}</button>}
@@ -305,18 +228,9 @@ export default function AccountPage() {
               </form>
             </section>
 
-            <section className="atlas-settings-section mt-10" aria-labelledby="cloud-data-heading">
-              <h2 id="cloud-data-heading" className="text-xl font-semibold">{zh ? "云端数据" : "Cloud data"}</h2>
-              <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "清空后会自动暂停同步，本机记录不会被删除。" : "Clearing cloud data also pauses sync. Records on this device are not deleted."}</p>
-              <div className="mt-5 flex flex-wrap items-center gap-3">
-                {confirmCloudClear && <button type="button" onClick={() => setConfirmCloudClear(false)} disabled={busy} className="atlas-text-button">{zh ? "取消" : "Cancel"}</button>}
-                <button type="button" onClick={() => void clearCloud()} disabled={busy} className="atlas-danger-action disabled:opacity-45"><Trash2 className="size-4" aria-hidden="true" />{action === "clear-cloud" ? (zh ? "正在清空…" : "Clearing…") : confirmCloudClear ? (zh ? "确认清空云端" : "Confirm cloud clear") : (zh ? "清空云端数据" : "Clear cloud data")}</button>
-              </div>
-            </section>
-
             <section className="atlas-settings-section mt-10" aria-labelledby="delete-account-heading">
               <h2 id="delete-account-heading" className="text-xl font-semibold">{zh ? "删除账号" : "Delete account"}</h2>
-              <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "账号、登录会话和全部云端数据会永久删除；这台设备上的本机数据仍然保留。" : "The account, sessions, and all cloud data are permanently deleted. This device's local data remains."}</p>
+              <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "账号、登录会话、全部云端数据和本机个人资料副本会永久删除；这台设备上的测评数据会转为游客副本保留。" : "The account, sessions, all cloud data, and the local profile copy are permanently deleted. Assessment data on this device remains as a guest copy."}</p>
               <div className="mt-5 max-w-md">
                 {confirmAccountDelete && <label className="block text-sm font-semibold"><span>{zh ? "当前密码" : "Current password"}</span><input aria-label={zh ? "当前密码" : "Current password"} value={deletePassword} onChange={(event) => setDeletePassword(event.target.value)} type="password" autoComplete="current-password" className="atlas-account-input mt-2" /></label>}
                 <div className="mt-4 flex flex-wrap items-center gap-3">

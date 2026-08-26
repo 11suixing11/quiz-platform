@@ -19,20 +19,20 @@ Quiz Platform helps people turn a few minutes of answering questions into a clea
 The product is a local-first self-reflection companion with optional accounts and
 cloud sync: it opens with a small, reviewed set of bilingual routes, keeps
 personal results on the current device by default, and treats results as prompts
-for reflection rather than verdicts. A signed-in user must explicitly choose a
-sync mode before device data is uploaded.
+for reflection rather than verdicts. After sign-in, device and cloud data are
+merged automatically.
 
 ## Operating Context
 
 - Standalone Next.js application served by Node.js on a self-managed VPS after a
   GitHub Actions validation and release step; Caddy terminates TLS and reverse
   proxies the application.
-- Email/password accounts, sessions, and optional cloud sync are backed by a
+- Email/password accounts, sessions, and automatic cloud sync are backed by a
   SQLite database outside the release directory.
 - Users may take a test in one sitting or resume an unfinished session.
 - Guest results, history, bookmarks, language, theme, and backups live in the
-  current browser. Signed-in users can explicitly choose whether selected data
-  is synchronized across devices.
+  current browser. Signed-in users automatically synchronize the merged data set
+  and their profile across devices.
 
 ## Capabilities and Constraints
 
@@ -40,8 +40,8 @@ sync mode before device data is uploaded.
 - 193 internal quiz modules remain available for staged content review but are not public routes by default.
 - Core product loop: discovery, test detail, answering, result, history, bookmarks, preferences, and data management.
 - Account surface supports email/password registration, sign-in, sign-out,
-  password changes that revoke other device sessions, cloud-data controls, and
-  account deletion. No email-based password-recovery flow is currently
+  password changes that revoke other device sessions, automatic data sync,
+  profile editing, and account deletion. No email-based password-recovery flow is currently
   configured.
 - Chinese and English only.
 - The standalone runtime and Caddy proxy must remain compatible with the
@@ -67,8 +67,8 @@ sync mode before device data is uploaded.
 1. Begin with a human question, not a wall of tests.
 2. Make the main journey obvious and keep secondary capabilities out of the way.
 3. Treat every result as a mirror and a starting point, never a verdict.
-4. Keep personal data understandable, portable, and local by default; make any
-   cloud upload an explicit user choice.
+4. Keep personal data understandable, portable, and local by default; disclose
+   that sign-in automatically merges the device copy into the account.
 5. Prefer one coherent model and one source of truth over duplicated registries and page-specific logic.
 
 ## Accessibility & Inclusion

@@ -2,7 +2,7 @@
 
 import {
   STORAGE_VERSION,
-  clearAllData as clearStorage,
+  clearStorageScope,
   getStorageSummary,
   parseStorageSnapshot,
   readSnapshot,
@@ -10,6 +10,8 @@ import {
   type StorageSnapshot,
 } from "./storage";
 import { TEST_REGISTRY } from "./test-registry";
+import { clearLocalProfile, mergeLocalProfiles, parseLocalProfile, readLocalProfile, writeLocalProfile } from "./local-profile";
+import { clearSyncBaseline } from "./account-sync";
 
 export type ImportMode = "merge" | "replace";
 
@@ -50,8 +52,8 @@ export function getDataStats(): DataStats {
   };
 }
 
-export function exportAllData() {
-  const payload = readSnapshot();
+export function exportAllData(userId?: string) {
+  const payload = { ...readSnapshot(), ...(userId ? { profile: readLocalProfile(userId) } : {}) };
   const json = JSON.stringify(payload, null, 2);
   if (typeof document !== "undefined") {
     const blob = new Blob([json], { type: "application/json" });
@@ -83,9 +85,10 @@ function mergeSnapshots(current: StorageSnapshot, incoming: StorageSnapshot): St
   };
 }
 
-export function importData(json: string, mode: ImportMode = "merge") {
+export function importData(json: string, mode: ImportMode = "merge", userId?: string) {
   try {
-    const incoming = parseStorageSnapshot(JSON.parse(json));
+    const parsed = JSON.parse(json) as unknown;
+    const incoming = parseStorageSnapshot(parsed);
     if (!incoming) {
       return { success: false, message: `Only version ${STORAGE_VERSION} backups are supported`, imported: 0 };
     }
@@ -93,6 +96,13 @@ export function importData(json: string, mode: ImportMode = "merge") {
     const currentAttemptIds = new Set(current.attempts.map((attempt) => attempt.id));
     const next = mode === "replace" ? incoming : mergeSnapshots(current, incoming);
     writeSnapshot(next);
+    if (userId && parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const incomingProfile = parseLocalProfile((parsed as { profile?: unknown }).profile);
+      if (incomingProfile) {
+        const currentProfile = readLocalProfile(userId);
+        writeLocalProfile(userId, mode === "replace" ? incomingProfile : mergeLocalProfiles(currentProfile, incomingProfile));
+      }
+    }
     const imported = mode === "replace"
       ? next.attempts.length
       : next.attempts.filter((attempt) => !currentAttemptIds.has(attempt.id)).length;
@@ -110,15 +120,21 @@ export function importData(json: string, mode: ImportMode = "merge") {
   }
 }
 
-export function clearAllData() {
-  clearStorage();
+export function clearAllData(userId: string | null = null) {
+  if (userId) {
+    clearSyncBaseline(userId);
+    clearLocalProfile(userId);
+  }
+  clearStorageScope(userId);
 }
 
-export function getDataSummary() {
+export function getDataSummary(userId?: string) {
   const summary = getStorageSummary();
+  const profile = userId ? readLocalProfile(userId) : null;
   return {
     quizEntries: summary.attempts,
     bookmarks: summary.bookmarks,
     storageUsed: summary.storageUsed,
+    hasProfile: Boolean(profile && (profile.avatar || profile.bio || profile.tags.length)),
   };
 }

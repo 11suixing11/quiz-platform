@@ -83,7 +83,7 @@ export default function HistoryPage() {
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [definitions, setDefinitions] = useState<Record<string, QuizDefinition>>({});
-  const cloudSyncEnabled = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+  const cloudSyncEnabled = Boolean(user && syncChoice === "merge");
   const entries = useMemo(() => attempts.map((attempt) => ({ attempt, entry: getQuizEntry(attempt.testId) })).filter((item): item is { attempt: typeof attempts[number]; entry: NonNullable<ReturnType<typeof getQuizEntry>> } => Boolean(item.entry)), [attempts]);
   const formatDate = (timestamp: number) => language === "zh" ? new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium" }).format(timestamp) : new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(timestamp);
 
@@ -102,7 +102,7 @@ export default function HistoryPage() {
     setPendingDelete(id);
     setDeleteError("");
     try {
-      if (cloudSyncEnabled) await deleteCloudAttempt(id);
+      if (cloudSyncEnabled && user) await deleteCloudAttempt(user.id, id);
       deleteAttempt(id);
     } catch {
       setDeleteError(language === "zh" ? "云端记录删除失败，请检查网络后重试。" : "The cloud record could not be deleted. Check your connection and try again.");
@@ -115,7 +115,7 @@ export default function HistoryPage() {
     setPendingDelete("*");
     setDeleteError("");
     try {
-      if (cloudSyncEnabled) await clearCloudAttempts();
+      if (cloudSyncEnabled && user) await clearCloudAttempts(user.id);
       clearAttempts();
       setConfirmClear(false);
     } catch {

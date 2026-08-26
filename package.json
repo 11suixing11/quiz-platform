@@ -14,7 +14,8 @@
         "audit:flagship": "node scripts/audit-flagship-tests.mjs",
         "test:scoring": "node scripts/smoke-score-tests.mjs",
         "test:storage": "node scripts/test-storage.mjs",
-        "test": "npm run check:registry && npm run test:scoring && npm run test:storage"
+        "test:cloud-revision": "node scripts/test-cloud-revision.mjs",
+        "test": "npm run check:registry && npm run test:scoring && npm run test:storage && npm run test:cloud-revision"
     },
     "dependencies": {
         "better-auth": "^1.7.1",

@@ -11,7 +11,7 @@ import {
   parseCloudSnapshot,
   type CloudMutableSnapshot,
 } from "./cloud-data-schema";
-import { asRow, getDatabase, withTransaction } from "./database";
+import { asRow, bumpSyncRevision, getDatabase, getSyncRevision, withTransaction } from "./database";
 
 /**
  * Storage access is deliberately kept separate from authentication. Every
@@ -26,12 +26,32 @@ export class DataValidationError extends Error {
   }
 }
 
+export class DataRevisionConflictError extends Error {
+  constructor(
+    public readonly baseRevision: number,
+    public readonly currentRevision: number,
+  ) {
+    super("Cloud data changed since it was last read");
+    this.name = "DataRevisionConflictError";
+  }
+}
+
 const DEFAULT_PREFERENCES: StoragePreferences = { lang: "zh", theme: "system" };
 
 export interface UserDataSummary {
   attempts: number;
   bookmarks: number;
   sessions: number;
+}
+
+export interface UserSnapshotState {
+  snapshot: StorageSnapshot;
+  revision: number;
+}
+
+export interface UserDataSummaryState {
+  summary: UserDataSummary;
+  revision: number;
 }
 
 function parseJson<T>(value: unknown, fallback: T): T {
@@ -69,11 +89,9 @@ function normalizeStoredSession(row: Record<string, unknown>): [string, QuizSess
   }];
 }
 
-/** Return the account's cloud snapshot. Completed raw answers are never read back. */
-export function getUserSnapshot(userId: string): StorageSnapshot {
+/** Read the account's cloud snapshot. Completed raw answers are never read back. */
+function readUserSnapshot(userId: string, now: number): StorageSnapshot {
   const database = getDatabase();
-  const now = Date.now();
-  database.prepare("DELETE FROM quiz_sessions WHERE user_id = ? AND expires_at <= ?").run(userId, now);
 
   const attemptRows = database.prepare(`
     SELECT id, test_id, result_json, test_name, test_name_en, completed_at
@@ -132,12 +150,26 @@ export function getUserSnapshot(userId: string): StorageSnapshot {
   };
 }
 
-/** Return counts only, so the account page can explain sync choices without
- * reading the user's result payload before they choose a sync mode. */
-export function getUserDataSummary(userId: string): UserDataSummary {
+function pruneUserExpiredSessions(userId: string, now: number) {
+  const result = getDatabase().prepare("DELETE FROM quiz_sessions WHERE user_id = ? AND expires_at <= ?").run(userId, now);
+  if (result.changes > 0) bumpSyncRevision(userId);
+}
+
+export function getUserSnapshotState(userId: string): UserSnapshotState {
+  return withTransaction(() => {
+    const now = Date.now();
+    pruneUserExpiredSessions(userId, now);
+    return { snapshot: readUserSnapshot(userId, now), revision: getSyncRevision(userId) };
+  });
+}
+
+export function getUserSnapshot(userId: string): StorageSnapshot {
+  return getUserSnapshotState(userId).snapshot;
+}
+
+/** Return counts without reading the user's complete result payload. */
+function readUserDataSummary(userId: string, now: number): UserDataSummary {
   const database = getDatabase();
-  const now = Date.now();
-  database.prepare("DELETE FROM quiz_sessions WHERE user_id = ? AND expires_at <= ?").run(userId, now);
   const attempts = asRow(database.prepare("SELECT COUNT(*) AS count FROM quiz_attempts WHERE user_id = ?").get(userId));
   const bookmarks = asRow(database.prepare("SELECT COUNT(*) AS count FROM bookmarks WHERE user_id = ?").get(userId));
   const sessions = asRow(database.prepare("SELECT COUNT(*) AS count FROM quiz_sessions WHERE user_id = ? AND expires_at > ?").get(userId, now));
@@ -146,6 +178,18 @@ export function getUserDataSummary(userId: string): UserDataSummary {
     bookmarks: Number(bookmarks?.count ?? 0),
     sessions: Number(sessions?.count ?? 0),
   };
+}
+
+export function getUserDataSummaryState(userId: string): UserDataSummaryState {
+  return withTransaction(() => {
+    const now = Date.now();
+    pruneUserExpiredSessions(userId, now);
+    return { summary: readUserDataSummary(userId, now), revision: getSyncRevision(userId) };
+  });
+}
+
+export function getUserDataSummary(userId: string): UserDataSummary {
+  return getUserDataSummaryState(userId).summary;
 }
 
 function clearMutableRows(userId: string) {
@@ -225,23 +269,46 @@ function insertImportedAttempts(userId: string, snapshot: StorageSnapshot, mode:
   }
 }
 
+function assertBaseRevision(userId: string, baseRevision: number) {
+  const currentRevision = getSyncRevision(userId);
+  if (currentRevision !== baseRevision) {
+    throw new DataRevisionConflictError(baseRevision, currentRevision);
+  }
+}
+
 /**
  * Save preferences/bookmarks/sessions only; history is intentionally
  * untouched. The mutable snapshot is a complete client state, so replacing
  * these rows is necessary for unbookmark/clear-session operations to propagate
  * across devices. The `mode` argument is retained for wire compatibility with
- * older clients; merge semantics belong to the explicit history-import path.
+ * older clients; history merge semantics belong to the dedicated sync path.
  */
-export function saveMutableSnapshot(userId: string, value: unknown, mode: "merge" | "replace" = "merge") {
-  const parsed = parseCloudPut({ mode, snapshot: value }, Date.now());
-  withTransaction(() => writeMutableRows(userId, parsed.snapshot, "replace", Date.now()));
-  return getUserSnapshot(userId);
+export function saveMutableSnapshot(
+  userId: string,
+  value: unknown,
+  baseRevision: number,
+  mode: "merge" | "replace" = "merge",
+): UserSnapshotState {
+  const parsed = parseCloudPut({ baseRevision, mode, snapshot: value }, Date.now());
+  return withTransaction(() => {
+    assertBaseRevision(userId, parsed.baseRevision);
+    const now = Date.now();
+    writeMutableRows(userId, parsed.snapshot, "replace", now);
+    const revision = bumpSyncRevision(userId);
+    return { snapshot: readUserSnapshot(userId, now), revision };
+  });
 }
 
-/** Explicitly import a v3 browser backup, stripping completed raw answers. */
-export function saveImportedSnapshot(userId: string, value: unknown, mode: "merge" | "replace" = "merge") {
-  const parsed = parseCloudImportPut({ mode, snapshot: value }, Date.now());
-  withTransaction(() => {
+/** Synchronize v3 browser history, stripping completed raw answers. */
+export function saveImportedSnapshot(
+  userId: string,
+  value: unknown,
+  baseRevision: number,
+  mode: "merge" | "replace" = "merge",
+): UserSnapshotState {
+  const parsed = parseCloudImportPut({ baseRevision, mode, snapshot: value }, Date.now());
+  return withTransaction(() => {
+    assertBaseRevision(userId, parsed.baseRevision);
     const database = getDatabase();
     if (parsed.mode === "replace") {
       database.prepare("DELETE FROM quiz_attempts WHERE user_id = ?").run(userId);
@@ -249,17 +316,25 @@ export function saveImportedSnapshot(userId: string, value: unknown, mode: "merg
     }
     const now = Date.now();
     insertImportedAttempts(userId, parsed.snapshot, parsed.mode, now);
-    writeMutableRows(userId, parsed.snapshot, "merge", now);
+    // A sync payload is the complete mutable state. History remains additive,
+    // while bookmarks and sessions must allow removals to propagate.
+    writeMutableRows(userId, parsed.snapshot, "replace", now);
+    const revision = bumpSyncRevision(userId);
+    return { snapshot: readUserSnapshot(userId, now), revision };
   });
-  return getUserSnapshot(userId);
 }
 
 /**
- * Backward-compatible name for callers that still explicitly import a full
+ * Backward-compatible name for callers that still synchronize a full
  * snapshot. New routes should call saveMutableSnapshot/saveImportedSnapshot.
  */
-export function saveUserSnapshot(userId: string, value: unknown, mode: "merge" | "replace" = "merge") {
-  return saveImportedSnapshot(userId, value, mode);
+export function saveUserSnapshot(
+  userId: string,
+  value: unknown,
+  baseRevision: number,
+  mode: "merge" | "replace" = "merge",
+) {
+  return saveImportedSnapshot(userId, value, baseRevision, mode);
 }
 
 export function createAttemptId() {
@@ -306,35 +381,51 @@ export function saveAttemptRecord(userId: string, input: NewAttemptRecord) {
       VALUES (?, ?, ?, ?, '[]', ?, ?, ?, ?)
     `).run(userId, attempt.id, attempt.testId, JSON.stringify(attempt.result), attempt.testName ?? null, attempt.testNameEn ?? null, attempt.timestamp, Date.now());
     database.prepare("DELETE FROM quiz_sessions WHERE user_id = ? AND test_id = ?").run(userId, attempt.testId);
+    bumpSyncRevision(userId);
   });
   return attempt;
 }
 
 export function deleteAttemptRecord(userId: string, id: string) {
-  getDatabase().prepare("DELETE FROM quiz_attempts WHERE user_id = ? AND id = ?").run(userId, id);
+  return withTransaction(() => {
+    getDatabase().prepare("DELETE FROM quiz_attempts WHERE user_id = ? AND id = ?").run(userId, id);
+    return bumpSyncRevision(userId);
+  });
 }
 
 export function clearAttemptRecords(userId: string) {
-  getDatabase().prepare("DELETE FROM quiz_attempts WHERE user_id = ?").run(userId);
+  return withTransaction(() => {
+    getDatabase().prepare("DELETE FROM quiz_attempts WHERE user_id = ?").run(userId);
+    return bumpSyncRevision(userId);
+  });
 }
 
 export function clearQuizSessionRecord(userId: string, testId: string) {
-  getDatabase().prepare("DELETE FROM quiz_sessions WHERE user_id = ? AND test_id = ?").run(userId, testId);
+  return withTransaction(() => {
+    getDatabase().prepare("DELETE FROM quiz_sessions WHERE user_id = ? AND test_id = ?").run(userId, testId);
+    return bumpSyncRevision(userId);
+  });
 }
 
 export function setBookmarkRecord(userId: string, testId: string, saved: boolean) {
-  if (saved) {
-    getDatabase().prepare("INSERT OR IGNORE INTO bookmarks (user_id, test_id, created_at) VALUES (?, ?, ?)").run(userId, testId, Date.now());
-  } else {
-    getDatabase().prepare("DELETE FROM bookmarks WHERE user_id = ? AND test_id = ?").run(userId, testId);
-  }
+  return withTransaction(() => {
+    if (saved) {
+      getDatabase().prepare("INSERT OR IGNORE INTO bookmarks (user_id, test_id, created_at) VALUES (?, ?, ?)").run(userId, testId, Date.now());
+    } else {
+      getDatabase().prepare("DELETE FROM bookmarks WHERE user_id = ? AND test_id = ?").run(userId, testId);
+    }
+    return bumpSyncRevision(userId);
+  });
 }
 
 export function setUserPreferences(userId: string, preferences: StoragePreferences) {
-  writePreferences(userId, {
-    lang: preferences.lang === "en" ? "en" : "zh",
-    theme: preferences.theme === "light" || preferences.theme === "dark" ? preferences.theme : "system",
-  }, Date.now());
+  return withTransaction(() => {
+    writePreferences(userId, {
+      lang: preferences.lang === "en" ? "en" : "zh",
+      theme: preferences.theme === "light" || preferences.theme === "dark" ? preferences.theme : "system",
+    }, Date.now());
+    return bumpSyncRevision(userId);
+  });
 }
 
 export function deleteUserData(userId: string) {
@@ -343,5 +434,7 @@ export function deleteUserData(userId: string) {
     database.prepare("DELETE FROM quiz_attempts WHERE user_id = ?").run(userId);
     clearMutableRows(userId);
     database.prepare("DELETE FROM preferences WHERE user_id = ?").run(userId);
+    database.prepare("DELETE FROM profiles WHERE user_id = ?").run(userId);
+    bumpSyncRevision(userId);
   });
 }

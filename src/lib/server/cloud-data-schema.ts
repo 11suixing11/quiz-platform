@@ -39,6 +39,8 @@ const preferencesSchema = z.strictObject({
   theme: z.enum(["system", "light", "dark"]),
 });
 
+const revisionSchema = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
+
 /*
  * Completed answers are accepted for importing an existing v3 backup, but
  * normalizeCloudSnapshot strips them before persistence. New submissions use
@@ -125,12 +127,14 @@ export const cloudSubmissionSchema = z.strictObject({
 
 /** Regular sync can update mutable state, but cannot create completed records. */
 export const cloudPutSchema = z.strictObject({
+  baseRevision: revisionSchema,
   mode: z.enum(["merge", "replace"]).default("merge"),
   snapshot: mutableSnapshotSchema,
 });
 
-/** Existing browser history is accepted only through an explicit import flow. */
+/** Browser history is accepted only through the dedicated history sync route. */
 export const cloudImportPutSchema = z.strictObject({
+  baseRevision: revisionSchema,
   mode: z.enum(["merge", "replace"]).default("merge"),
   snapshot: historicalSnapshotSchema,
 });
@@ -255,21 +259,21 @@ export function parseCloudSnapshot(value: unknown, now = Date.now()): StorageSna
 }
 
 /** Parse regular sync data. This route cannot import or forge attempts. */
-export function parseCloudPut(value: unknown, now = Date.now()): { mode: "merge" | "replace"; snapshot: CloudMutableSnapshot } {
+export function parseCloudPut(value: unknown, now = Date.now()): { baseRevision: number; mode: "merge" | "replace"; snapshot: CloudMutableSnapshot } {
   if (byteLength(value) > CLOUD_DATA_LIMITS.snapshotBytes + 32_000) {
     throw new CloudDataValidationError("The request is too large");
   }
   const input = parse(cloudPutSchema, value, "Invalid cloud data request");
-  return { mode: input.mode, snapshot: normalizeMutableSnapshot(input.snapshot, now) };
+  return { baseRevision: input.baseRevision, mode: input.mode, snapshot: normalizeMutableSnapshot(input.snapshot, now) };
 }
 
-/** Parse an explicit v3 history import, including its merge/replace mode. */
-export function parseCloudImportPut(value: unknown, now = Date.now()): { mode: "merge" | "replace"; snapshot: StorageSnapshot } {
+/** Parse a v3 history synchronization payload, including its merge/replace mode. */
+export function parseCloudImportPut(value: unknown, now = Date.now()): { baseRevision: number; mode: "merge" | "replace"; snapshot: StorageSnapshot } {
   if (byteLength(value) > CLOUD_DATA_LIMITS.snapshotBytes + 32_000) {
     throw new CloudDataValidationError("The request is too large");
   }
   const input = parse(cloudImportPutSchema, value, "Invalid cloud import request");
-  return { mode: input.mode, snapshot: parseCloudSnapshot(input.snapshot, now) };
+  return { baseRevision: input.baseRevision, mode: input.mode, snapshot: parseCloudSnapshot(input.snapshot, now) };
 }
 
 /** A narrow helper for endpoint code that wants a stable error boundary. */

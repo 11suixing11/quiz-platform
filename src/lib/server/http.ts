@@ -44,12 +44,19 @@ export async function assertTrustedMutation(request: Request) {
   return null;
 }
 
-export function allowRateLimitedRequest(request: Request, action: string) {
+/** Reject requests sent by a stale tab after another tab switches accounts. */
+export function assertExpectedAccount(request: Request, userId: string) {
+  return request.headers.get("x-expected-user-id") === userId
+    ? null
+    : error("账号状态已变化，请刷新后重试", 409, "ACCOUNT_CHANGED");
+}
+
+export function allowRateLimitedRequest(request: Request, action: string, maxAttempts = MAX_ATTEMPTS_PER_WINDOW) {
   const now = Date.now();
   const key = `${action}:${requestAddress(request)}`;
   const existing = rateLimits().get(key) ?? [];
   const recent = existing.filter((time) => now - time < WINDOW_MS);
-  if (recent.length >= MAX_ATTEMPTS_PER_WINDOW) {
+  if (recent.length >= maxAttempts) {
     rateLimits().set(key, recent);
     return false;
   }

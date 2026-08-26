@@ -103,7 +103,7 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
     if (!definition || resumeSession || !answers.some((answer) => answer !== null)) return;
     const savedAt = Date.now();
     saveQuizSession(testId, answers, currentQuestion);
-    const shouldSync = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+    const shouldSync = Boolean(user && syncChoice === "merge");
     draftSyncStarted.current = false;
     const timer = window.setTimeout(() => {
       setDraftSavedAt(savedAt);
@@ -131,7 +131,7 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
   const isLast = currentQuestion === total - 1;
   const draftAnswers = resumeSession?.answers ?? answers;
   const hasDraft = draftAnswers.some((answer) => answer !== null);
-  const cloudSyncEnabled = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+  const cloudSyncEnabled = Boolean(user && syncChoice === "merge");
 
   useEffect(() => {
     if (!draftCloudPending) return;
@@ -178,14 +178,8 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
         warning: false,
       };
     }
-    if (user && syncState === "awaiting-consent") {
-      return {
-        label: language === "zh" ? "已保存到本机 · 选择同步方式后同步" : "Saved on this device · Choose a sync mode to sync",
-        warning: false,
-      };
-    }
     return {
-      label: user ? (language === "zh" ? "仅保存在本机" : "Saved on this device only") : (language === "zh" ? "已保存到本机" : "Saved on this device"),
+      label: user ? (language === "zh" ? "本机已保存，等待同步" : "Saved here, waiting to sync") : (language === "zh" ? "已保存到本机" : "Saved on this device"),
       warning: false,
     };
   }, [cloudSyncEnabled, draftCloudPending, isOffline, language, syncState, user]);
@@ -217,13 +211,15 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
     setSubmitError("");
     try {
       const numericAnswers = answers as number[];
-      const cloudSyncEnabled = Boolean(user && (syncChoice === "merge" || syncChoice === "cloud"));
+      const cloudSyncEnabled = Boolean(user && syncChoice === "merge");
       let cloudFailed = false;
       let attempt;
 
       if (cloudSyncEnabled) {
         try {
-          const response = await submitCloudQuiz(testId, numericAnswers);
+          const currentUser = user;
+          if (!currentUser) throw new Error("登录状态已变化");
+          const response = await submitCloudQuiz(currentUser.id, testId, numericAnswers);
           attempt = saveAttempt({ ...response.attempt, answers: numericAnswers });
         } catch {
           cloudFailed = true;

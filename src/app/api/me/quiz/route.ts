@@ -2,7 +2,7 @@ import { loadQuizDefinition, scoreQuiz } from "@/core/quiz";
 import { getCurrentUser } from "@/lib/server/auth";
 import { clearAttemptRecords, DataValidationError, deleteAttemptRecord, saveAttemptRecord } from "@/lib/server/data";
 import { isCloudDataValidationError, parseCloudSubmission } from "@/lib/server/cloud-data-schema";
-import { assertTrustedMutation, error, json, readJson } from "@/lib/server/http";
+import { assertExpectedAccount, assertTrustedMutation, error, json, readJson } from "@/lib/server/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,6 +13,8 @@ export async function POST(request: Request) {
   if (trustedError) return trustedError;
   const user = await getCurrentUser();
   if (!user) return error("请先登录", 401, "UNAUTHORIZED");
+  const accountError = assertExpectedAccount(request, user.id);
+  if (accountError) return accountError;
 
   try {
     const input = parseCloudSubmission(await readJson(request, 64_000));
@@ -42,6 +44,8 @@ export async function DELETE(request: Request) {
   if (trustedError) return trustedError;
   const user = await getCurrentUser();
   if (!user) return error("请先登录", 401, "UNAUTHORIZED");
+  const accountError = assertExpectedAccount(request, user.id);
+  if (accountError) return accountError;
 
   const id = new URL(request.url).searchParams.get("id");
   if (id !== null) {

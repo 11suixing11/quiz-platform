@@ -178,6 +178,28 @@
 .atlas-account-input { min-height: 2.9rem; width: 100%; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); border-radius: .5rem; background: color-mix(in srgb, var(--paper) 92%, white 8%); padding: .7rem .8rem; color: var(--ink); font-size: .9rem; font-weight: 400; outline: none; transition: border-color .18s ease, box-shadow .18s ease; }
 .dark .atlas-account-input { background: color-mix(in srgb, var(--night) 90%, white 5%); }
 .atlas-account-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+.profile-panel { border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); padding: 1.75rem 0 1.1rem; }
+.profile-summary { display: flex; align-items: flex-start; gap: 1.25rem; }
+.profile-avatar-wrap { position: relative; flex: 0 0 auto; }
+.profile-avatar { display: grid; width: 5.5rem; height: 5.5rem; place-items: center; overflow: hidden; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, var(--paper)); color: var(--accent); font-size: .875rem; font-weight: 780; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar-action { position: absolute; right: -.35rem; bottom: -.35rem; display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 3px solid var(--paper); border-radius: 50%; background: var(--accent); color: var(--paper); }
+.dark .profile-avatar-action { border-color: var(--night); }
+.profile-bio { margin-top: 1.15rem; max-width: 58ch; font-size: .9rem; line-height: 1.7; }
+.profile-tags { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .85rem; }
+.profile-tags > span:not(.profile-tag-empty), .profile-tag-edit { display: inline-flex; min-height: 1.9rem; align-items: center; gap: .3rem; border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); padding: .32rem .68rem; color: var(--accent); font-size: .78rem; font-weight: 700; }
+.profile-tag-empty { color: color-mix(in srgb, var(--ink) 40%, transparent); font-size: .78rem; }
+.profile-form { margin-top: 1.6rem; border-top: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); padding-top: 1.5rem; }
+.profile-tag-editor { display: flex; min-height: 3rem; flex-wrap: wrap; align-items: center; gap: .4rem; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, var(--paper) 92%, white 8%); padding: .45rem; }
+.dark .profile-tag-editor { background: color-mix(in srgb, var(--night) 90%, white 5%); }
+.profile-tag-editor:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+.profile-tag-edit button, .profile-add-tag { display: grid; min-width: 1.75rem; min-height: 1.75rem; place-items: center; border-radius: 50%; }
+.profile-tag-edit button:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.profile-tag-editor input { min-width: 7rem; flex: 1; border: 0; background: transparent; padding: .35rem; font-size: .85rem; outline: none; }
+.profile-add-tag { color: var(--accent); }
+.profile-add-tag:disabled { cursor: not-allowed; opacity: .35; }
+.profile-feedback { min-height: 2.35rem; margin-top: .7rem; padding-top: .55rem; color: color-mix(in srgb, var(--ink) 42%, transparent); font-size: .78rem; }
+.profile-feedback.is-visible { color: var(--accent); }
 .atlas-sync-summary { display: flex; min-height: 4.5rem; flex-direction: column; justify-content: space-between; gap: .65rem; border-top: 1px solid var(--soft-line); border-bottom: 1px solid var(--soft-line); padding: .75rem 0; }
 .atlas-sync-summary span { color: var(--muted-text); font-size: .7rem; font-weight: 700; }
 .atlas-sync-summary strong { color: var(--ink); font-size: .8rem; font-weight: 750; line-height: 1.6; }
@@ -198,6 +220,7 @@
   .skip-link { transition: none; }
 }
 @media (max-width: 640px) { .atlas-return-strip { align-items: flex-start; flex-direction: column; } .atlas-inline-action { margin-left: 3.1rem; } .atlas-section-title { font-size: 2.7rem; } }
+@media (max-width: 640px) { .profile-summary { gap: 1rem; } .profile-avatar { width: 4.5rem; height: 4.5rem; } .profile-summary .atlas-secondary-action { width: 100%; justify-content: center; margin-top: .9rem; } }
 
 @media print {
   .atlas-header, nav, button, .atlas-primary-action, .atlas-secondary-action { display: none !important; }

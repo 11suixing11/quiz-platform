@@ -85,7 +85,7 @@ export default function HomePage() {
               <a href="#routes" className="wellness-primary-action"><span>{localized(language, "开始测评", "Start an assessment")}</span><MoveRight className="size-4" aria-hidden="true" /></a>
               <Link href="/history/" className="wellness-secondary-action"><History className="size-4" aria-hidden="true" />{localized(language, "查看记录", "View history")}</Link>
             </div>
-            <div className="wellness-trust-note"><ShieldCheck className="size-4" aria-hidden="true" /><span>{localized(language, "仅供自我反思，不是诊断；游客数据留在本机，登录后由你选择是否同步。", "For self-reflection, not diagnosis. Guest data stays on this device; sync is your choice after sign-in.")}</span></div>
+            <div className="wellness-trust-note"><ShieldCheck className="size-4" aria-hidden="true" /><span>{localized(language, "仅供自我反思，不是诊断；游客数据留在本机，登录后自动与账号合并同步。", "For self-reflection, not diagnosis. Guest data stays on this device; signing in merges and syncs it with your account.")}</span></div>
           </div>
 
           <aside id="checkin" className="wellness-checkin scroll-mt-8" aria-label={localized(language, "选择测评主题", "Choose an assessment subject")}>
@@ -104,7 +104,7 @@ export default function HomePage() {
               ))}
             </div>
             <a href="#routes" className="wellness-checkin-more">{localized(language, "查看全部测评", "See all assessments")}<ArrowUpRight className="size-3.5" aria-hidden="true" /></a>
-            <div className="wellness-sheet-note"><span className="wellness-sheet-dot" aria-hidden="true" />{localized(language, "本地优先 · 可选账号同步", "Local first · Optional account sync")}</div>
+            <div className="wellness-sheet-note"><span className="wellness-sheet-dot" aria-hidden="true" />{localized(language, "本地优先 · 登录后自动同步", "Local first · Automatic sync after sign-in")}</div>
           </aside>
         </section>
 
