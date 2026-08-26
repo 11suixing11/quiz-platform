@@ -40,7 +40,7 @@
 
 答案很简单：**隐私**。
 
-当你的网站没有服务器，你就不可能收集用户数据。这不是靠隐私政策承诺的，而是架构层面保证的。
+当产品没有应用后端时，测试答案和结果就没有可提交的服务端入口。托管层只负责提供静态文件；应用没有数据库、账号系统或产品分析接口，个人记录仍只保存在浏览器中。这不是只靠隐私政策承诺，而是由产品架构限定的。
 
 ```ts
 // next.config.ts
@@ -49,20 +49,20 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "export",        // 关键：导出为静态文件
   images: {
-    unoptimized: true,     // GitHub Pages 不支持图片优化
+    unoptimized: true,     // 静态导出没有运行时图片优化服务
   },
-  trailingSlash: true,     // 兼容 GitHub Pages 路由
+  trailingSlash: true,     // 便于静态文件服务器映射目录路由
 };
 
 export default nextConfig;
 ```
 
-三行配置搞定。`next build` 之后，`out/` 目录里就是完整的静态站点，直接丢到 GitHub Pages 就能跑。
+三行配置搞定。`next build` 之后，`out/` 目录里就是完整的静态站点。当前部署把这个目录作为发布产物，由自有 VPS 上的 Caddy 直接托管。
 
 好处：
-- **零服务器成本**：GitHub Pages 免费托管
-- **全球 CDN**：GitHub 自带分发
-- **零维护**：没有后端就不会挂
+- **发布内容可审计**：线上内容就是构建生成的 `out/` 目录
+- **交付边界明确**：Caddy 负责静态文件路由和 HTTPS
+- **应用维护面小**：没有账号、数据库、产品分析或 API 后端服务
 
 ### 100+ 个测试的加载策略：动态 import 注册表
 
@@ -439,7 +439,7 @@ export function RadarChart({ dimensions, accentColor = "#6B5B95", size = 280 }: 
 
 整个平台的"后端"就是 localStorage。测试结果、语言偏好、测试历史——全在客户端。
 
-这能 work 是因为场景本身就是单用户、本地的。你不需要服务器来记住你是个 INFJ。
+这能 work 是因为场景本身就是单用户、本地的。你不需要应用后端来记住你是个 INFJ。
 
 ### 4. Next.js 16 的 App Router 很香
 

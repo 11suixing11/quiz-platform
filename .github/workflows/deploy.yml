@@ -1,25 +1,17 @@
-name: Deploy static site
+name: Validate static site
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,18 +26,13 @@ jobs:
         run: npm audit --audit-level=high
       - name: Lint
         run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
       - name: Validate registry and scoring
         run: npm test
       - name: Audit flagship routes
         run: npm run audit:flagship
+      - name: Accessibility audit
+        run: npm run audit:a11y
       - name: Build static export
         run: npm run build
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

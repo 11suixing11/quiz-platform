@@ -13,7 +13,7 @@
 - **中英双语**：中文与 English 共用同一套导航、状态和数据模型
 - **本地优先**：无账号、无后端、无云同步；结果保存在当前浏览器
 - **可携带数据**：设置页支持 v3 JSON 导入、导出、合并、替换和清空
-- **静态部署**：Next.js 静态导出，通过 GitHub Pages 发布到 `https://loveuu.xyz/`
+- **静态部署**：Next.js 静态导出，由自有服务器上的 Caddy 发布到 `https://loveuu.xyz/`
 
 ## 体验路线
 
@@ -37,7 +37,7 @@
 - Tailwind CSS v4 + 原生 CSS tokens
 - Framer Motion（仅用于答题与结果中的必要过渡）
 - lucide-react
-- GitHub Pages + GitHub Actions
+- 自有 VPS + Caddy 静态托管；GitHub Actions 仅用于验证
 
 ## 目录结构
 
@@ -99,7 +99,7 @@ npm run start
 
 `audit:flagship` 只审阅首页的 16 个旗舰测试，不会把“能运行”误认为“已达到推荐质量”。当前 16 个旗舰入口均已通过 ready 门槛。
 
-静态构建产物位于 `out/`，预览服务由 `scripts/serve-static.mjs` 提供。
+静态构建产物位于 `out/`。生产环境由 Caddy 直接托管 `out/`，`scripts/serve-static.mjs` 仅用于本地预览。
 
 ## 添加测试
 

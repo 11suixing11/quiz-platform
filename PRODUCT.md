@@ -20,7 +20,7 @@ The product is a local-first self-reflection companion: it opens with a small, r
 
 ## Operating Context
 
-- Static web application deployed to GitHub Pages.
+- Static web application served by Caddy on a self-managed VPS.
 - No account, backend, database, or cloud sync.
 - Users may take a test in one sitting or resume an unfinished session.
 - Results, history, bookmarks, language, theme, and backups live in the current browser.

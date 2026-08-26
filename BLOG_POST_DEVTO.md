@@ -42,9 +42,9 @@ I wanted to flip every one of those assumptions.
 
 ## The Solution: Local-First, Privacy-Respecting
 
-The core philosophy is simple: **no server, no data collection, no accounts**.
+The core philosophy is simple: **no application backend, no product analytics, no accounts**.
 
-The entire platform is a static site deployed on GitHub Pages. Your test results live in `localStorage` on your own device. There's no backend, no database, no analytics tracking you across sessions. This isn't just a technical decision — it's an ethical one.
+The entire platform is exported as static files and served by Caddy on a self-hosted VPS. Your test results live in `localStorage` on your own device. There's no application backend, no database, no account system, and no product analytics tracking you across sessions. The hosting layer serves files, but quiz answers and results never become application requests.
 
 > "This isn't a diagnosis — it's a mirror to help you get closer to yourself."
 
@@ -63,7 +63,7 @@ Shadcn UI
 TypeScript
 ```
 
-### Static Export for GitHub Pages
+### Static Export Behind Caddy
 
 The entire site exports as static HTML/CSS/JS. Here's the `next.config.ts`:
 
@@ -72,17 +72,17 @@ The entire site exports as static HTML/CSS/JS. Here's the `next.config.ts`:
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  output: "export", // Generate deployable HTML/CSS/JS files
   images: {
-    unoptimized: true,
+    unoptimized: true, // A static export has no runtime image optimizer
   },
-  trailingSlash: true,
+  trailingSlash: true, // Map routes to directory/index.html on a static file server
 };
 
 export default nextConfig;
 ```
 
-Three lines of config. That's it. Next.js handles the rest — static generation of every test page, every result page, and the sitemap.
+Three lines of config. That's it. Next.js handles the rest — static generation of every test page, every result page, and the sitemap. The generated `out/` directory is the complete release artifact that Caddy serves from the VPS.
 
 ### 100+ Quiz Modules with Lazy Loading
 
@@ -189,12 +189,12 @@ Why? Because quiz state is inherently ephemeral. You take a test, see results, m
 
 ### Why Static Export? Privacy as a Feature
 
-When you have no server, you **can't** collect user data. There's no analytics endpoint, no session cookies, no user profiles. This is privacy by architecture, not by policy.
+With no application backend, there is nowhere in the product to submit quiz answers or results. There is no analytics endpoint, no session cookie, and no user profile. The application state stays in the browser by architecture rather than relying only on a policy promise.
 
 It also means:
-- **Zero hosting costs**: GitHub Pages is free
-- **Global CDN**: GitHub's infrastructure handles distribution
-- **No backend to maintain**: One less thing to break at 3 AM
+- **Auditable releases**: The deployed artifact is the generated `out/` directory
+- **Explicit delivery**: Caddy owns static-file routing and HTTPS on the self-hosted VPS
+- **No application backend to maintain**: No account, database, analytics, or API service sits behind the quizzes
 
 ### How 100+ Quizzes Stay Performant: Code Splitting
 
@@ -320,7 +320,7 @@ If I had built this English-only and tried to add Chinese later, I'd be refactor
 
 The entire "backend" of this platform is `localStorage`. Test results, language preferences, test history — it all lives client-side. The history page scans localStorage for all `quiz-result-*` keys and renders a timeline of your self-discovery journey.
 
-This works because the use case is inherently single-user and local. You don't need a server to remember that you're an INFJ who scored high on empathy.
+This works because the use case is inherently single-user and local. You don't need an application backend to remember that you're an INFJ who scored high on empathy.
 
 ### Framer Motion Is Worth It
 

@@ -11,7 +11,7 @@
 - [x] 切换到 know-yourself:v3 本地 snapshot
 - [x] 仅保留中文与 English
 - [x] 移除 secondary routes 与旧 URL 兼容
-- [x] 保持 GitHub Pages 静态导出
+- [x] 保持 Next.js 静态导出，由自有 VPS 上的 Caddy 托管；GitHub Actions 仅做验证
 
 ## 下一步（仍在当前边界内）
 

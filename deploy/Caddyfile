@@ -1,0 +1,26 @@
+loveuu.xyz, beta.loveuu.xyz {
+	root * /srv/quiz-platform/current
+	encode gzip
+
+	header {
+		-Server
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Strict-Transport-Security "max-age=31536000"
+		X-Frame-Options "DENY"
+	}
+
+	@immutable path /_next/static/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	@health path /healthz
+	respond @health "ok" 200
+
+	try_files {path} {path}/ {path}.html
+	file_server
+}
+
+www.loveuu.xyz {
+	redir https://loveuu.xyz{uri} permanent
+}
