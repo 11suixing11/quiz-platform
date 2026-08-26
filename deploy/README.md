@@ -105,9 +105,8 @@ For `loveyourself.cc.cd`, add these records at its authoritative DNS provider
   environment.
 
 During the DNS transition, `loveuu.xyz` remains available as a compatibility
-origin. Once the new apex and `www` records resolve and Caddy has obtained both
-certificates, the old apex can be changed to a permanent redirect in
-`deploy/Caddyfile` if desired.
+origin and now permanently redirects to `loveyourself.cc.cd`; the old beta
+host remains available for no-index origin smoke checks.
 
 ## Verify and roll back
 

@@ -15,7 +15,7 @@
 	}
 }
 
-loveyourself.cc.cd, loveuu.xyz, beta.loveuu.xyz {
+loveyourself.cc.cd, beta.loveuu.xyz {
 	import tls_compat
 	root * /srv/quiz-platform/releases/current
 	encode gzip
@@ -47,10 +47,10 @@ www.loveyourself.cc.cd {
 	redir https://loveyourself.cc.cd{uri} permanent
 }
 
-www.loveuu.xyz {
+loveuu.xyz, www.loveuu.xyz {
 	import tls_compat
 	import security_headers
-	redir https://loveuu.xyz{uri} permanent
+	redir https://loveyourself.cc.cd{uri} permanent
 }
 
 quiz.107-151-246-167.sslip.io {
