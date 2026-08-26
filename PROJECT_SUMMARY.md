@@ -1,10 +1,10 @@
 ﻿# 认识你自己 | Know Yourself — 重构摘要
 
-**更新：2026 年 8 月 20 日**
+**更新：2026 年 8 月 27 日**
 
 ## 产品定位
 
-这是一个面向中文与 English 用户的本地优先自我反思平台。它不要求用户先定义自己，而是从一个当下的问题或方向开始，完成一项测试，再把结果带回真实生活。
+这是一个面向中文与 English 用户的本地优先自我反思平台。它不要求用户先定义自己，而是从一个当下的问题或方向开始，完成一项测试，再把结果带回真实生活。游客无需账号；注册后可明确选择是否同步自己的数据。
 
 ## 第一版范围
 
@@ -14,6 +14,8 @@
 - 结果、反思引导、分享与重新测试
 - 历史、收藏、语言、主题
 - v3 本地数据导入 / 导出 / 清空
+- 邮箱密码注册、登录、退出和账号删除
+- 首次登录后的可选云同步（合并本机、只使用云端或暂不同步）
 - 隐私说明
 
 不再生成 analytics、dashboard、stats、trends、compare、compat 等 secondary routes，也不兼容旧 URL。
@@ -40,20 +42,27 @@
 
 新的 snapshot key 为 `know-yourself:v3`，结构包括 preferences、attempts、bookmarks、sessions。旧 v1 / v2 命名空间不会被读取或迁移。设置页提供合并与替换两种导入方式。
 
+### 账号与同步
+
+账号由自托管 Next.js 服务和 SQLite 数据库支持。注册或登录不会自动上传
+当前设备数据；首次登录后，用户必须选择合并本机与云端、只使用云端或暂不
+同步。登录后可验证当前密码并设置新密码，改密会撤销其他设备会话；当前不
+提供忘记密码邮件找回流程。
+
 ## 视觉系统
 
 当前方向是 **cartographer field atlas**：paper / ink / muted teal；等高线、路线、地图标记贯穿首页、答题和结果；整体低噪声、可访问、减少卡片模板感。
 
 ## 部署方式
 
-Next.js 以静态导出生成 `out/`，生产环境由自有服务器上的 Caddy 直接托管；GitHub Actions 通过受限部署用户发布已验证的 release；域名为 `https://loveyourself.cc.cd/`。浏览器本地存储模型不变，迁移不会上传或搬运用户历史记录。
+Next.js 生成 standalone 运行时，生产环境由自有服务器上的 Node 服务处理页面和 `/api/*`，Caddy 提供 HTTPS 并反向代理；GitHub Actions 通过受限部署用户发布已验证的 release；域名为 `https://loveyourself.cc.cd/`。浏览器仍保持本地优先，历史数据不会在用户明确选择同步前上传。
 
 ## 验证基线
 
 - registry：193 个内部测试模块，16 条公开旗舰路线
 - scoring：10,212 个答案边界场景
 - storage：v3 snapshot、历史、收藏、会话、导入导出、旧命名空间隔离
-- static build：57 个静态页面（16 × 3 + 核心静态页）
+- standalone build：包含 Node 服务、静态资源和 `better-sqlite3` Linux 原生模块
 
 ## 当前维护入口
 

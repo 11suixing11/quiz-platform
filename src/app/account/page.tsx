@@ -7,6 +7,7 @@ import {
   Cloud,
   CloudOff,
   DatabaseBackup,
+  KeyRound,
   LogIn,
   LogOut,
   RefreshCw,
@@ -18,10 +19,11 @@ import { useAccount, type SyncChoice } from "@/components/account-provider";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { useAttempts, useBookmarks, useLanguage } from "@/hooks/use-local-storage";
 import { readSnapshot, STORAGE_EVENT } from "@/lib/storage";
-import { deleteAccount, deleteCloudData, loginAccount, registerAccount } from "@/lib/account";
+import { changePassword, deleteAccount, deleteCloudData, loginAccount, registerAccount } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register";
+type PasswordFeedback = { tone: "success" | "error"; message: string } | null;
 
 function readableError(error: unknown, language: "zh" | "en") {
   const message = error instanceof Error ? error.message : "";
@@ -29,7 +31,10 @@ function readableError(error: unknown, language: "zh" | "en") {
   if (normalized.includes("INVALID_EMAIL_OR_PASSWORD")) return language === "zh" ? "邮箱或密码不正确。" : "The email or password is incorrect.";
   if (normalized.includes("USER_ALREADY_EXISTS")) return language === "zh" ? "这个邮箱已经注册，可以直接登录。" : "This email is already registered. Sign in instead.";
   if (normalized.includes("PASSWORD_TOO_SHORT")) return language === "zh" ? "密码至少需要 10 个字符。" : "Use at least 10 characters for your password.";
+  if (normalized.includes("PASSWORD_TOO_LONG")) return language === "zh" ? "密码不能超过 128 个字符。" : "Use no more than 128 characters for your password.";
   if (normalized.includes("INVALID_PASSWORD")) return language === "zh" ? "密码不正确。" : "The password is incorrect.";
+  if (normalized.includes("RATE_LIMIT") || normalized.includes("TOO_MANY_REQUESTS")) return language === "zh" ? "操作过于频繁，请稍后再试。" : "Too many attempts. Please try again later.";
+  if (normalized.includes("UNAUTHORIZED") || normalized.includes("NOT_AUTHENTICATED") || normalized.includes("FAILED_TO_GET_SESSION")) return language === "zh" ? "登录状态已失效，请重新登录。" : "Your session has expired. Please sign in again.";
   if (normalized.includes("INVALID_NAME")) return language === "zh" ? "显示名称需要为 1 至 80 个字符。" : "Use 1 to 80 characters for your display name.";
   return message || (language === "zh" ? "操作失败，请稍后重试。" : "The request failed. Please try again.");
 }
@@ -54,6 +59,10 @@ export default function AccountPage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordFeedback, setPasswordFeedback] = useState<PasswordFeedback>(null);
   const [deletePassword, setDeletePassword] = useState("");
   const [action, setAction] = useState<string | null>(null);
   const [feedback, setFeedback] = useState("");
@@ -152,6 +161,38 @@ export default function AccountPage() {
     }
   };
 
+  const updatePassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPasswordFeedback(null);
+    if (newPassword.length < 10) {
+      setPasswordFeedback({ tone: "error", message: zh ? "新密码至少需要 10 个字符。" : "Use at least 10 characters for your new password." });
+      return;
+    }
+    if (newPassword.length > 128) {
+      setPasswordFeedback({ tone: "error", message: zh ? "新密码不能超过 128 个字符。" : "Use no more than 128 characters for your new password." });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordFeedback({ tone: "error", message: zh ? "两次输入的新密码不一致。" : "The new passwords do not match." });
+      return;
+    }
+    setAction("change-password");
+    try {
+      await changePassword({ currentPassword, newPassword, revokeOtherSessions: true });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setPasswordFeedback({
+        tone: "success",
+        message: zh ? "密码已修改。当前设备保持登录，其他设备已退出登录。" : "Password changed. This device remains signed in; other devices have been signed out.",
+      });
+    } catch (error) {
+      setPasswordFeedback({ tone: "error", message: readableError(error, language) });
+    } finally {
+      setAction(null);
+    }
+  };
+
   const removeAccount = async () => {
     if (!confirmAccountDelete) {
       setConfirmAccountDelete(true);
@@ -237,6 +278,31 @@ export default function AccountPage() {
                 {cloudSyncEnabled && <button type="button" onClick={() => void syncNow()} disabled={busy || syncState === "syncing"} className="atlas-secondary-action justify-center disabled:opacity-45"><RefreshCw className={cn("size-4", syncState === "syncing" && "animate-spin")} aria-hidden="true" />{zh ? "立即同步" : "Sync now"}</button>}
                 <button type="button" onClick={() => void signOut()} disabled={busy} className="atlas-secondary-action justify-center disabled:opacity-45"><LogOut className="size-4" aria-hidden="true" />{zh ? "退出登录" : "Sign out"}</button>
               </div>
+            </section>
+
+            <section className="atlas-settings-section mt-10" aria-labelledby="password-heading">
+              <h2 id="password-heading" className="text-xl font-semibold">{zh ? "账号安全" : "Account security"}</h2>
+              <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "修改密码后，当前设备保持登录，其他设备会退出登录。" : "After changing your password, this device stays signed in and other devices are signed out."}</p>
+              <form onSubmit={updatePassword} className="mt-5 max-w-md space-y-4">
+                <label className="block text-sm font-semibold">
+                  <span>{zh ? "当前密码" : "Current password"}</span>
+                  <input aria-label={zh ? "当前密码" : "Current password"} value={currentPassword} onChange={(event) => { setCurrentPassword(event.target.value); setPasswordFeedback(null); }} name="current-password" type="password" autoComplete="current-password" required className="atlas-account-input mt-2" />
+                </label>
+                <label className="block text-sm font-semibold">
+                  <span>{zh ? "新密码" : "New password"}</span>
+                  <input aria-label={zh ? "新密码" : "New password"} value={newPassword} onChange={(event) => { setNewPassword(event.target.value); setPasswordFeedback(null); }} name="new-password" type="password" minLength={10} maxLength={128} autoComplete="new-password" required className="atlas-account-input mt-2" />
+                  <span className="mt-2 block text-xs font-normal text-ink/45 dark:text-white/45">{zh ? "10 至 128 个字符" : "10 to 128 characters"}</span>
+                </label>
+                <label className="block text-sm font-semibold">
+                  <span>{zh ? "确认新密码" : "Confirm new password"}</span>
+                  <input aria-label={zh ? "确认新密码" : "Confirm new password"} value={confirmNewPassword} onChange={(event) => { setConfirmNewPassword(event.target.value); setPasswordFeedback(null); }} name="confirm-new-password" type="password" minLength={10} maxLength={128} autoComplete="new-password" required className="atlas-account-input mt-2" />
+                </label>
+                <button type="submit" disabled={busy} className="atlas-secondary-action justify-center disabled:cursor-not-allowed disabled:opacity-45">
+                  <KeyRound className="size-4" aria-hidden="true" />
+                  {action === "change-password" ? (zh ? "正在修改…" : "Changing…") : (zh ? "修改密码" : "Change password")}
+                </button>
+                {passwordFeedback && <p className={cn("text-sm leading-6", passwordFeedback.tone === "error" ? "text-[#a53f3f] dark:text-red-200" : "text-accent")} role={passwordFeedback.tone === "error" ? "alert" : "status"}>{passwordFeedback.message}</p>}
+              </form>
             </section>
 
             <section className="atlas-settings-section mt-10" aria-labelledby="cloud-data-heading">

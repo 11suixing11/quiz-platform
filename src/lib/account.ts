@@ -40,6 +40,17 @@ interface QuizResponse {
   attempt: StorageSnapshot["attempts"][number];
 }
 
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+  /** Invalidate every other signed-in device after the password changes. */
+  revokeOtherSessions?: boolean;
+}
+
+export interface ChangePasswordResponse {
+  user: AccountUser;
+}
+
 export type SyncChoice = "merge" | "cloud" | "local";
 
 function mapUser(value: BetterAuthUser | null | undefined): AccountUser | null {
@@ -106,6 +117,24 @@ export async function logoutAccount() {
   }));
   notifyAuthSessionChanged();
   return payload;
+}
+
+/** Change the credential password and, by default, sign out other devices. */
+export async function changePassword(input: ChangePasswordInput): Promise<ChangePasswordResponse> {
+  const payload = await responseJson<{ user: BetterAuthUser }>(await fetch("/api/auth/change-password", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      currentPassword: input.currentPassword,
+      newPassword: input.newPassword,
+      revokeOtherSessions: input.revokeOtherSessions ?? true,
+    }),
+  }));
+  const user = mapUser(payload.user);
+  if (!user) throw new Error("账号响应无效");
+  notifyAuthSessionChanged();
+  return { user };
 }
 
 export async function getCloudSnapshot() {
