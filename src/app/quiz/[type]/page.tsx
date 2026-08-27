@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import QuizEngine from "@/components/quiz/quiz-engine";
 import { getQuizEntry, QUIZ_IDS } from "@/core/quiz";
+import { PRIVATE_PAGE_METADATA } from "@/lib/site-config";
 
 export const dynamicParams = false;
 
@@ -14,9 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
   const entry = getQuizEntry(type);
   if (!entry) notFound();
   return {
+    ...PRIVATE_PAGE_METADATA,
     title: { absolute: `${entry.title.zh} | 开始测评` },
-    robots: { index: false, follow: false },
-    alternates: { canonical: null },
   };
 }
 
