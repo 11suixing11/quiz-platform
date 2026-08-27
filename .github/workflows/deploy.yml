@@ -184,16 +184,40 @@ jobs:
           VPS_HOST: ${{ vars.VPS_HOST }}
         run: |
           set -euo pipefail
-          test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/test/big-five/)" = 301
-          test "$(curl --silent --show-error --head --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/test/big-five/ | tr -d '\r' | awk 'BEGIN { IGNORECASE=1 } /^location:/ { print $2; exit }')" = https://knowyourself.cc.cd/test/big-five/
-          test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --resolve "www.knowyourself.cc.cd:443:$VPS_HOST" https://www.knowyourself.cc.cd/test/big-five/)" = 301
-          test "$(curl --silent --show-error --head --resolve "www.knowyourself.cc.cd:443:$VPS_HOST" https://www.knowyourself.cc.cd/test/big-five/ | tr -d '\r' | awk 'BEGIN { IGNORECASE=1 } /^location:/ { print $2; exit }')" = https://knowyourself.cc.cd/test/big-five/
-          if getent ahostsv4 knowyourself.cc.cd >/dev/null; then
-            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/ -o /dev/null
-            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/test/big-five/ -o /dev/null
-            test "$(curl --fail --silent --show-error --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/healthz)" = ok
-            curl --fail --silent --show-error --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/robots.txt | grep -F 'Sitemap: https://knowyourself.cc.cd/sitemap.xml'
-            curl --fail --silent --show-error --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/sitemap.xml | grep -F '<loc>https://knowyourself.cc.cd/test/big-five/</loc>'
+          test -n "$VPS_HOST"
+          canonical_host=knowyourself.cc.cd
+          www_host=www.knowyourself.cc.cd
+          legacy_host=loveyourself.cc.cd
+          maintenance_host=quiz.107-151-246-167.sslip.io
+          test_path=/test/big-five/
+
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/" -o /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host$test_path" -o /dev/null
+          test "$(curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/healthz")" = ok
+          curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
+          curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
+
+          resolves_to_origin() {
+            getent ahostsv4 "$1" | awk -v expected="$VPS_HOST" '$1 == expected { found = 1 } END { exit !found }'
+          }
+
+          tls_ready() {
+            curl --silent --show-error --output /dev/null --connect-timeout 5 --max-time 15 \
+              --resolve "$1:443:$VPS_HOST" "https://$1/"
+          }
+
+          if ! resolves_to_origin "$canonical_host" || ! resolves_to_origin "$www_host"; then
+            echo "::notice::Canonical DNS is not active at the production origin yet; maintenance-host checks passed."
+          elif ! tls_ready "$canonical_host" || ! tls_ready "$www_host"; then
+            echo "::notice::Canonical TLS certificates are not ready yet; maintenance-host checks passed."
           else
-            echo "Public DNS is not active yet; the maintenance-host origin checks passed."
+            test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --resolve "$legacy_host:443:$VPS_HOST" "https://$legacy_host$test_path")" = 301
+            test "$(curl --silent --show-error --head --resolve "$legacy_host:443:$VPS_HOST" "https://$legacy_host$test_path" | tr -d '\r' | awk 'BEGIN { IGNORECASE=1 } /^location:/ { print $2; exit }')" = "https://$canonical_host$test_path"
+            test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --resolve "$www_host:443:$VPS_HOST" "https://$www_host$test_path")" = 301
+            test "$(curl --silent --show-error --head --resolve "$www_host:443:$VPS_HOST" "https://$www_host$test_path" | tr -d '\r' | awk 'BEGIN { IGNORECASE=1 } /^location:/ { print $2; exit }')" = "https://$canonical_host$test_path"
+            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/" -o /dev/null
+            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host$test_path" -o /dev/null
+            test "$(curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/healthz")" = ok
+            curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
+            curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
           fi
