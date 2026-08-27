@@ -4,15 +4,21 @@ import Link from "next/link";
 import { Check, LockKeyhole, X } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "@/components/account-provider";
-import { publishCommunityPost } from "@/lib/community";
+import { CommunityApiError, publishCommunityPost } from "@/lib/community";
+import { submitCloudQuiz } from "@/lib/account";
+import { replaceAttempt } from "@/lib/storage";
 import type { Lang } from "@/core/quiz";
 
-export function CommunityComposer({ attemptId, testName, resultTitle, summary, language, onClose }: {
+export function CommunityComposer({ attemptId, testId, answers, testName, resultTitle, summary, language, syncNow, onAttemptSynced, onClose }: {
   attemptId: string;
+  testId: string;
+  answers?: number[];
   testName: string;
   resultTitle: string;
   summary: Array<{ label: string; value: string }>;
   language: Lang;
+  syncNow: () => Promise<void>;
+  onAttemptSynced: (attemptId: string) => void;
   onClose: () => void;
 }) {
   const { user, profile } = useAccount();
@@ -32,7 +38,21 @@ export function CommunityComposer({ attemptId, testName, resultTitle, summary, l
   const submit = async () => {
     if (!reflection.trim() || !confirmed || busy) return;
     setBusy(true); setError("");
-    try { await publishCommunityPost(user.id, { attemptId, reflection, showResultType, showDimensions, showAvatar, allowComments }); setDone(true); }
+    try {
+      await syncNow();
+      let publishAttemptId = attemptId;
+      try {
+        await publishCommunityPost(user.id, { attemptId: publishAttemptId, reflection, showResultType, showDimensions, showAvatar, allowComments });
+      } catch (cause) {
+        if (!(cause instanceof CommunityApiError) || cause.code !== "ATTEMPT_NOT_FOUND" || !answers?.length) throw cause;
+        const synced = await submitCloudQuiz(user.id, testId, answers);
+        const localAttempt = replaceAttempt(attemptId, { ...synced.attempt, answers });
+        publishAttemptId = localAttempt?.id ?? synced.attempt.id;
+        onAttemptSynced(publishAttemptId);
+        await publishCommunityPost(user.id, { attemptId: publishAttemptId, reflection, showResultType, showDimensions, showAvatar, allowComments });
+      }
+      setDone(true);
+    }
     catch (cause) { setError(cause instanceof Error ? cause.message : (language === "zh" ? "暂时无法发布" : "Unable to publish")); }
     finally { setBusy(false); }
   };

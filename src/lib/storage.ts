@@ -488,6 +488,18 @@ export function saveAttempt(input: Omit<QuizAttempt, "id"> & { id?: string }) {
   return attempt;
 }
 
+export function replaceAttempt(id: string, input: QuizAttempt) {
+  const attempt = normalizeAttempt(input);
+  if (!attempt) return null;
+  updateSnapshot((current) => ({
+    ...current,
+    attempts: current.attempts.some((item) => item.id === id)
+      ? current.attempts.map((item) => item.id === id ? attempt : item)
+      : [...current.attempts, attempt],
+  }));
+  return attempt;
+}
+
 export function setAttempts(attempts: QuizAttempt[]) {
   const valid = attempts.map(normalizeAttempt).filter((item): item is QuizAttempt => Boolean(item));
   updateSnapshot((current) => ({ ...current, attempts: valid }));

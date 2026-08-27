@@ -12,6 +12,7 @@ import { ReflectionGuide } from "@/components/result/reflection-guide";
 import { ResultDetails } from "@/components/result/result-details";
 import { useLanguage } from "@/hooks/use-local-storage";
 import { getAttemptById, getLatestAttempt } from "@/lib/storage";
+import { copyOrShare } from "@/lib/share";
 import { CommunityComposer } from "@/components/community/community-composer";
 import type { ArchetypeData, DimensionData, Lang, ScoreBand } from "@/core/quiz";
 
@@ -337,18 +338,23 @@ function getResultDetails(
 export default function ResultClient({ testId }: { testId: string }) {
   const router = useRouter();
   const { language } = useLanguage();
-  const { user, syncChoice, syncState } = useAccount();
+  const { user, syncChoice, syncState, syncNow } = useAccount();
   const [definition, setDefinition] = useState<QuizDefinition | null>(null);
   const [result, setResult] = useState<QuizResult | null>(null);
   const [attemptId, setAttemptId] = useState<string | null>(null);
+  const [attemptAnswers, setAttemptAnswers] = useState<number[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [shareError, setShareError] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
   const [syncWarning, setSyncWarning] = useState(false);
+  const [loadedAccountScope, setLoadedAccountScope] = useState<string | null>();
   const entry = getQuizEntry(testId);
+  const accountScope = user?.id ?? null;
 
   useEffect(() => {
+    if (syncState === "loading" || syncState === "syncing") return;
+
     let cancelled = false;
     loadQuizDefinition(testId).then((loaded) => {
       if (cancelled) return;
@@ -359,11 +365,17 @@ export default function ResultClient({ testId }: { testId: string }) {
       if (attempt?.testId === testId) {
         setResult(attempt.result);
         setAttemptId(attempt.id);
+        setAttemptAnswers(attempt.answers.length > 0 ? attempt.answers : null);
+      } else {
+        setResult(null);
+        setAttemptId(null);
+        setAttemptAnswers(null);
       }
+      setLoadedAccountScope(accountScope);
       setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [testId]);
+  }, [accountScope, syncChoice, syncState, testId]);
 
   const content = useMemo(() => {
     if (!definition || !result) return null;
@@ -425,19 +437,25 @@ export default function ResultClient({ testId }: { testId: string }) {
     const text = language === "zh"
       ? `我完成了「${entry.title.zh}」，结果是 ${content.title}。`
       : `I completed “${entry.title.en}” and got ${content.title}.`;
-    if (navigator.share) {
-      try { await navigator.share({ title: content.title, text, url }); return; } catch (error) { if (error instanceof DOMException && error.name === "AbortError") return; }
-    }
     try {
-      await navigator.clipboard.writeText(`${text} ${url}`);
-      setCopied(true);
+      const outcome = await copyOrShare(navigator, { title: content.title, text, url });
+      setCopied(outcome === "copied");
       window.setTimeout(() => setCopied(false), 2200);
     } catch {
       setShareError(true);
     }
   }, [content, entry, language, testId]);
 
-  if (loading) return <Loading language={language} />;
+  const handleAttemptSynced = useCallback((nextAttemptId: string) => {
+    setAttemptId(nextAttemptId);
+    setSyncWarning(false);
+    const nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set("attempt", nextAttemptId);
+    nextUrl.searchParams.delete("sync");
+    window.history.replaceState(window.history.state, "", nextUrl);
+  }, []);
+
+  if (loading || syncState === "loading" || loadedAccountScope !== accountScope) return <Loading language={language} />;
   if (!definition || !entry || !result || !content) {
     return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state mx-auto mt-16 max-w-lg"><h1 className="text-2xl font-semibold">{language === "zh" ? "还没有找到这次结果" : "No result found yet"}</h1><p className="mt-3 max-w-md text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? "先完成一次测评。游客结果保存在本机；登录后会自动同步，也能在其他登录设备查看。" : "Complete the assessment once. Guest results stay on this device; after sign-in they sync automatically and are available on your other signed-in devices."}</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><Link href={`/test/${testId}/`} className="atlas-primary-action justify-center">{language === "zh" ? "查看测评说明" : "View assessment details"}<ArrowRight className="size-4" /></Link><Link href="/" className="atlas-secondary-action justify-center">{language === "zh" ? "返回首页" : "Back home"}</Link></div></div></PageContainer></div>;
   }
@@ -506,7 +524,7 @@ export default function ResultClient({ testId }: { testId: string }) {
 
         <ReflectionGuide testId={testId} entry={entry} pattern={pattern} result={result} dimensions={definition.resultContent.dimensions} accentColor={accent} lang={language} />
 
-        {communityOpen && attemptId && <CommunityComposer attemptId={attemptId} testName={testName} resultTitle={content.title} summary={content.summary} language={language} onClose={() => setCommunityOpen(false)} />}
+        {communityOpen && attemptId && <CommunityComposer attemptId={attemptId} testId={testId} answers={attemptAnswers ?? undefined} testName={testName} resultTitle={content.title} summary={content.summary} language={language} syncNow={syncNow} onAttemptSynced={handleAttemptSynced} onClose={() => setCommunityOpen(false)} />}
         <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测评" : "Retake"}</button><button type="button" onClick={share} className="atlas-secondary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "复制分享链接" : "Copy share link")}</button><button type="button" onClick={() => setCommunityOpen(true)} className="atlas-primary-action flex-1 justify-center"><Share2 className="size-4" aria-hidden="true" />{language === "zh" ? "公开分享结果" : "Share publicly"}</button></section>
         <p id="share-status" className="mt-3 min-h-5 text-center text-xs text-ink/55 dark:text-white/55" role="status" aria-live="polite">{copied ? (language === "zh" ? "分享文字和链接已复制。" : "Share text and link copied.") : shareError ? (language === "zh" ? "暂时无法分享或复制，请稍后再试。" : "Sharing and clipboard access are unavailable. Please try again.") : ""}</p>
         <div className="mt-5 flex flex-col gap-3 text-center text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-center"><Link href="/history/" className="atlas-text-link justify-center">{language === "zh" ? "查看历史" : "View history"}</Link><span className="hidden sm:inline">/</span><Link href={`/test/${testId}/`} className="atlas-text-link justify-center">{language === "zh" ? "查看测评说明" : "Assessment details"}</Link></div>

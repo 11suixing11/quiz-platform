@@ -61,6 +61,11 @@ const dataManager = await compile("src/lib/data-manager.ts", { "./storage": stor
   storage.saveQuizSession("big-five", [1, null, 2], 1);
   assert.equal(storage.getAttempts().length, 1);
   assert.equal(storage.getAttemptById(attempt.id)?.testId, "mbti");
+  const replaced = storage.replaceAttempt(attempt.id, { id: "server:1:replacement", testId: "mbti", result: { type: "INFJ" }, answers: [1, 2], timestamp });
+  assert.equal(replaced?.id, "server:1:replacement");
+  assert.equal(storage.getAttemptById(attempt.id), null);
+  assert.equal(storage.getAttemptById("server:1:replacement")?.result.type, "INFJ");
+  assert.equal(storage.getAttempts().length, 1);
   assert.deepEqual(storage.getBookmarks(), ["mbti", "big-five"]);
   assert.deepEqual(storage.getPreferences(), { lang: "en", theme: "dark" });
   assert.deepEqual(storage.getQuizSession("big-five")?.answers, [1, null, 2]);
