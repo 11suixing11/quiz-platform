@@ -47,10 +47,10 @@ export function CommunityComposer({ attemptId, testName, resultTitle, summary, l
         <textarea id="community-reflection" rows={6} maxLength={500} value={reflection} onChange={(event) => setReflection(event.target.value)} placeholder={language === "zh" ? "写下你愿意公开的一点感受或发现…" : "Write one feeling or discovery you are comfortable making public…"} />
         <span className="community-field-status">{Array.from(reflection).length}/500</span>
         <fieldset><legend>{language === "zh" ? "公开选项" : "Public options"}</legend>
-          <label><input type="checkbox" checked={showResultType} onChange={(event) => setShowResultType(event.target.checked)} />{language === "zh" ? "显示结果类型" : "Show result type"}</label>
-          <label><input type="checkbox" checked={showDimensions} onChange={(event) => setShowDimensions(event.target.checked)} />{language === "zh" ? "显示维度或分数摘要" : "Show dimension or score summary"}</label>
-          <label><input type="checkbox" checked={showAvatar} onChange={(event) => setShowAvatar(event.target.checked)} />{language === "zh" ? "显示我的头像" : "Show my avatar"}</label>
-          <label><input type="checkbox" checked={allowComments} onChange={(event) => setAllowComments(event.target.checked)} />{language === "zh" ? "允许留言和回复" : "Allow responses and replies"}</label>
+          <label><input aria-label={language === "zh" ? "显示结果类型" : "Show result type"} type="checkbox" checked={showResultType} onChange={(event) => setShowResultType(event.target.checked)} />{language === "zh" ? "显示结果类型" : "Show result type"}</label>
+          <label><input aria-label={language === "zh" ? "显示维度或分数摘要" : "Show dimension or score summary"} type="checkbox" checked={showDimensions} onChange={(event) => setShowDimensions(event.target.checked)} />{language === "zh" ? "显示维度或分数摘要" : "Show dimension or score summary"}</label>
+          <label><input aria-label={language === "zh" ? "显示我的头像" : "Show my avatar"} type="checkbox" checked={showAvatar} onChange={(event) => setShowAvatar(event.target.checked)} />{language === "zh" ? "显示我的头像" : "Show my avatar"}</label>
+          <label><input aria-label={language === "zh" ? "允许留言和回复" : "Allow responses and replies"} type="checkbox" checked={allowComments} onChange={(event) => setAllowComments(event.target.checked)} />{language === "zh" ? "允许留言和回复" : "Allow responses and replies"}</label>
         </fieldset>
       </div>
       <aside aria-label={language === "zh" ? "公开预览" : "Public preview"}>
@@ -62,7 +62,7 @@ export function CommunityComposer({ attemptId, testName, resultTitle, summary, l
         <div className="community-private-note"><LockKeyhole />{language === "zh" ? "不会公开原始答案、邮箱和精确完成时间" : "Raw answers, email, and exact completion time stay private"}</div>
       </aside>
     </div>
-    <label className="community-confirm"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />{language === "zh" ? "我确认以上内容可以公开展示" : "I confirm that the content above can be shown publicly"}</label>
+    <label className="community-confirm"><input aria-label={language === "zh" ? "我确认以上内容可以公开展示" : "I confirm that the content above can be shown publicly"} type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />{language === "zh" ? "我确认以上内容可以公开展示" : "I confirm that the content above can be shown publicly"}</label>
     <div className="community-composer-actions"><span role="status">{error}</span><button className="atlas-secondary-action" onClick={onClose}>{language === "zh" ? "取消" : "Cancel"}</button><button className="atlas-primary-action" disabled={!reflection.trim() || !confirmed || busy} onClick={submit}>{busy ? (language === "zh" ? "发布中…" : "Publishing…") : (language === "zh" ? "发布到公共频道" : "Publish to Community")}</button></div>
   </section>;
 }
