@@ -12,6 +12,7 @@ import { ReflectionGuide } from "@/components/result/reflection-guide";
 import { ResultDetails } from "@/components/result/result-details";
 import { useLanguage } from "@/hooks/use-local-storage";
 import { getAttemptById, getLatestAttempt } from "@/lib/storage";
+import { CommunityComposer } from "@/components/community/community-composer";
 import type { ArchetypeData, DimensionData, Lang, ScoreBand } from "@/core/quiz";
 
 function pickNarrative(definition: QuizDefinition, key: string, language: Lang) {
@@ -347,9 +348,11 @@ export default function ResultClient({ testId }: { testId: string }) {
   const { user, syncChoice, syncState } = useAccount();
   const [definition, setDefinition] = useState<QuizDefinition | null>(null);
   const [result, setResult] = useState<QuizResult | null>(null);
+  const [attemptId, setAttemptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [shareError, setShareError] = useState(false);
+  const [communityOpen, setCommunityOpen] = useState(false);
   const [syncWarning, setSyncWarning] = useState(false);
   const entry = getQuizEntry(testId);
 
@@ -363,6 +366,7 @@ export default function ResultClient({ testId }: { testId: string }) {
       const attempt = queryAttempt ? getAttemptById(queryAttempt) : getLatestAttempt(testId);
       if (attempt?.testId === testId) {
         setResult(attempt.result);
+        setAttemptId(attempt.id);
       }
       setLoading(false);
     });
@@ -510,7 +514,8 @@ export default function ResultClient({ testId }: { testId: string }) {
 
         <ReflectionGuide testId={testId} entry={entry} pattern={pattern} result={result} dimensions={definition.resultContent.dimensions} accentColor={accent} lang={language} />
 
-        <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测评" : "Retake"}</button><button type="button" onClick={share} className="atlas-primary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "分享结果" : "Share result")}</button></section>
+        {communityOpen && attemptId && <CommunityComposer attemptId={attemptId} testName={testName} resultTitle={content.title} summary={content.summary} language={language} onClose={() => setCommunityOpen(false)} />}
+        <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测评" : "Retake"}</button><button type="button" onClick={share} className="atlas-secondary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "复制分享链接" : "Copy share link")}</button><button type="button" onClick={() => setCommunityOpen(true)} className="atlas-primary-action flex-1 justify-center"><Share2 className="size-4" aria-hidden="true" />{language === "zh" ? "分享到公共频道" : "Share to Community"}</button></section>
         <p id="share-status" className="mt-3 min-h-5 text-center text-xs text-ink/55 dark:text-white/55" role="status" aria-live="polite">{copied ? (language === "zh" ? "分享文字和链接已复制。" : "Share text and link copied.") : shareError ? (language === "zh" ? "暂时无法分享或复制，请稍后再试。" : "Sharing and clipboard access are unavailable. Please try again.") : ""}</p>
         <div className="mt-5 flex flex-col gap-3 text-center text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-center"><Link href="/history/" className="atlas-text-link justify-center">{language === "zh" ? "查看历史" : "View history"}</Link><span className="hidden sm:inline">/</span><Link href={`/test/${testId}/`} className="atlas-text-link justify-center">{language === "zh" ? "查看测评说明" : "Assessment details"}</Link></div>
         <p className="mt-9 text-center text-xs leading-5 text-ink/35 dark:text-white/35">{language === "zh" ? "仅用于自我反思，不构成诊断或专业评估。" : "For self-reflection only. This is not a diagnosis or professional assessment."}</p>

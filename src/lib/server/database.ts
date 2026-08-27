@@ -82,6 +82,66 @@ function migrate(database: SQLiteDatabase) {
       user_id TEXT PRIMARY KEY NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
       revision INTEGER NOT NULL DEFAULT 0
     );
+
+    CREATE TABLE IF NOT EXISTS community_posts (
+      id TEXT PRIMARY KEY NOT NULL,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      attempt_id TEXT NOT NULL,
+      test_id TEXT NOT NULL,
+      test_name TEXT NOT NULL,
+      test_name_en TEXT NOT NULL,
+      result_title TEXT,
+      result_title_en TEXT,
+      dimensions_json TEXT NOT NULL DEFAULT '[]',
+      reflection TEXT NOT NULL,
+      show_result_type INTEGER NOT NULL DEFAULT 1,
+      show_dimensions INTEGER NOT NULL DEFAULT 0,
+      show_avatar INTEGER NOT NULL DEFAULT 1,
+      allow_comments INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      deleted_at INTEGER,
+      UNIQUE (user_id, attempt_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS community_posts_feed_idx
+      ON community_posts(deleted_at, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS community_reactions (
+      post_id TEXT NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      created_at INTEGER NOT NULL,
+      PRIMARY KEY (post_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS community_comments (
+      id TEXT PRIMARY KEY NOT NULL,
+      post_id TEXT NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      parent_id TEXT REFERENCES community_comments(id) ON DELETE CASCADE,
+      body TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      deleted_at INTEGER
+    );
+
+    CREATE INDEX IF NOT EXISTS community_comments_post_idx
+      ON community_comments(post_id, created_at ASC);
+
+    CREATE TABLE IF NOT EXISTS community_reports (
+      id TEXT PRIMARY KEY NOT NULL,
+      reporter_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      post_id TEXT REFERENCES community_posts(id) ON DELETE CASCADE,
+      comment_id TEXT REFERENCES community_comments(id) ON DELETE CASCADE,
+      reason TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      CHECK ((post_id IS NOT NULL AND comment_id IS NULL) OR (post_id IS NULL AND comment_id IS NOT NULL))
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS community_reports_post_unique_idx
+      ON community_reports(reporter_id, post_id) WHERE post_id IS NOT NULL;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS community_reports_comment_unique_idx
+      ON community_reports(reporter_id, comment_id) WHERE comment_id IS NOT NULL;
   `);
 
   // Better Auth creates its `user` table on first start, after this module is

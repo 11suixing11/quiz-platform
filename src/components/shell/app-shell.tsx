@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { ArrowLeft, Bookmark, History, House, Languages, Moon, Settings, Sun, UserRound } from "lucide-react";
+import { ArrowLeft, Bookmark, History, House, Languages, MessageCircle, Moon, Settings, Sun, UserRound } from "lucide-react";
 import { useAccount } from "@/components/account-provider";
 import { useLanguage, useTheme } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ function AccountAvatar({ displayName, avatar, compact = false }: { displayName: 
 
 const navItems = [
   { href: "/", label: "首页", labelEn: "Home", icon: House },
+  { href: "/community/", label: "公共频道", labelEn: "Community", icon: MessageCircle },
   { href: "/history/", label: "记录", labelEn: "History", icon: History },
   { href: "/bookmarks/", label: "收藏", labelEn: "Saved", icon: Bookmark },
   { href: "/settings/", label: "设置", labelEn: "Settings", icon: Settings },
@@ -97,7 +98,7 @@ export function AppHeader({ backHref, backLabel, section, narrow = false }: { ba
           {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span className="sm:hidden">认识你自己</span><span className="hidden sm:inline">认识你自己 <span className="text-ink/35 dark:text-white/35">/</span> Know Yourself</span></Link>}
           {section && <span className="hidden truncate text-xs font-medium tracking-[0.08em] text-ink/40 sm:inline dark:text-white/40">{section}</span>}
         </div>
-        <div className="flex shrink-0 items-center gap-1.5"><Link href="/account/" className={cn("atlas-icon-link", user && "atlas-account-link")} aria-label={accountLabel} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}>{user ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} /> : <UserRound className="size-4" aria-hidden="true" />}</Link><ThemeToggle compact /><LanguageToggle compact /></div>
+        <div className="flex shrink-0 items-center gap-1.5"><Link href="/community/" className="atlas-icon-link hidden gap-1.5 px-2.5 sm:inline-flex" aria-label={language === "zh" ? "公共频道" : "Community"} title={language === "zh" ? "公共频道" : "Community"}><MessageCircle className="size-4" aria-hidden="true" /><span className="text-xs font-semibold">{language === "zh" ? "公共频道" : "Community"}</span></Link><Link href="/account/" className={cn("atlas-icon-link", user && "atlas-account-link")} aria-label={accountLabel} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}>{user ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} /> : <UserRound className="size-4" aria-hidden="true" />}</Link><ThemeToggle compact /><LanguageToggle compact /></div>
       </div>
     </header>
   );
@@ -111,7 +112,7 @@ export function MobileNav() {
   if (routePath.startsWith("/quiz/") || routePath.startsWith("/result/")) return null;
   return (
     <nav className="atlas-mobile-nav fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 px-3 pt-2 backdrop-blur-xl dark:border-white/10 dark:bg-night/95 sm:hidden" aria-label={language === "zh" ? "主导航" : "Primary navigation"}>
-      <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
+      <div className="mx-auto grid max-w-lg grid-cols-6 gap-0.5">
         {navItems.map(({ href, label, labelEn, icon: Icon }) => {
           const active = href === "/" ? routePath === "/" : routePath.startsWith(href);
           const accountAvatar = href === "/account/" && user;
