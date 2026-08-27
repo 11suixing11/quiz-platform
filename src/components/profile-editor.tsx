@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import NextImage from "next/image";
 import { Camera, Check, Pencil, Plus, Trash2, X } from "lucide-react";
-import { mergeLocalProfiles, readLocalProfile, writeLocalProfile, type LocalProfile } from "@/lib/local-profile";
-import { getRemoteProfile, saveRemoteProfile } from "@/lib/account";
-import { isStorageScopeActive } from "@/lib/storage";
+import { useAccount } from "@/components/account-provider";
+import type { LocalProfile } from "@/lib/local-profile";
 import { cn } from "@/lib/utils";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -41,65 +40,21 @@ function resizeAvatar(file: File): Promise<string> {
 }
 
 export function ProfileEditor({ userId, displayName, email, zh, syncMode }: { userId: string; displayName: string; email: string; zh: boolean; syncMode: "merge" | null }) {
-  const [profile, setProfile] = useState<LocalProfile>({ avatar: "", bio: "", tags: [], updatedAt: 0 });
-  const [draft, setDraft] = useState<LocalProfile>(profile);
+  const { user, profile, saveProfile } = useAccount();
+  const currentProfile = profile ?? { avatar: "", bio: "", tags: [], updatedAt: 0 };
+  const [draft, setDraft] = useState<LocalProfile>(currentProfile);
   const [tag, setTag] = useState("");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const editingRef = useRef(false);
-  const userIdRef = useRef(userId);
   const operationRef = useRef(0);
-  const remoteWriteQueue = useRef<Promise<unknown>>(Promise.resolve());
-  useEffect(() => {
-    userIdRef.current = userId;
-  }, [userId]);
-
-  const enqueueRemoteWrite = <T,>(task: () => Promise<T>) => {
-    const next = remoteWriteQueue.current.catch(() => undefined).then(task);
-    remoteWriteQueue.current = next.catch(() => undefined);
-    return next;
-  };
 
   useEffect(() => {
-    let cancelled = false;
-    const operation = ++operationRef.current;
-    editingRef.current = false;
-    const isCurrent = () => !cancelled && operationRef.current === operation && userIdRef.current === userId && isStorageScopeActive(userId);
-    const timer = window.setTimeout(() => {
-      if (!isCurrent()) return;
-      setEditing(false);
-      setSaving(false);
-      setFeedback("");
-      const stored = readLocalProfile(userId);
-      setProfile(stored);
-      if (!editingRef.current) setDraft(stored);
-      if (syncMode && !editingRef.current && isCurrent()) void getRemoteProfile(userId).then(async ({ userId: remoteUserId, profile }) => {
-        // A slow read must never merge over a draft that the user started
-        // editing while the request was in flight.
-        if (!isCurrent() || editingRef.current || remoteUserId !== userId) return;
-        const next = mergeLocalProfiles(stored, profile);
-        const changed = next.avatar !== profile.avatar || next.bio !== profile.bio || next.tags.join("\0") !== profile.tags.join("\0");
-        const response = changed
-          ? await enqueueRemoteWrite(async () => {
-            if (!isCurrent() || editingRef.current) return null;
-            return saveRemoteProfile(userId, next);
-          })
-          : { userId: remoteUserId, profile: next };
-        if (!response || !isCurrent() || response.userId !== userId) return;
-        const synced = response.profile;
-        setProfile(synced);
-        if (!editingRef.current) setDraft(synced);
-        writeLocalProfile(userId, synced);
-      }).catch(() => undefined);
-    }, 0);
-    return () => {
-      cancelled = true;
-      operationRef.current += 1;
-      window.clearTimeout(timer);
-    };
-  }, [syncMode, userId]);
+    if (!profile || editingRef.current) return;
+    setDraft(profile);
+  }, [profile]);
 
   const addTag = () => {
     const next = tag.trim().slice(0, 16);
@@ -132,43 +87,36 @@ export function ProfileEditor({ userId, displayName, email, zh, syncMode }: { us
   };
 
   const save = async () => {
-    if (saving || !isStorageScopeActive(userId)) return;
+    if (saving || user?.id !== userId) return;
     const operation = ++operationRef.current;
     setSaving(true);
     try {
       const next = { ...draft, bio: draft.bio.trim(), tags: draft.tags.map((item) => item.trim()).filter(Boolean), updatedAt: Date.now() };
-      writeLocalProfile(userId, next);
-      const response = syncMode
-        ? await enqueueRemoteWrite(async () => {
-          if (operationRef.current !== operation || userIdRef.current !== userId || !isStorageScopeActive(userId)) return null;
-          return saveRemoteProfile(userId, next);
-        })
-        : { userId, profile: next };
-      if (!response || operationRef.current !== operation || userIdRef.current !== userId || response.userId !== userId || !isStorageScopeActive(userId)) return;
-      const saved = response.profile;
-      writeLocalProfile(userId, saved);
-      setProfile(saved);
-      setDraft(saved);
+      const result = await saveProfile(next);
+      if (operationRef.current !== operation || user?.id !== userId) return;
+      setDraft(result.profile);
       editingRef.current = false;
       setEditing(false);
-      setFeedback(syncMode ? (zh ? "个人资料已同步。" : "Profile synced.") : (zh ? "个人资料已保存在这台设备。" : "Profile saved on this device."));
+      setFeedback(result.remoteSaved
+        ? (zh ? "个人资料已同步。" : "Profile synced.")
+        : (zh ? "个人资料已保存在这台设备，但云端同步失败。" : "Profile saved on this device, but cloud sync failed."));
     } catch {
-      if (userIdRef.current === userId && isStorageScopeActive(userId)) setFeedback(syncMode ? (zh ? "本机已保存，但云端同步失败。" : "Saved on this device, but cloud sync failed.") : (zh ? "浏览器存储空间不足，头像可能过大。" : "Browser storage is full. The avatar may be too large."));
+      if (user?.id === userId) setFeedback(zh ? "个人资料未能保存，请重试。" : "Profile could not be saved. Try again.");
     } finally {
-      if (userIdRef.current === userId && isStorageScopeActive(userId)) setSaving(false);
+      if (user?.id === userId) setSaving(false);
     }
   };
 
   const cancel = () => {
     operationRef.current += 1;
     editingRef.current = false;
-    setDraft(profile);
+    setDraft(currentProfile);
     setTag("");
     setEditing(false);
     setFeedback("");
   };
 
-  const shown = editing ? draft : profile;
+  const shown = editing ? draft : currentProfile;
 
   return (
     <section className="profile-panel mt-12" aria-labelledby="profile-heading">
@@ -200,9 +148,9 @@ export function ProfileEditor({ userId, displayName, email, zh, syncMode }: { us
 
           {!editing && (
             <>
-              <p className={cn("profile-bio", !profile.bio && "text-ink/40 dark:text-white/40")}>{profile.bio || (zh ? "写下一句此刻的自我描述。" : "Add a short note about who you are right now.")}</p>
+              <p className={cn("profile-bio", !currentProfile.bio && "text-ink/40 dark:text-white/40")}>{currentProfile.bio || (zh ? "写下一句此刻的自我描述。" : "Add a short note about who you are right now.")}</p>
               <div className="profile-tags" aria-label={zh ? "个性标签" : "Personality tags"}>
-                {profile.tags.length > 0 ? profile.tags.map((item) => <span key={item}>{item}</span>) : <span className="profile-tag-empty">{zh ? "还没有个性标签" : "No personality tags yet"}</span>}
+                {currentProfile.tags.length > 0 ? currentProfile.tags.map((item) => <span key={item}>{item}</span>) : <span className="profile-tag-empty">{zh ? "还没有个性标签" : "No personality tags yet"}</span>}
               </div>
             </>
           )}

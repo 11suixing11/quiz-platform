@@ -82,13 +82,15 @@ const dataManager = await compile("src/lib/data-manager.ts", { "./storage": stor
 }
 
 {
-  const { localStorage } = setupStorage();
+  const { events, localStorage } = setupStorage();
   localProfile.writeLocalProfile("user-a", { avatar: "data:image/jpeg;base64,test", bio: "  保持好奇  ", tags: ["安静", "探索者"], updatedAt: 10 });
   localProfile.writeLocalProfile("user-b", { avatar: "", bio: "Different account", tags: ["Reader"], updatedAt: 20 });
   assert.equal(localProfile.readLocalProfile("user-a").bio, "  保持好奇  ");
   assert.deepEqual(localProfile.readLocalProfile("user-a").tags, ["安静", "探索者"]);
   assert.equal(localProfile.readLocalProfile("user-b").bio, "Different account");
   assert.equal(localStorage.length, 2);
+  assert(events.some((event) => event.type === localProfile.PROFILE_EVENT && event.detail.userId === "user-a"));
+  assert.equal(localProfile.profileStorageKey("user-a"), "know-yourself:profile:user-a");
   const mergedProfile = localProfile.mergeLocalProfiles(
     { avatar: "old", bio: "local", tags: ["安静"], updatedAt: 10 },
     { avatar: "new", bio: "cloud", tags: ["探索者"], updatedAt: 20 },
@@ -111,6 +113,16 @@ const dataManager = await compile("src/lib/data-manager.ts", { "./storage": stor
     { avatar: "", bio: "cloud", tags: ["探索者"], updatedAt: 20 },
   );
   assert.deepEqual(mixedLegacyProfile, { avatar: "legacy", bio: "cloud", tags: ["探索者", "安静"], updatedAt: 20 });
+  localProfile.clearLocalProfile("user-a");
+  assert.deepEqual(localProfile.readLocalProfile("user-a"), { avatar: "", bio: "", tags: [], updatedAt: 0 });
+  assert(events.some((event) => event.type === localProfile.PROFILE_EVENT && event.detail.userId === "user-a"));
+}
+
+{
+  const { events, localStorage } = setupStorage();
+  localStorage.setItem = () => { throw new Error("quota"); };
+  assert.equal(localProfile.writeLocalProfile("user-a", { avatar: "", bio: "Unsaved", tags: [], updatedAt: 1 }), false);
+  assert.equal(events.some((event) => event.type === localProfile.PROFILE_EVENT), false);
 }
 
 {

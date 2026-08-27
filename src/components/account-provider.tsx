@@ -7,11 +7,14 @@ import {
   importCloudSnapshot,
   isSyncRevisionConflict,
   logoutAccount,
+  getRemoteProfile,
+  saveRemoteProfile,
   type AccountUser,
   type SyncChoice,
 } from "@/lib/account";
 import { mergeAccountSnapshots, readSyncBaseline, writeSyncBaseline } from "@/lib/account-sync";
 import { AUTH_SESSION_EVENT, useSession } from "@/lib/auth-client";
+import { PROFILE_EVENT, mergeLocalProfiles, parseLocalProfile, profileStorageKey, readLocalProfile, writeLocalProfile, type LocalProfile } from "@/lib/local-profile";
 import { STORAGE_EVENT, activateStorageScope, isStorageAvailable, isStorageScopeActive, readSnapshot, writeAccountSnapshot, writeSnapshot, type StorageSnapshot } from "@/lib/storage";
 
 export type { SyncChoice } from "@/lib/account";
@@ -26,11 +29,13 @@ export interface SyncSummary {
 
 interface AccountContextValue {
   user: AccountUser | null;
+  profile: LocalProfile | null;
   syncState: SyncState;
   syncError: string;
   syncChoice: SyncChoice | null;
   /** Counts from the last successful cloud synchronization. */
   cloudSummary: SyncSummary | null;
+  saveProfile(profile: LocalProfile): Promise<{ profile: LocalProfile; localSaved: boolean; remoteSaved: boolean }>;
   refreshAccount(): Promise<void>;
   syncNow(): Promise<void>;
   signOut(): Promise<void>;
@@ -65,9 +70,20 @@ function summarizeSnapshot(snapshot: StorageSnapshot): SyncSummary {
   };
 }
 
+function emptyProfile(): LocalProfile {
+  return { avatar: "", bio: "", tags: [], updatedAt: 0 };
+}
+
+function sameProfile(left: LocalProfile, right: LocalProfile) {
+  return left.avatar === right.avatar
+    && left.bio === right.bio
+    && left.tags.join("\0") === right.tags.join("\0");
+}
+
 export function AccountProvider({ children }: { children: React.ReactNode }) {
   const { data: authSession, isPending: authSessionPending, refetch: refetchAuthSession } = useSession();
   const [user, setUser] = useState<AccountUser | null>(null);
+  const [profile, setProfile] = useState<LocalProfile | null>(null);
   const [syncChoice, setSyncChoiceState] = useState<SyncChoice | null>(null);
   const [cloudSummary, setCloudSummary] = useState<SyncSummary | null>(null);
   const [syncState, setSyncState] = useState<SyncState>("loading");
@@ -77,12 +93,34 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const syncing = useRef(false);
   const syncQueued = useRef(false);
   const userRef = useRef<AccountUser | null>(null);
+  const writingLocalProfile = useRef(false);
+  const profileWriteQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const profileWriteVersion = useRef(0);
   const choiceRef = useRef<SyncChoice | null>(null);
   const refreshVersion = useRef(0);
 
   const setChoice = useCallback((choice: SyncChoice | null) => {
     choiceRef.current = choice;
     setSyncChoiceState(choice);
+  }, []);
+
+  const setProfileSafely = useCallback((next: LocalProfile | null) => {
+    setProfile(next);
+  }, []);
+
+  const enqueueProfileWrite = useCallback(<T,>(task: () => Promise<T>) => {
+    const next = profileWriteQueue.current.catch(() => undefined).then(task);
+    profileWriteQueue.current = next.catch(() => undefined);
+    return next;
+  }, []);
+
+  const persistLocalProfile = useCallback((userId: string, value: LocalProfile) => {
+    writingLocalProfile.current = true;
+    try {
+      return writeLocalProfile(userId, value);
+    } finally {
+      writingLocalProfile.current = false;
+    }
   }, []);
 
   const writeRemoteSafely = useCallback((snapshot: StorageSnapshot) => {
@@ -107,6 +145,61 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     version === refreshVersion.current
       && userRef.current?.id === userId
       && isStorageScopeActive(userId), []);
+
+  const isCurrentAccount = useCallback((userId: string, version: number) =>
+    version === refreshVersion.current && userRef.current?.id === userId, []);
+
+  const loadProfile = useCallback(async (currentUser: AccountUser, version: number) => {
+    const local = isStorageAvailable() ? readLocalProfile(currentUser.id) : emptyProfile();
+    if (!isCurrentAccount(currentUser.id, version)) return;
+    setProfileSafely(local);
+    const mutationAtStart = profileWriteVersion.current;
+    try {
+      const response = await getRemoteProfile(currentUser.id);
+      if (!isCurrentAccount(currentUser.id, version) || profileWriteVersion.current !== mutationAtStart || response.userId !== currentUser.id) return;
+      const merged = mergeLocalProfiles(local, response.profile);
+      let synced = merged;
+      if (!sameProfile(merged, response.profile)) {
+        const saved = await enqueueProfileWrite(async () => {
+          if (!isCurrentAccount(currentUser.id, version) || profileWriteVersion.current !== mutationAtStart) return null;
+          return saveRemoteProfile(currentUser.id, merged);
+        });
+        if (!saved || !isCurrentAccount(currentUser.id, version) || profileWriteVersion.current !== mutationAtStart) return;
+        synced = saved.profile;
+      }
+      if (!isCurrentAccount(currentUser.id, version) || profileWriteVersion.current !== mutationAtStart) return;
+      persistLocalProfile(currentUser.id, synced);
+      setProfileSafely(synced);
+    } catch {
+      // Keep the local profile visible when the account profile is temporarily
+      // unavailable. The next account refresh can reconcile it again.
+    }
+  }, [enqueueProfileWrite, isCurrentAccount, persistLocalProfile, setProfileSafely]);
+
+  const saveProfile = useCallback(async (value: LocalProfile) => {
+    const currentUser = userRef.current;
+    const normalized = parseLocalProfile(value) ?? emptyProfile();
+    const operation = ++profileWriteVersion.current;
+    if (!currentUser) throw new Error("ACCOUNT_CHANGED");
+    setProfileSafely(normalized);
+    const localSaved = persistLocalProfile(currentUser.id, normalized);
+    let saved;
+    try {
+      saved = await enqueueProfileWrite(async () => {
+        if (userRef.current?.id !== currentUser.id || profileWriteVersion.current !== operation) return null;
+        return saveRemoteProfile(currentUser.id, normalized);
+      });
+    } catch (error) {
+      if (userRef.current?.id === currentUser.id && profileWriteVersion.current === operation) setProfileSafely(normalized);
+      if (localSaved) return { profile: normalized, localSaved: true, remoteSaved: false };
+      throw error;
+    }
+    if (!saved || userRef.current?.id !== currentUser.id || profileWriteVersion.current !== operation) throw new Error("PROFILE_SAVE_CANCELLED");
+    const next = parseLocalProfile(saved.profile) ?? normalized;
+    const finalLocalSaved = persistLocalProfile(currentUser.id, next);
+    setProfileSafely(next);
+    return { profile: next, localSaved: localSaved || finalLocalSaved, remoteSaved: true };
+  }, [enqueueProfileWrite, persistLocalProfile, setProfileSafely]);
 
   const performSync = useCallback(async (currentUser: AccountUser, version: number) => {
     setSyncState("syncing");
@@ -178,6 +271,8 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   const refreshAccount = useCallback(async () => {
     const version = ++refreshVersion.current;
+    profileWriteVersion.current += 1;
+    setProfileSafely(null);
     setChoice(null);
     setSyncState("loading");
     setSyncError("");
@@ -195,6 +290,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       }
 
       setChoice("merge");
+      void loadProfile(account.user, version);
       // Private browsing and hardened browser policies can disable localStorage.
       // Keep the signed-in account usable with cloud-only reads in that case
       // instead of leaving the provider in its loading state forever.
@@ -209,7 +305,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       setSyncError(error instanceof Error ? error.message : "账号状态加载失败");
       setSyncState("error");
     }
-  }, [activateScopeSafely, setChoice, syncNow]);
+  }, [activateScopeSafely, loadProfile, setChoice, setProfileSafely, syncNow]);
 
   const signOut = useCallback(async () => {
     try {
@@ -220,16 +316,46 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     refreshVersion.current += 1;
+    profileWriteVersion.current += 1;
     activateScopeSafely(null);
     userRef.current = null;
     syncing.current = false;
     syncQueued.current = false;
     setUser(null);
+    setProfileSafely(null);
     setChoice(null);
     setCloudSummary(null);
     setSyncState("guest");
     setSyncError("");
-  }, [activateScopeSafely, setChoice]);
+  }, [activateScopeSafely, setChoice, setProfileSafely]);
+
+  useEffect(() => {
+    const readActiveProfile = () => {
+      const currentUser = userRef.current;
+      if (!currentUser || !isStorageAvailable()) return;
+      setProfileSafely(readLocalProfile(currentUser.id));
+    };
+    const onProfileChange = (event: Event) => {
+      const currentUser = userRef.current;
+      if (!currentUser) return;
+      const userId = (event as CustomEvent<{ userId?: unknown }>).detail?.userId;
+      if (typeof userId === "string" && userId !== currentUser.id) return;
+      if (!writingLocalProfile.current) profileWriteVersion.current += 1;
+      readActiveProfile();
+    };
+    const onStorageChange = (event: StorageEvent) => {
+      const currentUser = userRef.current;
+      if (!currentUser || event.key !== profileStorageKey(currentUser.id)) return;
+      profileWriteVersion.current += 1;
+      readActiveProfile();
+    };
+    window.addEventListener(PROFILE_EVENT, onProfileChange);
+    window.addEventListener("storage", onStorageChange);
+    return () => {
+      window.removeEventListener(PROFILE_EVENT, onProfileChange);
+      window.removeEventListener("storage", onStorageChange);
+    };
+  }, [setProfileSafely]);
 
   useEffect(() => {
     if (authSessionPending) return;
@@ -261,14 +387,16 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     user,
+    profile,
     syncState,
     syncError,
     syncChoice,
     cloudSummary,
+    saveProfile,
     refreshAccount,
     syncNow,
     signOut,
-  }), [cloudSummary, refreshAccount, signOut, syncError, syncChoice, syncNow, syncState, user]);
+  }), [cloudSummary, profile, refreshAccount, saveProfile, signOut, syncError, syncChoice, syncNow, syncState, user]);
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;
 }
 

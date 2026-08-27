@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -9,6 +10,20 @@ import { useLanguage, useTheme } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 
 type Theme = "system" | "light" | "dark";
+
+function initials(name: string) {
+  return Array.from(name.trim()).slice(0, 2).join("").toUpperCase() || "ME";
+}
+
+function AccountAvatar({ displayName, avatar, compact = false }: { displayName: string; avatar?: string; compact?: boolean }) {
+  return (
+    <span className={cn("atlas-account-avatar", compact && "atlas-account-avatar-compact")} aria-hidden="true">
+      {avatar
+        ? <Image src={avatar} alt="" width={64} height={64} unoptimized />
+        : <span>{initials(displayName)}</span>}
+    </span>
+  );
+}
 
 const navItems = [
   { href: "/", label: "首页", labelEn: "Home", icon: House },
@@ -71,7 +86,10 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
 
 export function AppHeader({ backHref, backLabel, section, narrow = false }: { backHref?: string; backLabel?: string; section?: string; narrow?: boolean }) {
   const { language } = useLanguage();
-  const { user } = useAccount();
+  const { user, profile } = useAccount();
+  const accountLabel = user
+    ? (language === "zh" ? `打开 ${user.displayName} 的账号` : `Open ${user.displayName}'s account`)
+    : (language === "zh" ? "登录或注册" : "Sign in or register");
   return (
     <header className="atlas-header">
       <div className={cn("mx-auto flex w-full items-center justify-between gap-4 px-5 py-4 sm:px-8", narrow ? "max-w-3xl" : "max-w-6xl")}>
@@ -79,7 +97,7 @@ export function AppHeader({ backHref, backLabel, section, narrow = false }: { ba
           {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span className="sm:hidden">认识你自己</span><span className="hidden sm:inline">认识你自己 <span className="text-ink/35 dark:text-white/35">/</span> Know Yourself</span></Link>}
           {section && <span className="hidden truncate text-xs font-medium tracking-[0.08em] text-ink/40 sm:inline dark:text-white/40">{section}</span>}
         </div>
-        <div className="flex shrink-0 items-center gap-1.5"><Link href="/account/" className={cn("atlas-icon-link", user && "text-accent")} aria-label={user ? (language === "zh" ? "打开账号" : "Open account") : (language === "zh" ? "登录或注册" : "Sign in or register")} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}><UserRound className="size-4" aria-hidden="true" /></Link><ThemeToggle compact /><LanguageToggle compact /></div>
+        <div className="flex shrink-0 items-center gap-1.5"><Link href="/account/" className={cn("atlas-icon-link", user && "atlas-account-link")} aria-label={accountLabel} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}>{user ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} /> : <UserRound className="size-4" aria-hidden="true" />}</Link><ThemeToggle compact /><LanguageToggle compact /></div>
       </div>
     </header>
   );
@@ -88,6 +106,7 @@ export function AppHeader({ backHref, backLabel, section, narrow = false }: { ba
 export function MobileNav() {
   const pathname = usePathname();
   const { language } = useLanguage();
+  const { user, profile } = useAccount();
   const routePath = pathname || "/";
   if (routePath.startsWith("/quiz/") || routePath.startsWith("/result/")) return null;
   return (
@@ -95,7 +114,8 @@ export function MobileNav() {
       <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
         {navItems.map(({ href, label, labelEn, icon: Icon }) => {
           const active = href === "/" ? routePath === "/" : routePath.startsWith(href);
-          return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", active ? "bg-ink text-paper dark:bg-white dark:text-ink" : "text-ink/50 hover:bg-ink/5 dark:text-white/55 dark:hover:bg-white/5")}><Icon className="size-4" strokeWidth={active ? 2.2 : 1.7} /><span>{language === "zh" ? label : labelEn}</span></Link>;
+          const accountAvatar = href === "/account/" && user;
+          return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", active ? "bg-ink text-paper dark:bg-white dark:text-ink" : "text-ink/50 hover:bg-ink/5 dark:text-white/55 dark:hover:bg-white/5")}>{accountAvatar ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} compact /> : <Icon className="size-4" strokeWidth={active ? 2.2 : 1.7} />}<span>{language === "zh" ? label : labelEn}</span></Link>;
         })}
       </div>
     </nav>

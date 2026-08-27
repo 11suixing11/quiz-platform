@@ -5,17 +5,22 @@ export interface LocalProfile {
   updatedAt: number;
 }
 
+export const PROFILE_EVENT = "know-yourself:profile-change";
 const PROFILE_PREFIX = "know-yourself:profile:";
 const EMPTY_PROFILE: LocalProfile = { avatar: "", bio: "", tags: [], updatedAt: 0 };
 const AVATAR_PATTERN = /^data:image\/jpeg;base64,[a-zA-Z0-9+/=]+$/;
 
-function profileKey(userId: string) {
+export function profileStorageKey(userId: string) {
   return `${PROFILE_PREFIX}${encodeURIComponent(userId)}`;
+}
+
+function emitProfileChange(userId: string | null) {
+  window.dispatchEvent(new CustomEvent(PROFILE_EVENT, { detail: { userId } }));
 }
 
 export function readLocalProfile(userId: string): LocalProfile {
   try {
-    return parseLocalProfile(JSON.parse(window.localStorage.getItem(profileKey(userId)) || "null")) ?? { ...EMPTY_PROFILE };
+    return parseLocalProfile(JSON.parse(window.localStorage.getItem(profileStorageKey(userId)) || "null")) ?? { ...EMPTY_PROFILE };
   } catch {
     return { ...EMPTY_PROFILE };
   }
@@ -35,20 +40,34 @@ export function parseLocalProfile(value: unknown): LocalProfile | null {
 }
 
 export function writeLocalProfile(userId: string, profile: LocalProfile) {
-  window.localStorage.setItem(profileKey(userId), JSON.stringify(parseLocalProfile(profile) ?? EMPTY_PROFILE));
+  try {
+    window.localStorage.setItem(profileStorageKey(userId), JSON.stringify(parseLocalProfile(profile) ?? EMPTY_PROFILE));
+    emitProfileChange(userId);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function clearLocalProfile(userId: string) {
   try {
-    window.localStorage.removeItem(profileKey(userId));
+    window.localStorage.removeItem(profileStorageKey(userId));
+    emitProfileChange(userId);
+    return true;
   } catch {
     // Storage can be disabled; account deletion must still be considered done.
+    return false;
   }
 }
 
 export function clearAllLocalProfiles() {
-  const keys = Array.from({ length: window.localStorage.length }, (_, index) => window.localStorage.key(index));
-  for (const key of keys) if (key?.startsWith(PROFILE_PREFIX)) window.localStorage.removeItem(key);
+  try {
+    const keys = Array.from({ length: window.localStorage.length }, (_, index) => window.localStorage.key(index));
+    for (const key of keys) if (key?.startsWith(PROFILE_PREFIX)) window.localStorage.removeItem(key);
+    emitProfileChange(null);
+  } catch {
+    // Clearing application data should remain usable when storage is disabled.
+  }
 }
 
 export function mergeLocalProfiles(current: LocalProfile, incoming: LocalProfile): LocalProfile {
