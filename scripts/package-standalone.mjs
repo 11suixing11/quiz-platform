@@ -30,6 +30,9 @@ await mkdir(path.join(standaloneRoot, ".next"), { recursive: true });
 await cp(path.join(projectRoot, "public"), path.join(standaloneRoot, "public"), { recursive: true });
 await cp(path.join(nextRoot, "static"), path.join(standaloneRoot, ".next", "static"), { recursive: true });
 
-await assertFile(path.join(standaloneRoot, "public", "robots.txt"), "standalone public assets");
+// `robots.ts` is a Next metadata route, so verify that output tracing copied
+// its generated payload into the standalone release rather than only checking
+// the source build tree.
+await assertFile(path.join(standaloneRoot, ".next", "server", "app", "robots.txt.body"), "standalone robots metadata");
 await assertFile(path.join(standaloneRoot, ".next", "static"), "standalone static assets");
 console.log(`Standalone release prepared at ${standaloneRoot}`);

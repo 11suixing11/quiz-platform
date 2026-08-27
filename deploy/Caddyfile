@@ -17,13 +17,11 @@
 
 # The Next.js standalone server owns both rendered pages and /api routes.
 # Caddy remains the public TLS endpoint and reverse proxy.
-loveyourself.cc.cd, beta.loveuu.xyz {
+# Canonical production host.
+knowyourself.cc.cd {
 	import tls_compat
 	encode gzip
 	import security_headers
-
-	@beta host beta.loveuu.xyz
-	header @beta X-Robots-Tag "noindex, nofollow"
 
 	@immutable path /_next/static/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
@@ -38,16 +36,36 @@ loveyourself.cc.cd, beta.loveuu.xyz {
 	}
 }
 
-www.loveyourself.cc.cd {
+# Legacy hosts permanently redirect to the canonical domain.
+loveyourself.cc.cd, www.loveyourself.cc.cd, loveuu.xyz, www.loveuu.xyz {
 	import tls_compat
 	import security_headers
-	redir https://loveyourself.cc.cd{uri} permanent
+	redir https://knowyourself.cc.cd{uri} 301
 }
 
-loveuu.xyz, www.loveuu.xyz {
+www.knowyourself.cc.cd {
 	import tls_compat
 	import security_headers
-	redir https://loveyourself.cc.cd{uri} permanent
+	redir https://knowyourself.cc.cd{uri} 301
+}
+
+# A no-index origin probe used by deployment checks.
+beta.loveuu.xyz {
+	import tls_compat
+	encode gzip
+	import security_headers
+	header X-Robots-Tag "noindex, nofollow"
+
+	@immutable path /_next/static/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:3333
+	}
 }
 
 # A DNS-only maintenance hostname used for origin smoke tests. It is never

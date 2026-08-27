@@ -1,6 +1,7 @@
 import { TEST_REGISTRY, type TestRegistryEntry } from "./test-registry";
+import type { QuizTopicId } from "@/core/quiz/types";
 
-export type CoreTestGroupId = "self" | "emotion" | "relationship" | "life";
+export type CoreTestGroupId = QuizTopicId;
 
 export interface CoreTestGroup {
   id: CoreTestGroupId;
@@ -78,7 +79,17 @@ export const CORE_TEST_GROUPS: CoreTestGroup[] = [
 
 export const CORE_TEST_IDS = CORE_TEST_GROUPS.flatMap((group) => group.ids);
 
+export const FEATURED_CORE_TEST_IDS = [
+  "big-five",
+  "emotion-regulation",
+  "attachment-style",
+  "lifestyle-alignment",
+  "self-compassion",
+  "work-style",
+] as const;
+
 export const CORE_TEST_SET = new Set(CORE_TEST_IDS);
+const coreGroupByTestId = new Map(CORE_TEST_GROUPS.flatMap((group) => group.ids.map((id) => [id, group] as const)));
 
 export const SENSITIVE_TEST_IDS = new Set([
   "anxiety",
@@ -102,11 +113,13 @@ export function getCoreGroupTests(group: CoreTestGroup): TestRegistryEntry[] {
   return getCoreTests(group.ids);
 }
 
+export function getCoreTestGroup(testId: string): CoreTestGroup | undefined {
+  return coreGroupByTestId.get(testId);
+}
+
 export function getNextCoreTests(currentTestId: string, limit = 3) {
-  const current = TEST_REGISTRY.find((test) => test.id === currentTestId);
-  const preferred = current
-    ? CORE_TEST_IDS.filter((id) => id !== currentTestId && TEST_REGISTRY.find((test) => test.id === id)?.category === current.category)
-    : [];
+  const currentGroup = getCoreTestGroup(currentTestId);
+  const preferred = currentGroup?.ids.filter((id) => id !== currentTestId) ?? [];
   const fallback = CORE_TEST_IDS.filter((id) => id !== currentTestId && !preferred.includes(id));
   return getCoreTests([...preferred, ...fallback]).slice(0, limit);
 }

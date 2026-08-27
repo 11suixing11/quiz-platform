@@ -57,7 +57,7 @@ function Loading({ language }: { language: Lang }) {
 }
 
 const resultLeadCopy: Record<string, { zh: string; en: string }> = {
-  personality: {
+  self: {
     zh: "你更常用什么方式，走进这个世界？",
     en: "How do you tend to move through the world?",
   },
@@ -69,17 +69,9 @@ const resultLeadCopy: Record<string, { zh: string; en: string }> = {
     zh: "在靠近别人时，你也在保护什么？",
     en: "What are you protecting as you move closer to others?",
   },
-  career: {
-    zh: "什么样的做事方式，更接近你？",
-    en: "What way of working feels most like you?",
-  },
-  lifestyle: {
+  life: {
     zh: "你的日常，正在为哪些事留位置？",
     en: "What is your daily life making room for?",
-  },
-  mental: {
-    zh: "最近的你，正在用什么方式应对生活？",
-    en: "How have you been meeting life lately?",
   },
 };
 
@@ -414,10 +406,10 @@ export default function ResultClient({ testId }: { testId: string }) {
       resultLabel,
       identityNote,
       summary: getResultSummary(definition, result, language),
-      lead: getResultLead(definition.category, language),
+      lead: getResultLead(entry?.topic.id ?? "self", language),
       details: getResultDetails(definition, result, language, narrative, typeData, archetype, scoreBand),
     };
-  }, [definition, language, result]);
+  }, [definition, entry, language, result]);
 
   const share = useCallback(async () => {
     if (!content || !entry) return;
@@ -515,10 +507,10 @@ export default function ResultClient({ testId }: { testId: string }) {
         <ReflectionGuide testId={testId} entry={entry} pattern={pattern} result={result} dimensions={definition.resultContent.dimensions} accentColor={accent} lang={language} />
 
         {communityOpen && attemptId && <CommunityComposer attemptId={attemptId} testName={testName} resultTitle={content.title} summary={content.summary} language={language} onClose={() => setCommunityOpen(false)} />}
-        <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测评" : "Retake"}</button><button type="button" onClick={share} className="atlas-secondary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "复制分享链接" : "Copy share link")}</button><button type="button" onClick={() => setCommunityOpen(true)} className="atlas-primary-action flex-1 justify-center"><Share2 className="size-4" aria-hidden="true" />{language === "zh" ? "分享到公共频道" : "Share to Community"}</button></section>
+        <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测评" : "Retake"}</button><button type="button" onClick={share} className="atlas-secondary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "复制分享链接" : "Copy share link")}</button><button type="button" onClick={() => setCommunityOpen(true)} className="atlas-primary-action flex-1 justify-center"><Share2 className="size-4" aria-hidden="true" />{language === "zh" ? "公开分享结果" : "Share publicly"}</button></section>
         <p id="share-status" className="mt-3 min-h-5 text-center text-xs text-ink/55 dark:text-white/55" role="status" aria-live="polite">{copied ? (language === "zh" ? "分享文字和链接已复制。" : "Share text and link copied.") : shareError ? (language === "zh" ? "暂时无法分享或复制，请稍后再试。" : "Sharing and clipboard access are unavailable. Please try again.") : ""}</p>
-        <div className="mt-5 flex flex-col gap-3 text-center text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-center"><Link href="/history/" className="atlas-text-link justify-center">{language === "zh" ? "查看历史" : "View history"}</Link><span className="hidden sm:inline">/</span><Link href={`/test/${testId}/`} className="atlas-text-link justify-center">{language === "zh" ? "查看测评说明" : "Assessment details"}</Link></div>
-        <p className="mt-9 text-center text-xs leading-5 text-ink/35 dark:text-white/35">{language === "zh" ? "仅用于自我反思，不构成诊断或专业评估。" : "For self-reflection only. This is not a diagnosis or professional assessment."}</p>
+        <div className="mt-5 flex flex-col gap-3 text-center text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-center"><Link href="/history/" className="atlas-text-link justify-center">{language === "zh" ? "查看历史" : "View history"}</Link><span className="hidden sm:inline">/</span><Link href={`/test/${testId}/`} className="atlas-text-link justify-center">{language === "zh" ? "查看测评说明" : "Assessment details"}</Link></div>
+        <p className="mt-9 text-center text-xs leading-5 text-muted-foreground">{language === "zh" ? "仅用于自我反思，不构成诊断或专业评估。" : "For self-reflection only. This is not a diagnosis or professional assessment."}</p>
       </PageContainer>
     </div>
   );

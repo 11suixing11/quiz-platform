@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://loveyourself.cc.cd/
+      url: https://knowyourself.cc.cd/
     steps:
       - name: Download standalone release
         uses: actions/download-artifact@v4
@@ -167,9 +167,9 @@ jobs:
           rm -f "$archive"
           application_origin=http://127.0.0.1:3333
           if ! sudo -n systemctl restart quiz-platform || ! sudo -n systemctl is-active quiz-platform >/dev/null || \
-             ! curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-all-errors -H 'Host: loveyourself.cc.cd' "$application_origin/" -o /dev/null || \
-             ! curl --fail --silent --show-error --retry 5 --retry-delay 1 --retry-all-errors -H 'Host: loveyourself.cc.cd' "$application_origin/test/big-five/" -o /dev/null || \
-             ! test "$(curl --fail --silent --show-error -H 'Host: loveyourself.cc.cd' "$application_origin/api/auth/get-session")" = null; then
+             ! curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-all-errors -H 'Host: knowyourself.cc.cd' "$application_origin/" -o /dev/null || \
+             ! curl --fail --silent --show-error --retry 5 --retry-delay 1 --retry-all-errors -H 'Host: knowyourself.cc.cd' "$application_origin/test/big-five/" -o /dev/null || \
+             ! test "$(curl --fail --silent --show-error -H 'Host: knowyourself.cc.cd' "$application_origin/api/auth/get-session")" = null; then
             if [ -n "$previous" ] && [ -d "$previous" ]; then
               rm -f "$releases/.rollback"
               ln -s "$previous" "$releases/.rollback"
@@ -184,10 +184,16 @@ jobs:
           VPS_HOST: ${{ vars.VPS_HOST }}
         run: |
           set -euo pipefail
-          if getent ahostsv4 loveyourself.cc.cd >/dev/null; then
-            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/ -o /dev/null
-            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/test/big-five/ -o /dev/null
-            test "$(curl --fail --silent --show-error --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/healthz)" = ok
+          test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/test/big-five/)" = 301
+          test "$(curl --silent --show-error --head --resolve "loveyourself.cc.cd:443:$VPS_HOST" https://loveyourself.cc.cd/test/big-five/ | tr -d '\r' | awk 'BEGIN { IGNORECASE=1 } /^location:/ { print $2; exit }')" = https://knowyourself.cc.cd/test/big-five/
+          test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --resolve "www.knowyourself.cc.cd:443:$VPS_HOST" https://www.knowyourself.cc.cd/test/big-five/)" = 301
+          test "$(curl --silent --show-error --head --resolve "www.knowyourself.cc.cd:443:$VPS_HOST" https://www.knowyourself.cc.cd/test/big-five/ | tr -d '\r' | awk 'BEGIN { IGNORECASE=1 } /^location:/ { print $2; exit }')" = https://knowyourself.cc.cd/test/big-five/
+          if getent ahostsv4 knowyourself.cc.cd >/dev/null; then
+            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/ -o /dev/null
+            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/test/big-five/ -o /dev/null
+            test "$(curl --fail --silent --show-error --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/healthz)" = ok
+            curl --fail --silent --show-error --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/robots.txt | grep -F 'Sitemap: https://knowyourself.cc.cd/sitemap.xml'
+            curl --fail --silent --show-error --resolve "knowyourself.cc.cd:443:$VPS_HOST" https://knowyourself.cc.cd/sitemap.xml | grep -F '<loc>https://knowyourself.cc.cd/test/big-five/</loc>'
           else
             echo "Public DNS is not active yet; the maintenance-host origin checks passed."
           fi

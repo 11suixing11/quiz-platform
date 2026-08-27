@@ -7,7 +7,7 @@ body:
     id: url
     attributes:
       label: Page URL
-      placeholder: https://loveyourself.cc.cd/...
+      placeholder: https://knowyourself.cc.cd/...
     validations:
       required: false
   - type: textarea

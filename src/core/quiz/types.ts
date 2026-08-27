@@ -7,6 +7,21 @@ export interface LocalizedText {
   en: string;
 }
 
+export type QuizTrustLevel = "research-adapted" | "self-exploration" | "playful-inspiration";
+export type QuizTopicId = "self" | "emotion" | "relationship" | "life";
+
+export interface QuizTrustProfile {
+  type: QuizTrustLevel;
+  label: LocalizedText;
+  source: LocalizedText;
+  limitations: LocalizedText;
+}
+
+export interface QuizTopic {
+  id: QuizTopicId;
+  label: LocalizedText;
+}
+
 export interface LegacyQuestion {
   id: number;
   zh: string;
@@ -188,6 +203,11 @@ export interface QuizCatalogEntry {
   title: LocalizedText;
   description: LocalizedText;
   load: () => Promise<{ default: unknown }>;
+}
+
+export interface PublicQuizCatalogEntry extends QuizCatalogEntry {
+  trust: QuizTrustProfile;
+  topic: QuizTopic;
 }
 
 export interface QuizDefinition {

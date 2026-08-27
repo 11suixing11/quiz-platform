@@ -1,0 +1,34 @@
+import type { Metadata } from "next";
+
+/**
+ * Public site identity and URL helpers.
+ *
+ * Keep the canonical origin in one place so metadata, feeds, auth and
+ * deployment checks cannot drift when the public domain changes.
+ */
+export const SITE_URL = "https://knowyourself.cc.cd";
+export const SITE_NAME = "认识你自己 | Know Yourself";
+export const SITE_DESCRIPTION = "一个安静、双语、本地优先的自我反思测评平台。";
+export const SITE_DESCRIPTION_EN = "A calm, bilingual, local-first self-reflection quiz platform.";
+export const OG_IMAGE_PATH = "/og-image.png";
+export const OG_IMAGE_URL = `${SITE_URL}${OG_IMAGE_PATH}`;
+
+export const PRIVATE_PAGE_METADATA: Metadata = {
+  description: null,
+  keywords: null,
+  robots: { index: false, follow: false },
+  alternates: { canonical: null },
+  openGraph: null,
+  twitter: null,
+};
+
+/** Return a canonical absolute URL while preserving the app's trailing slash convention. */
+export function siteUrl(path = "/") {
+  const normalizedPath = path === "" ? "/" : path.startsWith("/") ? path : `/${path}`;
+  return new URL(normalizedPath, SITE_URL).toString();
+}
+
+/** JSON-LD must not be allowed to terminate the script element. */
+export function serializeJsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}

@@ -54,7 +54,7 @@
 
 ## 部署方式
 
-Next.js 生成 standalone 运行时，生产环境由自有服务器上的 Node 服务处理页面和 `/api/*`，Caddy 提供 HTTPS 并反向代理；GitHub Actions 通过受限部署用户发布已验证的 release；域名为 `https://loveyourself.cc.cd/`。浏览器仍保持本地优先，登录后才会自动将本机数据合并到账号。
+Next.js 生成 standalone 运行时，生产环境由自有服务器上的 Node 服务处理页面和 `/api/*`，Caddy 提供 HTTPS 并反向代理；GitHub Actions 通过受限部署用户发布已验证的 release；主域名为 `https://knowyourself.cc.cd/`，旧域名仅作永久跳转。浏览器仍保持本地优先，登录后才会自动将本机数据合并到账号。
 
 ## 验证基线
 

@@ -1,45 +1,58 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
-import { ArrowRight, Bookmark, BookmarkCheck, CheckCircle2, Clock3, ListChecks, PauseCircle, ShieldCheck } from "lucide-react";
-import { loadQuizDefinition, getQuizEntry, QUIZ_CATALOG, type QuizDefinition } from "@/core/quiz";
+import { ArrowRight, BadgeInfo, Bookmark, BookmarkCheck, CheckCircle2, Clock3, ListChecks, PauseCircle, ShieldCheck } from "lucide-react";
+import { getQuizEntry, QUIZ_CATALOG, type QuizQuestion } from "@/core/quiz";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { CategoryMark } from "@/components/quiz/category-mark";
 import { TestCard } from "@/components/TestCard";
 import { useBookmarks, useLanguage } from "@/hooks/use-local-storage";
 
-export default function TestDetailClient({ testId }: { testId: string }) {
+type SampleQuestion = Pick<QuizQuestion, "id" | "prompt">;
+
+export default function TestDetailClient({ testId, sampleQuestions }: { testId: string; sampleQuestions: SampleQuestion[] }) {
   const { language } = useLanguage();
   const { isBookmarked, toggleBookmark } = useBookmarks();
-  const [definition, setDefinition] = useState<QuizDefinition | null>(null);
   const entry = getQuizEntry(testId);
   const saved = isBookmarked(testId);
 
-  useEffect(() => {
-    let cancelled = false;
-    loadQuizDefinition(testId).then((value) => { if (!cancelled) setDefinition(value); });
-    return () => { cancelled = true; };
-  }, [testId]);
-
-  const related = useMemo(() => entry ? QUIZ_CATALOG.filter((item) => item.category === entry.category && item.id !== testId).slice(0, 3) : [], [entry, testId]);
+  const related = useMemo(() => entry ? QUIZ_CATALOG.filter((item) => item.topic.id === entry.topic.id && item.id !== testId).slice(0, 3) : [], [entry, testId]);
   if (!entry) return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state"><h1 className="text-2xl font-semibold">{language === "zh" ? "找不到这项测评" : "Assessment not found"}</h1><Link href="/" className="atlas-primary-action mx-auto mt-6">{language === "zh" ? "返回首页" : "Back home"}</Link></div></PageContainer></div>;
 
   const title = language === "zh" ? entry.title.zh : entry.title.en;
   const description = language === "zh" ? entry.description.zh : entry.description.en;
-  const sampleQuestions = definition?.questions.slice(0, 3) ?? [];
-
   return (
     <div className="atlas-page wellness-page min-h-screen">
       <AppHeader section={title} />
       <PageContainer className="assessment-detail-enter">
         <div className="grid gap-12 lg:grid-cols-[1fr_0.78fr] lg:items-start">
           <section>
-            <div className="flex items-center gap-3 text-accent"><CategoryMark category={entry.category} className="size-12" /><span className="atlas-section-kicker">{language === "zh" ? "已选择的测评" : "Assessment selected"}</span></div>
+            <div className="flex items-center gap-3 text-accent"><CategoryMark category={entry.topic.id} className="size-12" /><span className="atlas-section-kicker">{entry.topic.label[language]}</span></div>
             <h1 className="mt-7 max-w-2xl text-5xl font-semibold leading-[0.95] tracking-[-0.065em] sm:text-7xl">{title}</h1>
-            <p className="mt-7 max-w-xl text-base leading-7 text-ink/60 dark:text-white/60">{description}</p>
-            <div className="mt-8 flex flex-wrap gap-2 text-xs text-ink/55 dark:text-white/55"><span className="atlas-meta-chip"><ListChecks className="size-3.5" />{entry.questions} {language === "zh" ? "道问题" : "questions"}</span><span className="atlas-meta-chip"><Clock3 className="size-3.5" />{entry.duration} {language === "zh" ? "分钟" : "min"}</span><span className="atlas-meta-chip">{entry.kind === "type" ? (language === "zh" ? "类型结果" : "Type result") : entry.kind === "dimensions" ? (language === "zh" ? "维度结果" : "Dimension result") : (language === "zh" ? "分数结果" : "Score result")}</span></div>
+            <p className="mt-7 max-w-xl text-base leading-7 text-muted-foreground">{description}</p>
+            <div className="mt-8 flex flex-wrap gap-2 text-xs text-muted-foreground"><span className="atlas-meta-chip"><ListChecks className="size-3.5" />{entry.questions} {language === "zh" ? "道问题" : "questions"}</span><span className="atlas-meta-chip"><Clock3 className="size-3.5" />{entry.duration} {language === "zh" ? "分钟" : "min"}</span><span className="atlas-meta-chip">{entry.kind === "type" ? (language === "zh" ? "类型结果" : "Type result") : entry.kind === "dimensions" ? (language === "zh" ? "维度结果" : "Dimension result") : (language === "zh" ? "分数结果" : "Score result")}</span><span className="atlas-meta-chip text-accent"><BadgeInfo className="size-3.5" />{entry.trust.label[language]}</span></div>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"><Link href={`/quiz/${testId}/`} className="atlas-primary-action justify-center sm:justify-start">{language === "zh" ? "开始测评" : "Start assessment"}<ArrowRight className="size-4" aria-hidden="true" /></Link><button type="button" onClick={() => toggleBookmark(testId)} className="atlas-secondary-action justify-center sm:justify-start">{saved ? <BookmarkCheck className="size-4" /> : <Bookmark className="size-4" />}{saved ? (language === "zh" ? "已收藏" : "Saved") : (language === "zh" ? "稍后再做" : "Save for later")}</button><Link href="/#routes" className="assessment-reselect-link justify-center sm:justify-start">{language === "zh" ? "重新选择测评" : "Choose another"}</Link></div>
+            <section className="mt-12 border-t border-ink/10 pt-6 dark:border-white/10" aria-labelledby="assessment-trust-title">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="atlas-section-kicker">{language === "zh" ? "依据与边界" : "Basis and limits"}</p>
+                  <h2 id="assessment-trust-title" className="mt-2 text-xl font-semibold tracking-[-0.035em]">{language === "zh" ? "这项测评如何理解" : "How to read this assessment"}</h2>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/8 px-3 py-1.5 text-xs font-semibold text-accent"><BadgeInfo className="size-3.5" aria-hidden="true" />{entry.trust.label[language]}</span>
+              </div>
+              <dl className="mt-5 grid gap-5 border-t border-ink/10 pt-5 dark:border-white/10 sm:grid-cols-2">
+                <div>
+                  <dt className="text-xs font-semibold text-ink/72 dark:text-white/72">{language === "zh" ? "参考框架" : "Reference frame"}</dt>
+                  <dd className="mt-2 text-sm leading-6 text-muted-foreground">{entry.trust.source[language]}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold text-ink/72 dark:text-white/72">{language === "zh" ? "使用边界" : "Limits"}</dt>
+                  <dd className="mt-2 text-sm leading-6 text-muted-foreground">{entry.trust.limitations[language]}</dd>
+                </div>
+              </dl>
+              <p className="mt-5 border-t border-ink/14 pt-4 text-xs leading-5 text-muted-foreground dark:border-white/16">{language === "zh" ? "把结果当作可以继续观察和对话的线索，而不是诊断、能力证明或永久标签。" : "Treat the result as a prompt for further observation and conversation, not as a diagnosis, proof of ability, or permanent label."}</p>
+            </section>
             <section className="atlas-assessment-brief mt-12" aria-labelledby="assessment-brief-title">
               <div className="atlas-assessment-brief-heading">
                 <p className="atlas-section-kicker">{language === "zh" ? "开始前" : "Before you begin"}</p>
@@ -54,7 +67,7 @@ export default function TestDetailClient({ testId }: { testId: string }) {
             </section>
           </section>
 
-          <aside className="atlas-detail-panel"><div className="atlas-detail-grid" aria-hidden="true" /><p className="atlas-section-kicker relative">{language === "zh" ? "你会遇到的问题" : "Questions you will meet"}</p><div className="relative mt-6 space-y-4">{sampleQuestions.length ? sampleQuestions.map((question, index) => <div key={question.id} className="border-t border-ink/12 pt-4 dark:border-white/12"><span className="atlas-question-index">{String(index + 1).padStart(2, "0")}</span><p className="mt-2 text-sm font-medium leading-6">{question.prompt[language]}</p></div>) : <div className="atlas-skeleton-lines" />}</div><p className="relative mt-8 text-xs leading-5 text-ink/42 dark:text-white/42">{language === "zh" ? "没有标准答案。选择最接近你当下感受的选项即可。" : "There are no right answers. Choose what feels closest to you today."}</p></aside>
+          <aside className="atlas-detail-panel"><div className="atlas-detail-grid" aria-hidden="true" /><p className="atlas-section-kicker relative">{language === "zh" ? "你会遇到的问题" : "Questions you will meet"}</p><div className="relative mt-6 space-y-4">{sampleQuestions.map((question, index) => <div key={question.id} className="border-t border-ink/16 pt-4 dark:border-white/18"><span className="atlas-question-index">{String(index + 1).padStart(2, "0")}</span><p className="mt-2 text-sm font-medium leading-6">{question.prompt[language]}</p></div>)}</div><p className="relative mt-8 text-xs leading-5 text-muted-foreground">{language === "zh" ? "没有标准答案。选择最接近你当下感受的选项即可。" : "There are no right answers. Choose what feels closest to you today."}</p></aside>
         </div>
 
         {related.length > 0 && <section className="mt-20 border-t border-ink/10 pt-10 dark:border-white/10"><div className="flex items-end justify-between"><div><p className="atlas-section-kicker">{language === "zh" ? "相关测评" : "Related assessments"}</p><h2 className="atlas-section-title mt-2">{language === "zh" ? "如果你想从另一个角度继续" : "Continue from another angle"}</h2></div><Link href="/#library" className="hidden text-xs font-semibold text-accent hover:underline sm:block">{language === "zh" ? "查看全部" : "See all"}</Link></div><div className="mt-6 grid gap-4 sm:grid-cols-3">{related.map((item, index) => <TestCard key={item.id} test={item} index={index} lang={language} />)}</div></section>}

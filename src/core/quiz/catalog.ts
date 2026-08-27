@@ -1,8 +1,10 @@
 import { CATEGORY_COLORS } from "@/lib/constants";
+import { CORE_TEST_IDS, getCoreTestGroup } from "@/lib/core-tests";
+import { FLAGSHIP_TRUST_PROFILES } from "@/lib/quiz-trust";
 import { TEST_REGISTRY } from "@/lib/test-registry";
 import { normalizeLegacyQuestions } from "./definition";
 import { assertQuizDefinition } from "./validation";
-import type { LegacyQuizContent, QuizCatalogEntry, QuizDefinition } from "./types";
+import type { LegacyQuizContent, PublicQuizCatalogEntry, QuizCatalogEntry, QuizDefinition } from "./types";
 
 function getAvailability(entry: (typeof TEST_REGISTRY)[number]): QuizCatalogEntry["availability"] {
   return entry.availability ?? "review";
@@ -24,9 +26,18 @@ export const INTERNAL_QUIZ_CATALOG: QuizCatalogEntry[] = TEST_REGISTRY.map((entr
 }));
 
 /** Public catalog: the v0.2 product surface is intentionally limited to flagship routes. */
-export const QUIZ_CATALOG: QuizCatalogEntry[] = INTERNAL_QUIZ_CATALOG.filter((quiz) =>
-  quiz.availability === "flagship",
-);
+const internalCatalogById = new Map(INTERNAL_QUIZ_CATALOG.map((quiz) => [quiz.id, quiz]));
+
+export const QUIZ_CATALOG: PublicQuizCatalogEntry[] = CORE_TEST_IDS
+  .map((id) => {
+    const quiz = internalCatalogById.get(id);
+    if (!quiz || quiz.availability !== "flagship") throw new Error(`Curated quiz ${id} is not available as a flagship route`);
+    const trust = FLAGSHIP_TRUST_PROFILES[quiz.id];
+    if (!trust) throw new Error(`Flagship quiz ${quiz.id} is missing trust metadata`);
+    const group = getCoreTestGroup(quiz.id);
+    if (!group) throw new Error(`Flagship quiz ${quiz.id} is missing a public topic`);
+    return { ...quiz, trust, topic: { id: group.id, label: { zh: group.zh, en: group.en } } };
+  });
 
 export const QUIZ_IDS = QUIZ_CATALOG.map((quiz) => quiz.id);
 
@@ -35,7 +46,7 @@ export const INTERNAL_QUIZ_IDS = INTERNAL_QUIZ_CATALOG.map((quiz) => quiz.id);
 const catalogById = new Map(QUIZ_CATALOG.map((quiz) => [quiz.id, quiz]));
 const definitionCache = new Map<string, Promise<QuizDefinition | null>>();
 
-export function getQuizEntry(id: string): QuizCatalogEntry | undefined {
+export function getQuizEntry(id: string): PublicQuizCatalogEntry | undefined {
   return catalogById.get(id);
 }
 

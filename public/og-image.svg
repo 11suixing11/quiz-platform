@@ -3,17 +3,19 @@
   <desc id="desc">A bilingual local-first self-reflection quiz platform.</desc>
   <rect width="1200" height="630" fill="#f4f0e7"/>
   <g fill="none" stroke="#2f6b5f" opacity=".18">
-    <ellipse cx="1050" cy="130" rx="310" ry="155" transform="rotate(-12 1050 130)" stroke-width="2"/>
-    <ellipse cx="1050" cy="130" rx="270" ry="125" transform="rotate(-12 1050 130)"/>
-    <ellipse cx="1050" cy="130" rx="225" ry="92" transform="rotate(-12 1050 130)"/>
+    <circle cx="1018" cy="224" r="188" stroke-width="2"/>
+    <circle cx="1018" cy="224" r="145"/>
+    <circle cx="1018" cy="224" r="103"/>
   </g>
-  <text x="86" y="112" fill="#2f6b5f" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="19" font-weight="700" letter-spacing="4">A MAP FOR THE SELF</text>
+  <text x="86" y="112" fill="#2f6b5f" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="19" font-weight="700" letter-spacing="4">A QUIET PLACE TO NOTICE</text>
   <text x="82" y="220" fill="#17221f" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="78" font-weight="700" letter-spacing="-4">Know Yourself</text>
-  <text x="86" y="285" fill="#5e6965" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="26">16 curated routes. Choose a direction, answer honestly,</text>
-  <text x="86" y="326" fill="#5e6965" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="26">and carry one useful reflection back into daily life.</text>
+  <text x="86" y="285" fill="#5e6965" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="26">16 reviewed bilingual assessments.</text>
+  <text x="86" y="326" fill="#5e6965" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="26">Notice a pattern. Carry one useful question onward.</text>
   <rect x="780" y="185" width="330" height="350" rx="24" fill="#ffffff" fill-opacity=".24" stroke="#17221f" stroke-opacity=".16"/>
-  <path d="M814 482C866 435 884 462 923 400C960 341 985 383 1022 315C1056 253 1080 280 1092 222" fill="none" stroke="#2f6b5f" stroke-width="3" stroke-dasharray="7 10"/>
-  <path d="M802 510C868 494 910 504 949 459C1000 401 1031 432 1093 370" fill="none" stroke="#17221f" stroke-opacity=".2" stroke-width="2"/>
-  <g fill="#2f6b5f" stroke="#f4f0e7" stroke-width="4"><circle cx="844" cy="455" r="9"/><circle cx="954" cy="376" r="9"/><circle cx="1065" cy="273" r="9"/></g>
+  <circle cx="945" cy="315" r="76" fill="#f2d7c5" fill-opacity=".82"/>
+  <circle cx="1038" cy="386" r="54" fill="#4f705f" fill-opacity=".78"/>
+  <path d="M820 482C864 436 908 450 937 412C968 372 1007 373 1090 438" fill="none" stroke="#2f6b5f" stroke-width="3"/>
+  <path d="M832 470C872 427 899 425 930 387C966 344 1004 346 1081 405" fill="none" stroke="#936451" stroke-opacity=".55" stroke-width="2"/>
+  <g fill="#2f6b5f" stroke="#f4f0e7" stroke-width="4"><circle cx="853" cy="455" r="9"/><circle cx="963" cy="365" r="9"/><circle cx="1062" cy="414" r="9"/></g>
   <text x="86" y="574" fill="#17221f" fill-opacity=".44" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="17" font-weight="700" letter-spacing="2">认识你自己 / KNOW YOURSELF</text>
 </svg>

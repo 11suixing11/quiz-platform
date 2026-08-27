@@ -4,12 +4,12 @@ import Link from "next/link";
 import { ArrowRight, CircleHelp, Footprints, Waves } from "lucide-react";
 
 import { getNextCoreTests } from "@/lib/core-tests";
-import type { QuizCatalogEntry } from "@/core/quiz";
+import type { PublicQuizCatalogEntry } from "@/core/quiz";
 import type { DimensionData, Lang, QuizResult } from "@/lib/types";
 
 interface ReflectionGuideProps {
   testId: string;
-  entry: Pick<QuizCatalogEntry, "category">;
+  entry: Pick<PublicQuizCatalogEntry, "topic">;
   pattern: "type" | "dimensions" | "score";
   result: QuizResult;
   dimensions?: Record<string, DimensionData>;
@@ -23,7 +23,7 @@ const categoryCopy: Record<string, {
   actionZh: string;
   actionEn: string;
 }> = {
-  personality: {
+  self: {
     questionZh: "最近一次你觉得“这很像我”的时刻，发生了什么？",
     questionEn: "When did you most recently think, “this is very me,” and what was happening?",
     actionZh: "接下来一周，留意一次你顺着惯性行动的瞬间，再试一次不同的小选择。",
@@ -35,25 +35,13 @@ const categoryCopy: Record<string, {
     actionZh: "给下一次明显情绪起一个更准确的名字，并记录它出现前的一件小事。",
     actionEn: "Give your next strong emotion a precise name and note one small thing that happened before it.",
   },
-  mental: {
-    questionZh: "最近哪些情境最消耗你？又有什么让你恢复得比预想更快？",
-    questionEn: "What has drained you most lately, and what helped you recover faster than expected?",
-    actionZh: "选一个最容易执行的恢复动作，把它缩小到十分钟以内。",
-    actionEn: "Choose one restorative action and make it small enough to do in under ten minutes.",
-  },
   relationship: {
     questionZh: "在重要关系里，你最希望对方理解、却最少直接说出口的是什么？",
     questionEn: "In an important relationship, what do you most want understood but least often say directly?",
     actionZh: "把一个含蓄期待改写成一句具体、可回应的表达。",
     actionEn: "Turn one unspoken expectation into a specific request the other person can respond to.",
   },
-  career: {
-    questionZh: "哪类工作即使很累，完成后仍会让你觉得值得？",
-    questionEn: "What kind of work still feels worthwhile even when it is tiring?",
-    actionZh: "从结果里选一个重要偏好，在本周的安排里为它腾出一个具体位置。",
-    actionEn: "Pick one important preference from the result and give it a concrete place in this week’s schedule.",
-  },
-  lifestyle: {
+  life: {
     questionZh: "如果只调整一个日常习惯，什么最可能让生活更像你想要的样子？",
     questionEn: "If you changed one daily habit, which would make life feel more like the one you want?",
     actionZh: "把那个改变缩小成今天就能完成的一步。",
@@ -61,7 +49,7 @@ const categoryCopy: Record<string, {
   },
 };
 
-const fallbackCopy = categoryCopy.personality;
+const fallbackCopy = categoryCopy.self;
 
 function getPatternText(
   pattern: ReflectionGuideProps["pattern"],
@@ -100,7 +88,7 @@ export function ReflectionGuide({
   accentColor,
   lang,
 }: ReflectionGuideProps) {
-  const copy = categoryCopy[entry.category] ?? fallbackCopy;
+  const copy = categoryCopy[entry.topic.id] ?? fallbackCopy;
   const recommendations = getNextCoreTests(testId, 3);
   const blocks = [
     {

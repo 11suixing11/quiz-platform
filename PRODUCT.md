@@ -45,7 +45,8 @@ merged automatically.
   configured.
 - Chinese and English only.
 - The standalone runtime and Caddy proxy must remain compatible with the
-  custom-domain root path at `https://loveyourself.cc.cd/`.
+  custom-domain root path at `https://knowyourself.cc.cd/`; the previous
+  `loveyourself.cc.cd` host is redirect-only.
 - The systematic refactor intentionally starts a new storage namespace and does not migrate old browser data or preserve old secondary URLs.
 - Analytics, dashboard, statistics, trends, comparison, and compatibility tools are outside the first refactored release.
 

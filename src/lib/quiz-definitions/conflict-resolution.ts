@@ -53,7 +53,7 @@ const definition = defineQuiz({
   category: "relationship",
   accent: legacy.color ?? "#4CAF50",
   duration: "4-7",
-  title: { zh: "冲突解决能力测试", en: "Conflict Resolution Test" },
+  title: { zh: "冲突处理方式测试", en: "Conflict Response Test" },
   description: {
     zh: "回看你在冲突中的倾听、表达、调节和修复习惯。",
     en: "Reflect on how you listen, express yourself, regulate emotion, and repair relationships during conflict.",

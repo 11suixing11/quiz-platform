@@ -33,9 +33,10 @@ function setupStorage(entries = {}) {
 
 const storage = await compile("src/lib/storage.ts");
 const registry = await compile("src/lib/test-registry.ts");
+const coreTests = await compile("src/lib/core-tests.ts", { "./test-registry": registry });
 const localProfile = await compile("src/lib/local-profile.ts");
 const accountSync = await compile("src/lib/account-sync.ts");
-const dataManager = await compile("src/lib/data-manager.ts", { "./storage": storage, "./test-registry": registry, "./local-profile": localProfile, "./account-sync": accountSync });
+const dataManager = await compile("src/lib/data-manager.ts", { "./storage": storage, "./core-tests": coreTests, "./local-profile": localProfile, "./account-sync": accountSync });
 
 {
   const { localStorage } = setupStorage({
@@ -79,6 +80,13 @@ const dataManager = await compile("src/lib/data-manager.ts", { "./storage": stor
   assert.equal(replace.imported, 1);
   assert.deepEqual(storage.getAttempts().map((item) => item.id), ["b"]);
   assert.deepEqual(storage.getBookmarks(), ["big-five"]);
+}
+
+{
+  setupStorage();
+  storage.saveAttempt({ testId: "mbti", result: { score: 80 }, answers: [], timestamp: 10 });
+  storage.saveAttempt({ testId: "attachment-style", result: { score: 60 }, answers: [], timestamp: 20 });
+  assert.deepEqual(dataManager.getDataStats().categories, { self: 1, relationship: 1 });
 }
 
 {

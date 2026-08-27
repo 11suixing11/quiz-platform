@@ -10,7 +10,7 @@ canonical_url: https://github.com/11suixing11/quiz-platform
 
 # I Built a Self-Discovery Platform — Here's What I Learned
 
-![Cover](https://loveyourself.cc.cd/og-image.png)
+![Cover](https://knowyourself.cc.cd/og-image.png)
 
 ## The Moment It Started
 
@@ -20,9 +20,9 @@ I wanted something better. Something that felt like a quiet conversation with yo
 
 So I built it.
 
-**[Know Yourself (认识你自己)](https://loveyourself.cc.cd/)** — a self-discovery platform with 100+ quizzes, zero ads, zero tracking, and everything stored locally on your device. It is built for reflection, not clinical diagnosis.
+**[Know Yourself (认识你自己)](https://knowyourself.cc.cd/)** — a self-discovery platform with 16 reviewed bilingual assessments, zero ads, zero tracking, and local-first storage. It is built for reflection, not clinical diagnosis.
 
-🔗 **Live**: https://loveyourself.cc.cd/
+🔗 **Live**: https://knowyourself.cc.cd/
 ⭐ **GitHub**: https://github.com/11suixing11/quiz-platform
 
 ---
@@ -357,7 +357,7 @@ Direction-aware animations that feel natural. The `custom` prop on `AnimatePrese
 
 The platform is live and free:
 
-🔗 **https://loveyourself.cc.cd/**
+🔗 **https://knowyourself.cc.cd/**
 
 Start with the Big Five, MBTI, or Enneagram if you're into personality. Try the Emotional Intelligence or Love Language tests for relationships. Or just browse — there's something for every kind of self-curious person.
 

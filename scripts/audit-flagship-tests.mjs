@@ -205,6 +205,23 @@ assert.deepEqual(
   new Set(coreIds),
   "Public catalog IDs must match CORE_TEST_IDS",
 );
+for (const entry of publicCatalog) {
+  assert.ok(["self", "emotion", "relationship", "life"].includes(entry.topic?.id), `${entry.id} has an unknown public topic`);
+  assert.ok(entry.topic?.label?.zh?.trim(), `${entry.id} topic.label.zh is required`);
+  assert.ok(entry.topic?.label?.en?.trim(), `${entry.id} topic.label.en is required`);
+  assert.ok(entry.trust, `${entry.id} must include trust metadata`);
+  assert.ok(
+    ["research-adapted", "self-exploration", "playful-inspiration"].includes(entry.trust.type),
+    `${entry.id} has an unknown trust type`,
+  );
+  for (const field of ["label", "source", "limitations"]) {
+    assert.ok(entry.trust[field]?.zh?.trim(), `${entry.id} trust.${field}.zh is required`);
+    assert.ok(entry.trust[field]?.en?.trim(), `${entry.id} trust.${field}.en is required`);
+  }
+  const trustWarnings = [];
+  inspectEnglish(entry.trust, `${entry.id}.trust`, trustWarnings);
+  assert.equal(trustWarnings.length, 0, trustWarnings.join("; "));
+}
 const entries = coreIds.map((id) => registry.find((entry) => entry.id === id)).filter(Boolean);
 assert.equal(entries.length, 16, "Expected 16 flagship entries");
 

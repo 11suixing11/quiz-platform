@@ -3,12 +3,14 @@ import "server-only";
 import { APIError, betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { getDatabase } from "@/lib/server/database";
+import { SITE_URL } from "@/lib/site-config";
 
-const PRODUCTION_ORIGIN = "https://loveyourself.cc.cd";
+const PRODUCTION_ORIGIN = SITE_URL;
+const PRODUCTION_HOST = new URL(PRODUCTION_ORIGIN).hostname;
 const DEVELOPMENT_ORIGINS = [
   "http://localhost:*",
   "http://127.0.0.1:*",
-  "https://loveyourself.cc.cd",
+  PRODUCTION_ORIGIN,
 ] as const;
 
 function authSecret() {
@@ -165,7 +167,7 @@ export function requestAddress(request: Request) {
 export async function isTrustedMutation(request: Request) {
   const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
   const isDevelopmentHost = process.env.NODE_ENV !== "production" && ["localhost", "127.0.0.1", "::1"].includes(host);
-  if (!isDevelopmentHost && host !== "loveyourself.cc.cd") return false;
+  if (!isDevelopmentHost && host !== PRODUCTION_HOST) return false;
 
   const origin = request.headers.get("origin");
   if (!origin) return isDevelopmentHost;

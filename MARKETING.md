@@ -10,7 +10,7 @@ Current product copy for community posts, repository listings, and launch pages.
 
 ### English
 
-A calm, bilingual self-reflection platform with 16 curated routes and browser-local data.
+A calm, bilingual self-reflection platform with 16 reviewed assessments and local-first data.
 
 ## Repository description
 
@@ -25,7 +25,7 @@ A calm, bilingual self-reflection platform with 16 curated routes and browser-lo
 ```markdown
 # 我重构了一个本地优先的中英双语自我反思平台
 
-「认识你自己 | Know Yourself」把公开体验收敛成 16 条清楚的路线：
+「认识你自己 | Know Yourself」把公开体验收敛成 16 项经过审阅的测评：
 
 探索方向 → 查看测试说明 → 答题 → 阅读结果 → 回到历史或收藏
 
@@ -49,7 +49,7 @@ A calm, bilingual self-reflection platform with 16 curated routes and browser-lo
 ```markdown
 # I rebuilt a local-first bilingual self-reflection platform
 
-Know Yourself opens with 16 curated routes. The refactor was not about adding more features. It was about making one path clear:
+Know Yourself opens with 16 reviewed assessments. The refactor was not about adding more features. It was about making one path clear:
 
 choose a direction → read the test notes → answer → understand the result → revisit history or saved quizzes
 
@@ -73,9 +73,9 @@ Source: https://github.com/11suixing11/quiz-platform
 ### Short post
 
 ```text
-Know Yourself is a local-first set of 16 reviewed bilingual self-reflection routes.
+Know Yourself is a local-first set of 16 reviewed bilingual self-reflection assessments.
 
-Choose one of 16 curated routes, answer in a few minutes, and leave with a result you can revisit. No account, no backend, and no cloud sync.
+Choose one of 16 reviewed assessments, answer in a few minutes, and leave with a result you can revisit. Guest data stays local; accounts add optional cross-device sync.
 
 [Live URL]
 https://github.com/11suixing11/quiz-platform
@@ -100,7 +100,7 @@ https://github.com/11suixing11/quiz-platform
 - Languages: Simplified Chinese and English
 - Scoring families: type, dimensions, score
 - Storage: browser-local `know-yourself:v3` snapshot
-- Deployment: Next.js static export served by Caddy on a self-hosted VPS at `https://loveyourself.cc.cd/`; GitHub Actions validates and publishes releases
+- Deployment: Next.js standalone Node runtime behind Caddy on a self-hosted VPS at `https://knowyourself.cc.cd/`; GitHub Actions validates and publishes releases
 - License: MIT
 
 ## Claims to avoid

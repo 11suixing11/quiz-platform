@@ -9,7 +9,7 @@ import {
   writeSnapshot,
   type StorageSnapshot,
 } from "./storage";
-import { TEST_REGISTRY } from "./test-registry";
+import { getCoreTestGroup } from "./core-tests";
 import { clearLocalProfile, mergeLocalProfiles, parseLocalProfile, readLocalProfile, writeLocalProfile } from "./local-profile";
 import { clearSyncBaseline } from "./account-sync";
 
@@ -32,8 +32,8 @@ export function getDataStats(): DataStats {
   const categories: Record<string, number> = {};
   const scores: number[] = [];
   for (const attempt of snapshot.attempts) {
-    const entry = TEST_REGISTRY.find((test) => test.id === attempt.testId);
-    if (entry) categories[entry.category] = (categories[entry.category] ?? 0) + 1;
+    const group = getCoreTestGroup(attempt.testId);
+    if (group) categories[group.id] = (categories[group.id] ?? 0) + 1;
     const score = attempt.result.score ?? attempt.result.overallScore ?? attempt.result.percentage;
     if (typeof score === "number") scores.push(score);
   }

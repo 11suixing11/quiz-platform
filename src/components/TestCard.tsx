@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { ArrowRight, Bookmark, BookmarkCheck, Clock3 } from "lucide-react";
-import type { QuizCatalogEntry } from "@/core/quiz";
+import type { PublicQuizCatalogEntry } from "@/core/quiz";
+import type { QuizTrustProfile } from "@/core/quiz/types";
 import type { TestRegistryEntry } from "@/lib/test-registry";
 import type { Lang } from "@/lib/types";
 import { TEST_CATEGORIES } from "@/lib/constants";
+import { getCoreTestGroup } from "@/lib/core-tests";
 import { useBookmarks } from "@/hooks/use-local-storage";
 import { CategoryMark } from "@/components/quiz/category-mark";
 
-type TestCardItem = TestRegistryEntry | QuizCatalogEntry;
+type TestCardItem = TestRegistryEntry | PublicQuizCatalogEntry;
 
 function getCardCopy(test: TestCardItem, lang: Lang) {
   if ("title" in test) {
@@ -35,23 +37,31 @@ export function TestCard({ test, index = 0, lang = "zh" }: { test: TestCardItem;
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const saved = isBookmarked(test.id);
   const { title, description, duration } = getCardCopy(test, lang);
-  const categoryLabel = getCategoryLabel(test.category, lang);
+  const group = "topic" in test ? test.topic : undefined;
+  const fallbackGroup = getCoreTestGroup(test.id);
+  const categoryLabel = group?.label[lang] ?? (fallbackGroup ? (lang === "zh" ? fallbackGroup.zh : fallbackGroup.en) : getCategoryLabel(test.category, lang));
+  const category = group?.id ?? fallbackGroup?.id ?? test.category;
+  const trust = "trust" in test ? (test as TestCardItem & { trust?: QuizTrustProfile }).trust : undefined;
+  const trustLabel = trust?.label[lang];
 
   return (
     <article className="atlas-test-card">
       <Link href={`/test/${test.id}/`} className="group block h-full">
         <div className="flex h-full flex-col gap-5 p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <CategoryMark category={test.category} className="text-accent" />
-              <span className="atlas-card-category truncate">{categoryLabel}</span>
+            <div className="flex min-w-0 items-start gap-2.5">
+              <CategoryMark category={category} className="text-accent" />
+              <span className="min-w-0">
+                <span className="atlas-card-category block truncate">{categoryLabel}</span>
+                {trustLabel && <span className="atlas-card-trust mt-1 inline-flex">{trustLabel}</span>}
+              </span>
             </div>
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-semibold tracking-[-0.025em] text-ink transition group-hover:text-accent dark:text-white">{title}</h3>
-            <p className="mt-2 line-clamp-3 text-sm leading-6 text-ink/58 dark:text-white/58">{description}</p>
+            <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{description}</p>
           </div>
-          <div className="flex items-center justify-between gap-3 border-t border-ink/10 pt-4 text-xs text-ink/45 dark:border-white/10 dark:text-white/45">
+          <div className="flex items-center justify-between gap-3 border-t border-ink/14 pt-4 text-xs text-muted-foreground dark:border-white/16">
             <span className="inline-flex min-w-0 items-center gap-2"><span className="atlas-index">{String(index + 1).padStart(2, "0")}</span><span className="inline-flex items-center gap-1.5"><Clock3 className="size-3.5" />{test.questions} {lang === "zh" ? "题" : "questions"} · {duration} {lang === "zh" ? "分钟" : "min"}</span></span>
             <span className="inline-flex items-center gap-1 font-semibold text-ink/70 transition group-hover:text-accent dark:text-white/70"><span>{lang === "zh" ? "先了解" : "Explore"}</span><ArrowRight className="size-3.5 transition group-hover:translate-x-0.5" aria-hidden="true" /></span>
           </div>

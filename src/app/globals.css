@@ -169,6 +169,7 @@
 .atlas-result-score-dot { display: inline-block; width: .55rem; height: .55rem; border-radius: 999px; background: var(--accent); }
 .atlas-history-row { display: flex; align-items: center; gap: .9rem; border-bottom: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); padding: 1rem .2rem; }
 .atlas-icon-link { display: inline-flex; min-height: 2.75rem; min-width: 2.75rem; align-items: center; justify-content: center; border-radius: 999px; color: color-mix(in srgb, var(--ink) 50%, transparent); transition: background .2s, color .2s; }
+.atlas-header-community-link { display: none; }
 .atlas-icon-link:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
 .atlas-account-link { color: var(--accent); }
 .atlas-account-avatar { display: grid; width: 2.15rem; height: 2.15rem; flex: none; place-items: center; overflow: hidden; border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, var(--paper)); color: var(--accent); font-size: .66rem; font-weight: 800; line-height: 1; }
@@ -226,6 +227,7 @@
   .skip-link { transition: none; }
 }
 @media (max-width: 640px) { .atlas-return-strip { align-items: flex-start; flex-direction: column; } .atlas-inline-action { margin-left: 3.1rem; } .atlas-section-title { font-size: 2.7rem; } }
+@media (min-width: 640px) { .atlas-header-community-link { display: inline-flex; } }
 @media (max-width: 640px) { .profile-summary { gap: 1rem; } .profile-avatar { width: 4.5rem; height: 4.5rem; } .profile-summary .atlas-secondary-action { width: 100%; justify-content: center; margin-top: .9rem; } }
 
 @media print {
@@ -240,8 +242,8 @@
   --ink: #2d3530;
   --accent: #4f705f;
   --muted-text: #716a62;
-  --line: rgba(45, 53, 48, .14);
-  --soft-line: rgba(45, 53, 48, .09);
+  --line: rgba(45, 53, 48, .18);
+  --soft-line: rgba(45, 53, 48, .13);
   --accent-wash: #e6eee8;
   --warm-wash: #f2d7c5;
   --warm-surface: #fff1e3;
@@ -256,8 +258,8 @@
   --ink: #f1eee7;
   --accent: #a8c7b5;
   --muted-text: #b6b4ab;
-  --line: rgba(241, 238, 231, .15);
-  --soft-line: rgba(241, 238, 231, .09);
+  --line: rgba(241, 238, 231, .2);
+  --soft-line: rgba(241, 238, 231, .14);
   --accent-wash: #263a32;
   --warm-wash: #49302a;
   --warm-surface: #332824;
@@ -283,7 +285,7 @@
 .wellness-hero { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(21rem, .72fr); align-items: center; gap: clamp(2.5rem, 7vw, 7rem); min-height: 38rem; padding: clamp(3.5rem, 9vw, 7rem) 0 clamp(3rem, 7vw, 5.5rem); border-bottom: 1px solid var(--soft-line); }
 .wellness-hero-copy { max-width: 43rem; }
 .wellness-overline, .wellness-small-label { color: var(--muted-text); font-size: .68rem; font-weight: 700; letter-spacing: .07em; line-height: 1.5; }
-.wellness-display { max-width: 12ch; color: var(--ink); font-size: clamp(3rem, 6.1vw, 5.35rem); font-weight: 570; letter-spacing: -.03em; line-height: 1.04; text-wrap: balance; }
+.wellness-display { max-width: 12ch; color: var(--ink); font-size: clamp(3rem, 5.6vw, 4.85rem); font-weight: 570; letter-spacing: -.03em; line-height: 1.07; text-wrap: balance; }
 .wellness-display em { color: var(--accent); font-style: normal; }
 .wellness-hero-context { max-width: 36rem; margin-top: 1.35rem; color: var(--accent); font-size: .92rem; font-weight: 750; line-height: 1.65; }
 .wellness-hero-lede { max-width: 36rem; margin-top: .7rem; color: var(--muted-text); font-size: 1.04rem; line-height: 1.9; }
@@ -348,6 +350,7 @@
 .wellness-route-link { display: flex; align-items: center; gap: .7rem; min-height: 3.45rem; border-bottom: 1px solid var(--soft-line); color: var(--ink); transition: transform .18s ease, color .18s ease, background-color .18s ease; }
 .wellness-route-link:hover { transform: translateX(.4rem); background: color-mix(in srgb, var(--topic-color) 6%, transparent); color: var(--accent); }
 .wellness-route-icon { display: inline-flex; width: 2rem; height: 2rem; align-items: center; justify-content: center; border-radius: 999px; color: var(--topic-color); background: color-mix(in srgb, var(--topic-color) 12%, transparent); }
+.wellness-route-meta { display: block; margin-top: .25rem; color: var(--muted-text); font-size: .7rem; line-height: 1.5; }
 .wellness-library { margin-inline: -1.25rem; }
 .wellness-library > div { max-width: 72rem; }
 .wellness-library .atlas-section-title { max-width: 20ch; font-size: clamp(2.15rem, 5vw, 4rem); letter-spacing: -.04em; }
@@ -365,6 +368,7 @@
 .atlas-test-card { min-height: 16rem; background: var(--paper-strong); box-shadow: none; animation: none; contain: content; }
 .atlas-test-card:hover { box-shadow: 0 16px 32px rgba(38, 50, 47, .08); }
 .atlas-card-category { color: var(--muted-text); font-size: .68rem; font-weight: 750; letter-spacing: .04em; }
+.atlas-card-trust { align-items: center; border-radius: 999px; background: var(--accent-wash); padding: .22rem .48rem; color: var(--accent); font-size: .72rem; font-weight: 750; line-height: 1.35; }
 .atlas-card-save { background: transparent; }
 .atlas-search { border-bottom-color: var(--line); }
 .atlas-filter { border-color: var(--line); }
@@ -443,7 +447,7 @@
 }
 @media (max-width: 640px) {
   .wellness-hero { gap: 1.5rem; padding-top: 2.65rem; padding-bottom: 1.75rem; }
-  .wellness-display { font-size: clamp(2.75rem, 12vw, 3.55rem); line-height: 1.04; }
+  .wellness-display { font-size: clamp(2.7rem, 11vw, 3.25rem); line-height: 1.07; }
   .wellness-hero-context { margin-top: 1.1rem; font-size: .82rem; }
   .wellness-hero-lede { margin-top: .65rem; font-size: .92rem; line-height: 1.8; }
   .wellness-hero-actions { margin-top: 1.65rem; }

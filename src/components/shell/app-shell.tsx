@@ -27,7 +27,7 @@ function AccountAvatar({ displayName, avatar, compact = false }: { displayName: 
 
 const navItems = [
   { href: "/", label: "首页", labelEn: "Home", icon: House },
-  { href: "/community/", label: "公共频道", labelEn: "Community", icon: MessageCircle },
+  { href: "/community/", label: "测评分享", labelEn: "Shared", icon: MessageCircle },
   { href: "/history/", label: "记录", labelEn: "History", icon: History },
   { href: "/bookmarks/", label: "收藏", labelEn: "Saved", icon: Bookmark },
   { href: "/settings/", label: "设置", labelEn: "Settings", icon: Settings },
@@ -95,10 +95,10 @@ export function AppHeader({ backHref, backLabel, section, narrow = false }: { ba
     <header className="atlas-header">
       <div className={cn("mx-auto flex w-full items-center justify-between gap-4 px-5 py-4 sm:px-8", narrow ? "max-w-3xl" : "max-w-6xl")}>
         <div className="flex min-w-0 items-center gap-4">
-          {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span className="sm:hidden">认识你自己</span><span className="hidden sm:inline">认识你自己 <span className="text-ink/35 dark:text-white/35">/</span> Know Yourself</span></Link>}
-          {section && <span className="hidden truncate text-xs font-medium tracking-[0.08em] text-ink/40 sm:inline dark:text-white/40">{section}</span>}
+          {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span className="sm:hidden">认识你自己</span><span className="hidden sm:inline">认识你自己 <span className="text-muted-foreground">/</span> Know Yourself</span></Link>}
+          {section && <span className="hidden truncate text-xs font-medium tracking-[0.08em] text-muted-foreground sm:inline">{section}</span>}
         </div>
-        <div className="flex shrink-0 items-center gap-1.5"><Link href="/community/" className="atlas-icon-link hidden gap-1.5 px-2.5 sm:inline-flex" aria-label={language === "zh" ? "公共频道" : "Community"} title={language === "zh" ? "公共频道" : "Community"}><MessageCircle className="size-4" aria-hidden="true" /><span className="text-xs font-semibold">{language === "zh" ? "公共频道" : "Community"}</span></Link><Link href="/account/" className={cn("atlas-icon-link", user && "atlas-account-link")} aria-label={accountLabel} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}>{user ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} /> : <UserRound className="size-4" aria-hidden="true" />}</Link><ThemeToggle compact /><LanguageToggle compact /></div>
+        <div className="flex shrink-0 items-center gap-1.5"><Link href="/community/" className="atlas-icon-link atlas-header-community-link gap-1.5 px-2.5" aria-label={language === "zh" ? "查看公开的测评分享" : "View shared reflections"} title={language === "zh" ? "测评分享" : "Shared reflections"}><MessageCircle className="size-4" aria-hidden="true" /><span className="text-xs font-semibold">{language === "zh" ? "测评分享" : "Shared"}</span></Link><Link href="/account/" className={cn("atlas-icon-link", user && "atlas-account-link")} aria-label={accountLabel} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}>{user ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} /> : <UserRound className="size-4" aria-hidden="true" />}</Link><ThemeToggle compact /><LanguageToggle compact /></div>
       </div>
     </header>
   );
@@ -116,7 +116,7 @@ export function MobileNav() {
         {navItems.map(({ href, label, labelEn, icon: Icon }) => {
           const active = href === "/" ? routePath === "/" : routePath.startsWith(href);
           const accountAvatar = href === "/account/" && user;
-          return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", active ? "bg-ink text-paper dark:bg-white dark:text-ink" : "text-ink/50 hover:bg-ink/5 dark:text-white/55 dark:hover:bg-white/5")}>{accountAvatar ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} compact /> : <Icon className="size-4" strokeWidth={active ? 2.2 : 1.7} />}<span>{language === "zh" ? label : labelEn}</span></Link>;
+          return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[10px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", active ? "bg-ink text-paper dark:bg-white dark:text-ink" : "text-ink/65 hover:bg-ink/5 dark:text-white/68 dark:hover:bg-white/5")}>{accountAvatar ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} compact /> : <Icon className="size-4" strokeWidth={active ? 2.2 : 1.7} />}<span>{language === "zh" ? label : labelEn}</span></Link>;
         })}
       </div>
     </nav>

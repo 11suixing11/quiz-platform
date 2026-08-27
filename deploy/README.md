@@ -58,7 +58,7 @@ durable path above and does not grant the app user shell or sudo access beyond
 the two commands in [deploy/quiz-platform.sudoers](./quiz-platform.sudoers).
 
 The environment file must define a strong random `BETTER_AUTH_SECRET` and the
-canonical `BETTER_AUTH_URL=https://loveyourself.cc.cd`. Do not commit either
+canonical `BETTER_AUTH_URL=https://knowyourself.cc.cd`. Do not commit either
 value. Generate the secret on the server, for example with `openssl rand -base64 32`.
 
 ```bash
@@ -134,8 +134,8 @@ sudo systemctl is-active caddy
 ```
 
 The `beta.loveuu.xyz` and `quiz.107-151-246-167.sslip.io` hosts remain
-no-index origin probes. Legacy `loveuu.xyz` hosts permanently redirect to the
-canonical `loveyourself.cc.cd` host.
+no-index origin probes. Legacy `loveyourself.cc.cd` and `loveuu.xyz` hosts
+permanently redirect to the canonical `knowyourself.cc.cd` host.
 
 ## GitHub Actions deployment
 
@@ -154,17 +154,20 @@ Caddy.
 ## Verify and roll back
 
 ```powershell
+curl.exe -fsSI https://knowyourself.cc.cd/
+curl.exe -fsSI https://www.knowyourself.cc.cd/
 curl.exe -fsSI https://loveyourself.cc.cd/
-curl.exe -fsSI https://www.loveyourself.cc.cd/
 curl.exe -sSI https://beta.loveuu.xyz/
-curl.exe -sSI https://loveyourself.cc.cd/does-not-exist
-curl.exe -fsS https://loveyourself.cc.cd/healthz
-curl.exe -fsS https://loveyourself.cc.cd/api/auth/get-session
+curl.exe -sSI https://knowyourself.cc.cd/does-not-exist
+curl.exe -fsS https://knowyourself.cc.cd/healthz
+curl.exe -fsS https://knowyourself.cc.cd/api/auth/get-session
 ```
 
 The beta response must include `X-Robots-Tag: noindex, nofollow`; missing paths
 must return the branded 404 with status `404`; `/healthz` must return `ok`; and
-the unauthenticated session probe must return JSON `null`.
+the unauthenticated session probe must return JSON `null`. The legacy and
+`www` hosts must return `301` and preserve the path and query string when they
+redirect to `https://knowyourself.cc.cd`.
 
 To roll back to a known-good release:
 

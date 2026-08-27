@@ -12,11 +12,13 @@ import {
 import { cn } from "@/lib/utils";
 
 const icons = {
+  self: Brain,
   personality: Brain,
   emotion: Waves,
   mental: Leaf,
   relationship: HeartHandshake,
   career: BriefcaseBusiness,
+  life: BriefcaseBusiness,
   intelligence: Lightbulb,
   lifestyle: Sparkles,
   social: MessageCircleHeart,

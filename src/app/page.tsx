@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowDown, ArrowRight, ArrowUpRight, Bookmark, History, MoveRight, ShieldCheck } from "lucide-react";
-import LazyExploreSection from "@/components/LazyExploreSection";
+import ExploreSection from "@/components/ExploreSection";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { CategoryMark } from "@/components/quiz/category-mark";
 import { CORE_TEST_GROUPS, getCoreGroupTests } from "@/lib/core-tests";
@@ -47,12 +47,12 @@ function RouteCard({ group, language }: { group: (typeof CORE_TEST_GROUPS)[numbe
       <div className="wellness-topic-routes">
         {tests.map((test) => (
           <Link key={test.id} href={"/test/" + test.id + "/"} className="wellness-route-link group">
-            <span className="wellness-route-icon"><CategoryMark category={test.category} className="size-8 border-0" /></span>
+            <span className="wellness-route-icon"><CategoryMark category={group.id} className="size-8 border-0" /></span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold">{language === "zh" ? test.zh.name : test.en.name}</span>
-              <span className="mt-1 block text-xs text-ink/48 dark:text-white/48">{test.questions} {language === "zh" ? "题" : "questions"} · {test.time} {language === "zh" ? "分钟" : "min"}</span>
+              <span className="wellness-route-meta">{test.questions} {language === "zh" ? "题" : "questions"} · {test.time} {language === "zh" ? "分钟" : "min"} · {getQuizEntry(test.id)?.trust.label[language]}</span>
             </span>
-            <ArrowRight className="size-4 shrink-0 text-ink/32 transition group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/32" aria-hidden="true" />
+            <ArrowRight className="size-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-accent" aria-hidden="true" />
           </Link>
         ))}
       </div>
@@ -122,7 +122,7 @@ export default function HomePage() {
                 <p className="wellness-small-label">{localized(language, "继续上次的记录", "Continue your last reflection")}</p>
                 <p className="mt-1 truncate text-sm font-semibold">{language === "zh" ? latestEntry.title.zh : latestEntry.title.en}</p>
               </div>
-              <span className="ml-auto shrink-0 text-xs text-ink/42 dark:text-white/42">{relativeTime(latest.timestamp, language)}</span>
+              <span className="ml-auto shrink-0 text-xs text-muted-foreground">{relativeTime(latest.timestamp, language)}</span>
             </div>
             <Link href={"/result/" + latest.testId + "/?attempt=" + encodeURIComponent(latest.id)} className="wellness-inline-action">{localized(language, "回看结果", "Review result")} <ArrowUpRight className="size-3.5" aria-hidden="true" /></Link>
           </section>
@@ -152,25 +152,25 @@ export default function HomePage() {
         </section>
 
         <section id="library" className="wellness-library border-t border-ink/12 dark:border-white/12">
-          <LazyExploreSection lang={language} />
+          <ExploreSection lang={language} />
         </section>
 
         <section className="wellness-support-grid">
           <Link href="/bookmarks/" className="wellness-support-panel group">
             <Bookmark className="size-5 text-accent" aria-hidden="true" />
             <div><h2>{localized(language, "收藏一项以后再做", "Save an assessment for later")}</h2><p>{localized(language, "游客收藏保存在本机；开启账号同步后，也能在其他设备继续。", "Guest bookmarks stay on this device; account sync makes them available on your other devices.")}</p></div>
-            <ArrowUpRight className="ml-auto size-4 text-ink/35 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/35" aria-hidden="true" />
+            <ArrowUpRight className="ml-auto size-4 text-muted-foreground transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" aria-hidden="true" />
           </Link>
           <Link href="/settings/" className="wellness-support-panel group">
             <ShieldCheck className="size-5 text-accent" aria-hidden="true" />
             <div><h2>{localized(language, "你的数据，你来决定", "Your data, your call")}</h2><p>{localized(language, "随时导出、导入或清除这台设备上的记录。", "Export, import, or clear everything stored on this device.")}</p></div>
-            <ArrowUpRight className="ml-auto size-4 text-ink/35 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent dark:text-white/35" aria-hidden="true" />
+            <ArrowUpRight className="ml-auto size-4 text-muted-foreground transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" aria-hidden="true" />
           </Link>
         </section>
       </PageContainer>
 
       <footer className="wellness-footer">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 text-xs text-ink/45 dark:text-white/45 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="font-semibold text-ink/70 dark:text-white/70">认识你自己 / Know Yourself</span>
           <div className="flex gap-5"><Link href="/privacy/" className="atlas-text-link">{localized(language, "隐私", "Privacy")}</Link><a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noreferrer" className="atlas-text-link">GitHub</a></div>
         </div>
