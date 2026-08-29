@@ -112,7 +112,7 @@ SMTP_SECURE=false
 JOURNAL_ADMIN_USER_ID=...
 ```
 
-客户端通过运行时 `/api/config/turnstile` 读取 `TURNSTILE_SITE_KEY`；`NEXT_PUBLIC_TURNSTILE_SITE_KEY` 仅作为本地或旧部署兼容项。`SMTP_USER` 和 `SMTP_PASSWORD` 必须同时提供或同时省略；`JOURNAL_ADMIN_USER_ID` 也可使用兼容变量 `ADMIN_USER_ID`，当前生产设计只配置一个管理员用户 ID。生产密钥只放在服务器环境文件中，不提交到仓库。
+客户端通过运行时 `/api/config/turnstile` 读取 `TURNSTILE_SITE_KEY`；`/api/config/account` 只返回邮箱验证和注册是否可用的布尔值，不返回 SMTP 主机、账号或密钥。注册与重发接口在运行配置缺失时直接返回 `503`，注册成功后再显式发送验证邮件，因此界面不会把失败投递显示为成功。`NEXT_PUBLIC_TURNSTILE_SITE_KEY` 仅作为本地或旧部署兼容项。`SMTP_USER` 和 `SMTP_PASSWORD` 必须同时提供或同时省略；`JOURNAL_ADMIN_USER_ID` 也可使用兼容变量 `ADMIN_USER_ID`，当前生产设计只配置一个管理员用户 ID。生产密钥只放在服务器环境文件中，不提交到仓库。
 
 Turnstile、SMTP、管理员 ID、媒体目录和备份目录都是生产发布的必需运行时配置或验收项。仓库提供相应代码路径，但不能据此推断生产服务器已经填入有效密钥或完成外部服务验证。
 

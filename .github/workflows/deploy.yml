@@ -202,13 +202,28 @@ jobs:
             rollback_release
             exit 1
           fi
-          for path in /test/big-five/ /assessments/ /journal/ /community/ /privacy/ /complaints/ /api/config/turnstile /quiz-media/animal-personality/cover.webp; do
+          for path in /test/big-five/ /assessments/ /journal/ /community/ /privacy/ /complaints/ /api/config/account /api/config/turnstile /quiz-media/animal-personality/cover.webp; do
             if ! curl --fail --silent --show-error --retry 5 --retry-delay 1 --retry-all-errors \
               -H 'Host: knowyourself.cc.cd' "$application_origin$path" -o /dev/null; then
               rollback_release
               exit 1
             fi
           done
+          if ! account_configuration="$(curl --fail --silent --show-error -H 'Host: knowyourself.cc.cd' "$application_origin/api/config/account")" || \
+             ! turnstile_configuration="$(curl --fail --silent --show-error -H 'Host: knowyourself.cc.cd' "$application_origin/api/config/turnstile")"; then
+            rollback_release
+            exit 1
+          fi
+          if ! ACCOUNT_CONFIGURATION="$account_configuration" TURNSTILE_CONFIGURATION="$turnstile_configuration" /usr/bin/node -e '
+            const account = JSON.parse(process.env.ACCOUNT_CONFIGURATION || "null");
+            const turnstile = JSON.parse(process.env.TURNSTILE_CONFIGURATION || "null");
+            if (account?.emailVerificationAvailable !== true || account?.registrationAvailable !== true) process.exit(1);
+            if (typeof turnstile?.siteKey !== "string" || !turnstile.siteKey.trim()) process.exit(1);
+          '; then
+            echo "Email verification or registration runtime configuration is unavailable" >&2
+            rollback_release
+            exit 1
+          fi
           home_metadata="$(curl --fail --silent --show-error -A 'Twitterbot/1.0' -H 'Host: knowyourself.cc.cd' "$application_origin/")"
           home_og_title_tag="$(printf '%s' "$home_metadata" | grep -Eo '<meta property="og:title" content="[^"]+"/>' | head -n 1 || true)"
           home_twitter_title_tag="$(printf '%s' "$home_metadata" | grep -Eo '<meta name="twitter:title" content="[^"]+"/>' | head -n 1 || true)"
@@ -293,13 +308,21 @@ jobs:
           legacy_host=loveyourself.cc.cd
           maintenance_host=quiz.107-151-246-167.sslip.io
           test_path=/test/big-five/
-          smoke_paths=("$test_path" /assessments/ /journal/ /community/ /privacy/ /complaints/ /api/config/turnstile /quiz-media/animal-personality/cover.webp)
+          smoke_paths=("$test_path" /assessments/ /journal/ /community/ /privacy/ /complaints/ /api/config/account /api/config/turnstile /quiz-media/animal-personality/cover.webp)
 
           curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/" -o /dev/null
           for path in "${smoke_paths[@]}"; do
             curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host$path" -o /dev/null
           done
           test "$(curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/healthz")" = ok
+          account_configuration="$(curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/api/config/account")"
+          turnstile_configuration="$(curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/api/config/turnstile")"
+          ACCOUNT_CONFIGURATION="$account_configuration" TURNSTILE_CONFIGURATION="$turnstile_configuration" node -e '
+            const account = JSON.parse(process.env.ACCOUNT_CONFIGURATION || "null");
+            const turnstile = JSON.parse(process.env.TURNSTILE_CONFIGURATION || "null");
+            if (account?.emailVerificationAvailable !== true || account?.registrationAvailable !== true) process.exit(1);
+            if (typeof turnstile?.siteKey !== "string" || !turnstile.siteKey.trim()) process.exit(1);
+          '
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/sitemap.xml" | grep -F "<loc>https://$canonical_host/assessments/</loc>"

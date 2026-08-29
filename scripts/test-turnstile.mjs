@@ -15,6 +15,11 @@ function compileRoute() {
   const testModule = { exports: {} };
   const localRequire = (request) => {
     if (request === "@/lib/server/http") return { json: (value) => value };
+    if (request === "@/lib/server/account-capabilities") {
+      return {
+        turnstileSiteKey: () => (process.env.TURNSTILE_SITE_KEY || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "").trim(),
+      };
+    }
     throw new Error(`Unexpected runtime import in ${relativePath}: ${request}`);
   };
   new Function("require", "module", "exports", outputText)(localRequire, testModule, testModule.exports);

@@ -44,6 +44,11 @@ export interface ChangePasswordResponse {
   user: AccountUser;
 }
 
+export interface AccountCapabilities {
+  emailVerificationAvailable: boolean;
+  registrationAvailable: boolean;
+}
+
 export class AccountApiError extends Error {
   constructor(
     message: string,
@@ -114,6 +119,13 @@ export async function getAccount() {
   return authUserResponse(payload);
 }
 
+export async function getAccountCapabilities() {
+  return responseJson<AccountCapabilities>(await fetch("/api/config/account", {
+    cache: "no-store",
+    headers: { Accept: "application/json" },
+  }));
+}
+
 export async function registerAccount(input: { email: string; password: string; displayName: string; captchaToken: string }) {
   const payload = await responseJson<{ user: BetterAuthUser }>(await fetch("/api/auth/sign-up/email", {
     method: "POST",
@@ -123,7 +135,7 @@ export async function registerAccount(input: { email: string; password: string; 
       Accept: "application/json",
       "X-Captcha-Response": input.captchaToken,
     },
-    body: JSON.stringify({ name: input.displayName, email: input.email, password: input.password }),
+    body: JSON.stringify({ name: input.displayName, email: input.email, password: input.password, callbackURL: "/account/" }),
   }));
   notifyAuthSessionChanged();
   return authUserResponse({ user: payload.user, session: null });

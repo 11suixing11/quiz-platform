@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
   KeyRound,
@@ -16,7 +16,7 @@ import { ProfileEditor } from "@/components/profile-editor";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { TurnstileWidget, type TurnstileConfigurationStatus } from "@/components/turnstile-widget";
 import { useLanguage } from "@/hooks/use-local-storage";
-import { changePassword, deleteAccount, loginAccount, registerAccount, sendVerificationEmail } from "@/lib/account";
+import { AccountApiError, changePassword, deleteAccount, getAccountCapabilities, loginAccount, registerAccount, sendVerificationEmail } from "@/lib/account";
 import { clearSyncBaseline } from "@/lib/account-sync";
 import { clearLocalProfile } from "@/lib/local-profile";
 import { adoptSnapshotAsGuest, readSnapshot } from "@/lib/storage";
@@ -27,7 +27,8 @@ type PasswordFeedback = { tone: "success" | "error"; message: string } | null;
 
 function readableError(error: unknown, language: "zh" | "en") {
   const message = error instanceof Error ? error.message : "";
-  const normalized = message.toUpperCase().replaceAll(" ", "_");
+  const code = error instanceof AccountApiError ? error.code ?? "" : "";
+  const normalized = `${code} ${message}`.toUpperCase().replaceAll(" ", "_");
   if (normalized.includes("INVALID_EMAIL_OR_PASSWORD")) return language === "zh" ? "邮箱或密码不正确。" : "The email or password is incorrect.";
   if (normalized.includes("USER_ALREADY_EXISTS")) return language === "zh" ? "这个邮箱已经注册，可以直接登录。" : "This email is already registered. Sign in instead.";
   if (normalized.includes("PASSWORD_TOO_SHORT")) return language === "zh" ? "密码至少需要 10 个字符。" : "Use at least 10 characters for your password.";
@@ -38,6 +39,8 @@ function readableError(error: unknown, language: "zh" | "en") {
   if (normalized.includes("INVALID_NAME")) return language === "zh" ? "显示名称需要为 1 至 80 个字符。" : "Use 1 to 80 characters for your display name.";
   if (normalized.includes("EMAIL_NOT_VERIFIED")) return language === "zh" ? "请先完成邮箱验证。" : "Verify your email before signing in.";
   if (normalized.includes("MISSING_RESPONSE") || normalized.includes("CAPTCHA")) return language === "zh" ? "请完成人机验证后再继续。" : "Complete human verification before continuing.";
+  if (normalized.includes("REGISTRATION_UNAVAILABLE")) return language === "zh" ? "注册服务暂未开放，请稍后再试。" : "Registration is not available yet. Try again later.";
+  if (normalized.includes("EMAIL_VERIFICATION_UNAVAILABLE")) return language === "zh" ? "验证邮件服务暂不可用，请稍后再试。" : "Email verification is temporarily unavailable. Try again later.";
   if (normalized.includes("VERIFICATION_EMAIL") || normalized.includes("EMAIL_DELIVERY")) return language === "zh" ? "验证邮件暂时无法发送，请稍后重试。" : "The verification email could not be sent. Try again later.";
   return message || (language === "zh" ? "操作失败，请稍后重试。" : "The request failed. Please try again.");
 }
@@ -70,10 +73,27 @@ export default function AccountPage() {
   const [captchaResetSignal, setCaptchaResetSignal] = useState(0);
   const [captchaConfigurationStatus, setCaptchaConfigurationStatus] = useState<TurnstileConfigurationStatus>("loading");
   const [confirmAccountDelete, setConfirmAccountDelete] = useState(false);
+  const [emailVerificationAvailable, setEmailVerificationAvailable] = useState<boolean | null>(null);
+  const [registrationAvailable, setRegistrationAvailable] = useState<boolean | null>(null);
 
   const zh = language === "zh";
   const busy = action !== null;
   const cloudSyncEnabled = Boolean(user && syncChoice === "merge");
+
+  useEffect(() => {
+    let active = true;
+    void getAccountCapabilities().then((capabilities) => {
+      if (!active) return;
+      setEmailVerificationAvailable(capabilities.emailVerificationAvailable);
+      setRegistrationAvailable(capabilities.registrationAvailable);
+    }).catch(() => {
+      if (!active) return;
+      setEmailVerificationAvailable(false);
+      setRegistrationAvailable(false);
+    });
+    return () => { active = false; };
+  }, []);
+
   const submitAuth = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFeedback("");
@@ -86,6 +106,13 @@ export default function AccountPage() {
       setFeedback(zh ? "请输入显示名称。" : "Enter a display name.");
       return;
     }
+    if (authMode === "register" && registrationAvailable !== true) {
+      setFeedback(registrationAvailable === null
+        ? (zh ? "正在检查注册服务，请稍候。" : "Checking registration availability. Please wait.")
+        : (zh ? "注册服务暂未开放，请稍后再试。" : "Registration is not available yet. Try again later."));
+      setFeedbackTone("error");
+      return;
+    }
     if (authMode === "register" && (captchaConfigurationStatus !== "ready" || !captchaToken)) {
       setFeedback(captchaConfigurationStatus === "unavailable"
         ? (zh ? "人机验证尚未配置，当前无法注册。" : "Human verification is not configured, so registration is unavailable.")
@@ -96,14 +123,21 @@ export default function AccountPage() {
     setAction("auth");
     try {
       if (authMode === "register") {
-        await registerAccount({ email: email.trim(), password, displayName: displayName.trim(), captchaToken });
+        const targetEmail = email.trim();
+        await registerAccount({ email: targetEmail, password, displayName: displayName.trim(), captchaToken });
         setPassword("");
         setCaptchaToken("");
         setCaptchaResetSignal((value) => value + 1);
         setAuthMode("login");
         setNeedsVerification(true);
-        setFeedbackTone("success");
-        setFeedback(zh ? "账号已创建。请打开验证邮件，完成后再登录。" : "Account created. Open the verification email, then sign in.");
+        try {
+          await sendVerificationEmail(targetEmail);
+          setFeedbackTone("success");
+          setFeedback(zh ? "注册请求已处理。若邮箱需要验证，你会收到验证邮件。" : "Registration request processed. If the address needs verification, a message will be sent.");
+        } catch {
+          setFeedbackTone("error");
+          setFeedback(zh ? "注册请求已处理，但验证邮件发送失败。请稍后使用下方按钮重试。" : "The registration request was processed, but the verification email could not be sent. Retry below later.");
+        }
         return;
       } else {
         await loginAccount({ email: email.trim(), password });
@@ -114,7 +148,9 @@ export default function AccountPage() {
       const message = readableError(error, language);
       setFeedbackTone("error");
       setFeedback(message);
-      const normalized = error instanceof Error ? error.message.toUpperCase().replaceAll(" ", "_") : "";
+      const normalized = error instanceof AccountApiError
+        ? `${error.code ?? ""} ${error.message}`.toUpperCase().replaceAll(" ", "_")
+        : error instanceof Error ? error.message.toUpperCase().replaceAll(" ", "_") : "";
       setNeedsVerification(normalized.includes("EMAIL_NOT_VERIFIED"));
       if (authMode === "register") {
         setCaptchaToken("");
@@ -128,6 +164,13 @@ export default function AccountPage() {
   const resendVerification = async () => {
     const targetEmail = user?.email ?? email.trim();
     if (!targetEmail) return;
+    if (emailVerificationAvailable !== true) {
+      setFeedbackTone("error");
+      setFeedback(emailVerificationAvailable === null
+        ? (zh ? "正在检查邮件服务，请稍候。" : "Checking email delivery. Please wait.")
+        : (zh ? "验证邮件服务暂不可用，请稍后再试。" : "Email verification is temporarily unavailable. Try again later."));
+      return;
+    }
     setAction("verify-email");
     setFeedback("");
     try {
@@ -234,9 +277,11 @@ export default function AccountPage() {
                 {authMode === "register" && <label className="block text-sm font-semibold"><span>{zh ? "显示名称" : "Display name"}</span><input aria-label={zh ? "显示名称" : "Display name"} value={displayName} onChange={(event) => setDisplayName(event.target.value)} name="name" autoComplete="name" maxLength={80} required className="atlas-account-input mt-2" /></label>}
                 <label className="block text-sm font-semibold"><span>{zh ? "邮箱" : "Email"}</span><input aria-label={zh ? "邮箱" : "Email"} value={email} onChange={(event) => setEmail(event.target.value)} name="email" type="email" autoComplete="email" required className="atlas-account-input mt-2" /></label>
                 <label className="block text-sm font-semibold"><span>{zh ? "密码" : "Password"}</span><input aria-label={zh ? "密码" : "Password"} value={password} onChange={(event) => setPassword(event.target.value)} name="password" type="password" minLength={10} maxLength={128} autoComplete={authMode === "login" ? "current-password" : "new-password"} required className="atlas-account-input mt-2" /><span className="mt-2 block text-xs font-normal text-ink/45 dark:text-white/45">{zh ? "至少 10 个字符" : "At least 10 characters"}</span></label>
-                {authMode === "register" && <TurnstileWidget action="signup" language={language} resetSignal={captchaResetSignal} onConfigurationChange={setCaptchaConfigurationStatus} onTokenChange={setCaptchaToken} />}
-                <button type="submit" disabled={busy || (authMode === "register" && (captchaConfigurationStatus !== "ready" || !captchaToken))} className="atlas-primary-action w-full justify-center disabled:cursor-not-allowed disabled:opacity-45">{authMode === "login" ? <LogIn className="size-4" aria-hidden="true" /> : <UserPlus className="size-4" aria-hidden="true" />}{action === "auth" ? (zh ? "请稍候…" : "Please wait…") : authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</button>
-                {needsVerification && <button type="button" onClick={() => void resendVerification()} disabled={busy || !email.trim()} className="atlas-secondary-action w-full justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "重新发送验证邮件" : "Resend verification email")}</button>}
+                {authMode === "register" && registrationAvailable === null && <p className="text-sm text-ink/55 dark:text-white/55" role="status">{zh ? "正在检查注册服务…" : "Checking registration availability…"}</p>}
+                {authMode === "register" && registrationAvailable === false && <p className="text-sm text-[#a53f3f] dark:text-red-200" role="alert">{zh ? "注册服务暂未开放，请稍后再试。" : "Registration is not available yet. Try again later."}</p>}
+                {authMode === "register" && registrationAvailable === true && <TurnstileWidget action="signup" language={language} resetSignal={captchaResetSignal} onConfigurationChange={setCaptchaConfigurationStatus} onTokenChange={setCaptchaToken} />}
+                <button type="submit" disabled={busy || (authMode === "register" && (registrationAvailable !== true || captchaConfigurationStatus !== "ready" || !captchaToken))} className="atlas-primary-action w-full justify-center disabled:cursor-not-allowed disabled:opacity-45">{authMode === "login" ? <LogIn className="size-4" aria-hidden="true" /> : <UserPlus className="size-4" aria-hidden="true" />}{action === "auth" ? (zh ? "请稍候…" : "Please wait…") : authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</button>
+                {needsVerification && <button type="button" onClick={() => void resendVerification()} disabled={busy || !email.trim() || emailVerificationAvailable !== true} className="atlas-secondary-action w-full justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "重新发送验证邮件" : "Resend verification email")}</button>}
               </form>
             </div>
           </section>
@@ -247,7 +292,8 @@ export default function AccountPage() {
             {!user.emailVerified && <section className="atlas-settings-section mt-10" aria-labelledby="verify-email-heading">
               <h2 id="verify-email-heading" className="text-xl font-semibold">{zh ? "验证邮箱" : "Verify email"}</h2>
               <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "完成邮箱验证后才能上传图片和公开札记。" : "Email verification is required before uploading images or publishing journals."}</p>
-              <button type="button" onClick={() => void resendVerification()} disabled={busy} className="atlas-secondary-action mt-5 justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "发送验证邮件" : "Send verification email")}</button>
+              {emailVerificationAvailable === false && <p className="mt-3 text-sm text-[#a53f3f] dark:text-red-200" role="alert">{zh ? "验证邮件服务暂不可用，请稍后再试。" : "Email verification is temporarily unavailable. Try again later."}</p>}
+              <button type="button" onClick={() => void resendVerification()} disabled={busy || emailVerificationAvailable !== true} className="atlas-secondary-action mt-5 justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "发送验证邮件" : "Send verification email")}</button>
             </section>}
 
             <section className="atlas-settings-section mt-10" aria-labelledby="sync-heading">

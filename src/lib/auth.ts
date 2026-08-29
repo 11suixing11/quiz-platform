@@ -65,6 +65,7 @@ export const auth = betterAuth({
   secret: authSecret(),
   database,
   trustedOrigins: process.env.NODE_ENV === "production" ? [PRODUCTION_ORIGIN] : [...DEVELOPMENT_ORIGINS],
+  logger: { level: "warn" },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 10,
@@ -73,12 +74,16 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
   emailVerification: {
-    sendOnSignUp: true,
-    sendOnSignIn: true,
+    sendOnSignUp: false,
+    sendOnSignIn: false,
     autoSignInAfterVerification: true,
     expiresIn: 60 * 60 * 24,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendAccountVerificationEmail({ email: user.email, displayName: user.name, url });
+      try {
+        await sendAccountVerificationEmail({ email: user.email, displayName: user.name, url });
+      } catch {
+        throw new Error("VERIFICATION_EMAIL_DELIVERY_FAILED");
+      }
     },
   },
   databaseHooks: {

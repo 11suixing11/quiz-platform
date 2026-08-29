@@ -24,7 +24,8 @@
         "test:journal": "node scripts/test-journal.mjs",
         "test:turnstile": "node scripts/test-turnstile.mjs",
         "test:share": "node scripts/test-share.mjs",
-        "test": "npm run check:registry && npm run test:scoring && npm run test:quiz-media && npm run test:storage && npm run test:cloud-revision && npm run test:community && npm run test:journal && npm run test:turnstile && npm run test:share"
+        "test:auth-email": "node scripts/test-auth-email.mjs",
+        "test": "npm run check:registry && npm run test:scoring && npm run test:quiz-media && npm run test:storage && npm run test:cloud-revision && npm run test:community && npm run test:journal && npm run test:turnstile && npm run test:share && npm run test:auth-email"
     },
     "dependencies": {
         "better-auth": "^1.7.1",

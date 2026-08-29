@@ -23,6 +23,15 @@ function smtpConfiguration() {
   };
 }
 
+export function emailDeliveryConfigured() {
+  try {
+    smtpConfiguration();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function mailTransport() {
   if (transporter) return transporter;
   const configuration = smtpConfiguration();
