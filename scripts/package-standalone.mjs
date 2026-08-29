@@ -1,4 +1,4 @@
-import { access, cp, mkdir, readFile, rename, rm } from "node:fs/promises";
+import { access, cp, mkdir, readFile, readdir, rename, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -30,6 +30,22 @@ await mkdir(path.join(standaloneRoot, ".next"), { recursive: true });
 await cp(path.join(projectRoot, "public"), path.join(standaloneRoot, "public"), { recursive: true });
 await cp(path.join(nextRoot, "static"), path.join(standaloneRoot, ".next", "static"), { recursive: true });
 
+// Sharp loads its platform-specific optional packages dynamically. Turbopack
+// tracing can omit that optional @img scope, so copy the packages installed
+// for the build host into the standalone runtime explicitly.
+const installedImgRoot = path.join(projectRoot, "node_modules", "@img");
+const packagedImgRoot = path.join(standaloneRoot, "node_modules", "@img");
+await assertFile(installedImgRoot, "installed Sharp platform packages");
+const installedImgPackages = (await readdir(installedImgRoot, { withFileTypes: true }))
+  .filter((entry) => entry.isDirectory() && entry.name.startsWith("sharp-"))
+  .map((entry) => entry.name);
+if (!installedImgPackages.length) {
+  throw new Error(`No Sharp platform package is installed under ${installedImgRoot}`);
+}
+await rm(packagedImgRoot, { recursive: true, force: true });
+await mkdir(path.dirname(packagedImgRoot), { recursive: true });
+await cp(installedImgRoot, packagedImgRoot, { recursive: true });
+
 // Keep the installed systemd unit unchanged: the packaged server.js is a
 // supervisor that starts both Next's generated server and the media worker.
 const packagedServer = path.join(standaloneRoot, "server.js");
@@ -52,4 +68,8 @@ await assertFile(path.join(standaloneRoot, ".next", "static"), "standalone stati
 await assertFile(nextServer, "Next standalone server");
 await assertFile(path.join(standaloneRoot, "media-worker.mjs"), "media worker");
 await assertFile(path.join(standaloneRoot, "node_modules", "sharp", "package.json"), "Sharp runtime");
+await assertFile(path.join(packagedImgRoot, "colour", "package.json"), "Sharp colour runtime");
+for (const packageName of installedImgPackages) {
+  await assertFile(path.join(packagedImgRoot, packageName, "package.json"), `Sharp platform runtime ${packageName}`);
+}
 console.log(`Standalone release prepared at ${standaloneRoot}`);
