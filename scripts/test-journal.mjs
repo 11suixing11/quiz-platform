@@ -479,12 +479,17 @@ try {
   assert.equal(existsSync(currentPublicPath), false, "account deletion preparation must fail closed by quarantining public media");
   sqlite.prepare("UPDATE deletion_tombstones SET deleted_at = ? WHERE entity_type = 'pending_user_media' AND entity_id = 'owner'")
     .run(Date.now() - (10 * 60_000));
+  const mediaOperationLockPath = path.join(process.env.MEDIA_ROOT, "tmp", ".media-operation-lock");
   await stopWorker(worker);
   worker = startWorker();
   await waitForCondition(
-    () => existsSync(currentPublicPath) && sqlite.prepare("SELECT COUNT(*) AS count FROM deletion_tombstones WHERE entity_type = 'pending_user_media' AND entity_id = 'owner'").get().count === 0,
+    () => existsSync(currentPublicPath)
+      && sqlite.prepare("SELECT COUNT(*) AS count FROM deletion_tombstones WHERE entity_type = 'pending_user_media' AND entity_id = 'owner'").get().count === 0
+      && !existsSync(mediaOperationLockPath),
     "media worker did not recover a stale account-deletion preparation for an existing user",
   );
+  await stopWorker(worker);
+  worker = undefined;
 
   journal.deleteJournalEntry("owner", draft.id);
   assert.throws(() => journal.getPublishedJournalEntry(draft.id, null), (error) => error.code === "PUBLIC_JOURNAL_NOT_FOUND");
@@ -492,8 +497,6 @@ try {
   assert.ok(sqlite.prepare("SELECT COUNT(*) AS count FROM deletion_tombstones WHERE entity_id = ?").get(draft.id).count > 0);
   assert.ok(sqlite.prepare("SELECT COUNT(*) AS count FROM journal_revisions WHERE entry_id = ?").get(draft.id).count >= 2, "public revisions remain immutable records until account deletion");
   assert.ok(sqlite.prepare("SELECT COUNT(*) AS count FROM moderation_audit_log").get().count >= 3);
-  await stopWorker(worker);
-  worker = undefined;
   const processingAssetDraft = journal.createJournalEntry("reader-2", { title: "处理中图片删除" });
   const processingAssetBatch = await batch("reader-2", processingAssetDraft.id);
   const processingAssetEntry = await journal.uploadJournalAsset("reader-2", processingAssetDraft.id, await jpegFile("processing-asset.jpg"), { uploadId: processingAssetBatch.uploadId });
