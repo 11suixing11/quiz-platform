@@ -209,6 +209,28 @@ jobs:
               exit 1
             fi
           done
+          home_metadata="$(curl --fail --silent --show-error -A 'Twitterbot/1.0' -H 'Host: knowyourself.cc.cd' "$application_origin/")"
+          home_og_title_tag="$(printf '%s' "$home_metadata" | grep -Eo '<meta property="og:title" content="[^"]+"/>' | head -n 1 || true)"
+          home_twitter_title_tag="$(printf '%s' "$home_metadata" | grep -Eo '<meta name="twitter:title" content="[^"]+"/>' | head -n 1 || true)"
+          assert_public_metadata() {
+            local path="$1"
+            local html og_title_tag twitter_title_tag
+            html="$(curl --fail --silent --show-error -A 'Twitterbot/1.0' -H 'Host: knowyourself.cc.cd' "$application_origin$path")" || return 1
+            og_title_tag="$(printf '%s' "$html" | grep -Eo '<meta property="og:title" content="[^"]+"/>' | head -n 1 || true)"
+            twitter_title_tag="$(printf '%s' "$html" | grep -Eo '<meta name="twitter:title" content="[^"]+"/>' | head -n 1 || true)"
+            [ -n "$home_og_title_tag" ] && [ -n "$home_twitter_title_tag" ] &&
+              printf '%s' "$html" | grep -F "<link rel=\"canonical\" href=\"https://knowyourself.cc.cd$path\"/>" >/dev/null &&
+              printf '%s' "$html" | grep -F "<meta property=\"og:url\" content=\"https://knowyourself.cc.cd$path\"/>" >/dev/null &&
+              [ -n "$og_title_tag" ] && [ "$og_title_tag" != "$home_og_title_tag" ] &&
+              [ -n "$twitter_title_tag" ] && [ "$twitter_title_tag" != "$home_twitter_title_tag" ] &&
+              ! printf '%s' "$html" | grep -F '| Know Yourself | Know Yourself</title>' >/dev/null
+          }
+          for path in /test/big-five/ /assessments/ /complaints/; do
+            if ! assert_public_metadata "$path"; then
+              rollback_release
+              exit 1
+            fi
+          done
           # The auth probe above runs database migrations. Verify that the
           # supervisor and its worker then remain the same live processes.
           media_worker_pids() {
@@ -280,6 +302,28 @@ jobs:
           test "$(curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/healthz")" = ok
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
+          curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/sitemap.xml" | grep -F "<loc>https://$canonical_host/assessments/</loc>"
+
+          home_metadata="$(curl --fail --silent --show-error -A 'Twitterbot/1.0' --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/")"
+          home_og_title_tag="$(printf '%s' "$home_metadata" | grep -Eo '<meta property="og:title" content="[^"]+"/>' | head -n 1 || true)"
+          home_twitter_title_tag="$(printf '%s' "$home_metadata" | grep -Eo '<meta name="twitter:title" content="[^"]+"/>' | head -n 1 || true)"
+          assert_public_metadata() {
+            local request_host="$1"
+            local path="$2"
+            local html og_title_tag twitter_title_tag
+            html="$(curl --fail --silent --show-error -A 'Twitterbot/1.0' --resolve "$request_host:443:$VPS_HOST" "https://$request_host$path")" || return 1
+            og_title_tag="$(printf '%s' "$html" | grep -Eo '<meta property="og:title" content="[^"]+"/>' | head -n 1 || true)"
+            twitter_title_tag="$(printf '%s' "$html" | grep -Eo '<meta name="twitter:title" content="[^"]+"/>' | head -n 1 || true)"
+            [ -n "$home_og_title_tag" ] && [ -n "$home_twitter_title_tag" ] &&
+              printf '%s' "$html" | grep -F "<link rel=\"canonical\" href=\"https://$canonical_host$path\"/>" >/dev/null &&
+              printf '%s' "$html" | grep -F "<meta property=\"og:url\" content=\"https://$canonical_host$path\"/>" >/dev/null &&
+              [ -n "$og_title_tag" ] && [ "$og_title_tag" != "$home_og_title_tag" ] &&
+              [ -n "$twitter_title_tag" ] && [ "$twitter_title_tag" != "$home_twitter_title_tag" ] &&
+              ! printf '%s' "$html" | grep -F '| Know Yourself | Know Yourself</title>' >/dev/null
+          }
+          for path in "$test_path" /assessments/ /complaints/; do
+            assert_public_metadata "$maintenance_host" "$path"
+          done
 
           resolves_to_origin() {
             getent ahostsv4 "$1" | awk -v expected="$VPS_HOST" '$1 == expected { found = 1 } END { exit !found }'
@@ -306,4 +350,8 @@ jobs:
             test "$(curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/healthz")" = ok
             curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
             curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
+            curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/sitemap.xml" | grep -F "<loc>https://$canonical_host/assessments/</loc>"
+            for path in "$test_path" /assessments/ /complaints/; do
+              assert_public_metadata "$canonical_host" "$path"
+            done
           fi

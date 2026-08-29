@@ -2,19 +2,19 @@
 import "./globals.css";
 import { MobileNav, PreferenceSync } from "@/components/shell/app-shell";
 import { AccountProvider } from "@/components/account-provider";
-import { OG_IMAGE_URL, serializeJsonLd, SITE_NAME, SITE_URL, siteUrl } from "@/lib/site-config";
+import { OG_IMAGE_URL, serializeJsonLd, SITE_DESCRIPTION, SITE_DESCRIPTION_EN, SITE_NAME, SITE_URL, siteUrl } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "认识你自己 | Know Yourself", template: "%s | Know Yourself" },
-  description: "16 项经过审阅的中英双语心理评测。游客记录保存在当前浏览器，登录后可在自己的设备之间同步。",
+  description: `${SITE_DESCRIPTION} ${SITE_DESCRIPTION_EN}`,
   alternates: { canonical: "/" },
   keywords: ["自我反思", "人格测试", "情绪", "关系", "self reflection", "personality quiz"],
   authors: [{ name: "Know Yourself" }],
   manifest: "/manifest.json",
   openGraph: {
     title: "认识你自己 | Know Yourself",
-    description: "16 项经过审阅的中英双语心理评测，安静、清晰，并且本地优先。",
+    description: SITE_DESCRIPTION,
     siteName: SITE_NAME,
     locale: "zh_CN",
     alternateLocale: ["en_US"],
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     url: siteUrl("/"),
     images: [{ url: OG_IMAGE_URL, width: 1200, height: 630, alt: "认识你自己 | Know Yourself" }],
   },
-  twitter: { card: "summary_large_image", title: "认识你自己 | Know Yourself", description: "Bilingual, local-first self-reflection quizzes.", images: [OG_IMAGE_URL] },
+  twitter: { card: "summary_large_image", title: "认识你自己 | Know Yourself", description: SITE_DESCRIPTION_EN, images: [OG_IMAGE_URL] },
   robots: { index: true, follow: true },
   other: { "apple-mobile-web-app-capable": "yes", "apple-mobile-web-app-status-bar-style": "default", "apple-mobile-web-app-title": "认识你自己" },
 };
@@ -35,7 +35,7 @@ const jsonLd = {
   name: "认识你自己",
   alternateName: "Know Yourself",
   url: SITE_URL,
-  description: "A bilingual, local-first self-reflection quiz library.",
+  description: `${SITE_DESCRIPTION} ${SITE_DESCRIPTION_EN}`,
   inLanguage: ["zh-CN", "en"],
 };
 
