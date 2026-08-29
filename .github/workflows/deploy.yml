@@ -64,7 +64,7 @@ jobs:
           PY
           file "$addon"
           file "$addon" | grep -E 'ELF 64-bit.*x86-64'
-          sharp_addon="$(find .next/standalone/node_modules/@img -path '*sharp-linux-x64*/lib/sharp-linux-x64.node' -print -quit)"
+          sharp_addon="$(find .next/standalone/node_modules/@img -path '*sharp-linux-x64*/lib/sharp-linux-x64*.node' -print -quit)"
           test -n "$sharp_addon"
           test -f "$sharp_addon"
           file "$sharp_addon" | grep -E 'ELF 64-bit.*x86-64'
