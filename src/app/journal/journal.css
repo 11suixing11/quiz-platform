@@ -1,3 +1,4 @@
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V4 · genre: modern-minimal · macrostructure: Workbench · design-system: DESIGN.md · designed-as-app */
 .journal-library-container,
 .journal-editor-container,
 .journal-reading-container { --journal-rule: color-mix(in srgb, var(--ink) 13%, transparent); }
@@ -24,7 +25,7 @@
 .journal-library-cover > img { width: 100%; height: 100%; object-fit: cover; }
 .journal-library-cover > span:not(.journal-status) { display: grid; width: 100%; height: 100%; place-items: center; color: color-mix(in srgb, var(--warm-ink) 62%, transparent); }
 .journal-library-cover > span > svg { width: 2.5rem; height: 2.5rem; stroke-width: 1.25; }
-.journal-status { position: absolute; left: .75rem; top: .75rem; display: inline-flex; min-height: 1.75rem; align-items: center; border: 1px solid color-mix(in srgb, var(--paper) 38%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--night) 78%, transparent); padding: .3rem .55rem; color: #fff8f0; font-size: .65rem; font-weight: 750; }
+.journal-status { position: absolute; left: .75rem; top: .75rem; display: inline-flex; min-height: 1.75rem; align-items: center; border: 1px solid color-mix(in srgb, var(--paper) 38%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--night) 78%, transparent); padding: .3rem .55rem; color: var(--color-night-ink); font-size: .65rem; font-weight: 750; }
 .journal-status-hidden { background: color-mix(in srgb, var(--danger) 82%, transparent); }
 .journal-status-processing { background: color-mix(in srgb, var(--warm-ink) 84%, transparent); }
 .journal-library-copy { padding: 1rem; }
@@ -153,7 +154,7 @@
 .journal-image-preview { position: relative; display: grid; min-height: 15rem; place-items: center; overflow: hidden; border-right: 1px solid var(--journal-rule); background: color-mix(in srgb, var(--ink) 5%, var(--paper)); }
 .journal-image-preview > img { width: 100%; height: 100%; max-height: 26rem; object-fit: contain; }
 .journal-image-preview > svg { width: 2rem; height: 2rem; color: color-mix(in srgb, var(--ink) 32%, transparent); }
-.journal-image-process { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: .55rem; background: color-mix(in srgb, var(--night) 72%, transparent); color: #fff; font-size: .7rem; font-weight: 750; }
+.journal-image-process { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: .55rem; background: color-mix(in srgb, var(--night) 72%, transparent); color: var(--color-night-ink); font-size: .7rem; font-weight: 750; }
 .journal-image-process.is-failed { background: color-mix(in srgb, var(--danger) 78%, transparent); }
 .journal-image-process svg { width: 1rem; height: 1rem; }
 .journal-image-fields { min-width: 0; padding: 1rem; }
@@ -230,7 +231,7 @@
 .journal-comments-closed { margin-top: .8rem; color: color-mix(in srgb, var(--ink) 48%, transparent); font-size: .72rem; }
 
 .journal-dialog-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; overflow-y: auto; background: color-mix(in srgb, var(--night) 64%, transparent); padding: 1.25rem; }
-.journal-report-dialog { width: min(100%, 32rem); border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); border-radius: .5rem; background: var(--paper); box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, .22); padding: 1.25rem; }
+.journal-report-dialog { width: min(100%, 32rem); border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); border-radius: .5rem; background: var(--paper); box-shadow: var(--shadow-dialog); padding: 1.25rem; }
 .journal-report-dialog > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--journal-rule); padding-bottom: 1rem; }
 .journal-report-dialog header p { color: color-mix(in srgb, var(--ink) 42%, transparent); font-size: .65rem; font-weight: 750; }
 .journal-report-dialog h2 { margin-top: .25rem; font-size: 1.25rem; font-weight: 700; }

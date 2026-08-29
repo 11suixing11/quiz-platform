@@ -150,7 +150,7 @@ export function TurnstileWidget({
   }
 
   if (configurationStatus === "unavailable") {
-    return <p className={cn("text-sm text-[#a53f3f] dark:text-red-200", className)} role="alert">
+    return <p className={cn("text-sm text-[color:var(--danger)]", className)} role="alert">
       {language === "zh" ? "人机验证尚未配置，当前无法继续。" : "Human verification is not configured, so this action is unavailable."}
     </p>;
   }
@@ -161,7 +161,7 @@ export function TurnstileWidget({
       id={`turnstile-${reactId.replaceAll(":", "")}`}
       aria-label={language === "zh" ? "人机验证" : "Human verification"}
     />
-    {failed && <p className="mt-2 text-sm text-[#a53f3f] dark:text-red-200" role="alert">
+    {failed && <p className="mt-2 text-sm text-[color:var(--danger)]" role="alert">
       {language === "zh" ? "验证加载失败，请刷新后重试。" : "Verification failed to load. Refresh and try again."}
     </p>}
   </div>;

@@ -278,7 +278,7 @@ export default function AccountPage() {
                 <label className="block text-sm font-semibold"><span>{zh ? "邮箱" : "Email"}</span><input aria-label={zh ? "邮箱" : "Email"} value={email} onChange={(event) => setEmail(event.target.value)} name="email" type="email" autoComplete="email" required className="atlas-account-input mt-2" /></label>
                 <label className="block text-sm font-semibold"><span>{zh ? "密码" : "Password"}</span><input aria-label={zh ? "密码" : "Password"} value={password} onChange={(event) => setPassword(event.target.value)} name="password" type="password" minLength={10} maxLength={128} autoComplete={authMode === "login" ? "current-password" : "new-password"} required className="atlas-account-input mt-2" /><span className="mt-2 block text-xs font-normal text-ink/45 dark:text-white/45">{zh ? "至少 10 个字符" : "At least 10 characters"}</span></label>
                 {authMode === "register" && registrationAvailable === null && <p className="text-sm text-ink/55 dark:text-white/55" role="status">{zh ? "正在检查注册服务…" : "Checking registration availability…"}</p>}
-                {authMode === "register" && registrationAvailable === false && <p className="text-sm text-[#a53f3f] dark:text-red-200" role="alert">{zh ? "注册服务暂未开放，请稍后再试。" : "Registration is not available yet. Try again later."}</p>}
+                {authMode === "register" && registrationAvailable === false && <p className="text-sm text-[color:var(--danger)]" role="alert">{zh ? "注册服务暂未开放，请稍后再试。" : "Registration is not available yet. Try again later."}</p>}
                 {authMode === "register" && registrationAvailable === true && <TurnstileWidget action="signup" language={language} resetSignal={captchaResetSignal} onConfigurationChange={setCaptchaConfigurationStatus} onTokenChange={setCaptchaToken} />}
                 <button type="submit" disabled={busy || (authMode === "register" && (registrationAvailable !== true || captchaConfigurationStatus !== "ready" || !captchaToken))} className="atlas-primary-action w-full justify-center disabled:cursor-not-allowed disabled:opacity-45">{authMode === "login" ? <LogIn className="size-4" aria-hidden="true" /> : <UserPlus className="size-4" aria-hidden="true" />}{action === "auth" ? (zh ? "请稍候…" : "Please wait…") : authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</button>
                 {needsVerification && <button type="button" onClick={() => void resendVerification()} disabled={busy || !email.trim() || emailVerificationAvailable !== true} className="atlas-secondary-action w-full justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "重新发送验证邮件" : "Resend verification email")}</button>}
@@ -292,17 +292,17 @@ export default function AccountPage() {
             {!user.emailVerified && <section className="atlas-settings-section mt-10" aria-labelledby="verify-email-heading">
               <h2 id="verify-email-heading" className="text-xl font-semibold">{zh ? "验证邮箱" : "Verify email"}</h2>
               <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "完成邮箱验证后才能上传图片和公开札记。" : "Email verification is required before uploading images or publishing journals."}</p>
-              {emailVerificationAvailable === false && <p className="mt-3 text-sm text-[#a53f3f] dark:text-red-200" role="alert">{zh ? "验证邮件服务暂不可用，请稍后再试。" : "Email verification is temporarily unavailable. Try again later."}</p>}
+              {emailVerificationAvailable === false && <p className="mt-3 text-sm text-[color:var(--danger)]" role="alert">{zh ? "验证邮件服务暂不可用，请稍后再试。" : "Email verification is temporarily unavailable. Try again later."}</p>}
               <button type="button" onClick={() => void resendVerification()} disabled={busy || emailVerificationAvailable !== true} className="atlas-secondary-action mt-5 justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "发送验证邮件" : "Send verification email")}</button>
             </section>}
 
             <section className="atlas-settings-section mt-10" aria-labelledby="sync-heading">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 id="sync-heading" className="text-2xl font-semibold">{zh ? "自动同步" : "Automatic sync"}</h2>
-                <div className="flex items-center gap-2 text-xs font-semibold text-ink/55 dark:text-white/55"><span className={cn("size-2 rounded-full", syncState === "ready" ? "bg-accent" : syncState === "error" ? "bg-[#a53f3f]" : "bg-ink/25 dark:bg-white/25")} aria-hidden="true" /><span>{syncState === "ready" ? (zh ? "同步已开启" : "Sync on") : syncState === "syncing" ? (zh ? "正在同步" : "Syncing") : (zh ? "需要处理" : "Needs attention")}</span></div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-ink/55 dark:text-white/55"><span className={cn("size-2 rounded-full", syncState === "ready" ? "bg-accent" : syncState === "error" ? "bg-[var(--danger)]" : "bg-ink/25 dark:bg-white/25")} aria-hidden="true" /><span>{syncState === "ready" ? (zh ? "同步已开启" : "Sync on") : syncState === "syncing" ? (zh ? "正在同步" : "Syncing") : (zh ? "需要处理" : "Needs attention")}</span></div>
               </div>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "登录后会自动合并本机与云端的结果、收藏、偏好、未完成进度和个人资料；已完成测评的原始答案只留在本机。" : "After signing in, device and cloud results, bookmarks, preferences, unfinished progress, and profile are merged automatically. Completed raw answers stay on this device."}</p>
-              {(syncError || (feedback && !confirmAccountDelete)) && <p className={cn("mt-4 text-sm leading-6", syncError ? "text-[#a53f3f] dark:text-red-200" : "text-accent")} role={syncError ? "alert" : "status"}>{syncError || feedback}</p>}
+              {(syncError || (feedback && !confirmAccountDelete)) && <p className={cn("mt-4 text-sm leading-6", syncError ? "text-[color:var(--danger)]" : "text-accent")} role={syncError ? "alert" : "status"}>{syncError || feedback}</p>}
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 {cloudSyncEnabled && <button type="button" onClick={() => void syncNow()} disabled={busy || syncState === "syncing"} className="atlas-secondary-action justify-center disabled:opacity-45"><RefreshCw className={cn("size-4", syncState === "syncing" && "animate-spin")} aria-hidden="true" />{zh ? "立即同步" : "Sync now"}</button>}
                 <button type="button" onClick={() => void signOut()} disabled={busy} className="atlas-secondary-action justify-center disabled:opacity-45"><LogOut className="size-4" aria-hidden="true" />{zh ? "退出登录" : "Sign out"}</button>
@@ -330,7 +330,7 @@ export default function AccountPage() {
                   <KeyRound className="size-4" aria-hidden="true" />
                   {action === "change-password" ? (zh ? "正在修改…" : "Changing…") : (zh ? "修改密码" : "Change password")}
                 </button>
-                {passwordFeedback && <p className={cn("text-sm leading-6", passwordFeedback.tone === "error" ? "text-[#a53f3f] dark:text-red-200" : "text-accent")} role={passwordFeedback.tone === "error" ? "alert" : "status"}>{passwordFeedback.message}</p>}
+                {passwordFeedback && <p className={cn("text-sm leading-6", passwordFeedback.tone === "error" ? "text-[color:var(--danger)]" : "text-accent")} role={passwordFeedback.tone === "error" ? "alert" : "status"}>{passwordFeedback.message}</p>}
               </form>
             </section>
 
@@ -343,13 +343,13 @@ export default function AccountPage() {
                   {confirmAccountDelete && <button type="button" onClick={() => { setConfirmAccountDelete(false); setDeletePassword(""); }} disabled={busy} className="atlas-text-button">{zh ? "取消" : "Cancel"}</button>}
                   <button type="button" onClick={() => void removeAccount()} disabled={busy} className="atlas-danger-action disabled:opacity-45"><ShieldCheck className="size-4" aria-hidden="true" />{action === "delete-account" ? (zh ? "正在删除…" : "Deleting…") : confirmAccountDelete ? (zh ? "确认永久删除" : "Delete permanently") : (zh ? "删除账号" : "Delete account")}</button>
                 </div>
-                {confirmAccountDelete && feedback && <p className="mt-3 text-sm text-[#a53f3f] dark:text-red-200" role="alert">{feedback}</p>}
+                {confirmAccountDelete && feedback && <p className="mt-3 text-sm text-[color:var(--danger)]" role="alert">{feedback}</p>}
               </div>
             </section>
           </>
         )}
 
-        {!user && feedback && <p className={cn("mt-5 text-sm", feedbackTone === "success" ? "text-accent" : "text-[#a53f3f] dark:text-red-200")} role={feedbackTone === "success" ? "status" : "alert"}>{feedback}</p>}
+        {!user && feedback && <p className={cn("mt-5 text-sm", feedbackTone === "success" ? "text-accent" : "text-[color:var(--danger)]")} role={feedbackTone === "success" ? "status" : "alert"}>{feedback}</p>}
         <p className="mt-10 text-sm text-ink/45 dark:text-white/45"><Link href="/privacy/" className="atlas-text-link justify-start font-semibold">{zh ? "查看隐私说明" : "Read privacy notes"}</Link></p>
       </PageContainer>
     </div>

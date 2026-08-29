@@ -106,7 +106,7 @@ export function NarrativeSection({
   typeData,
   dimensions,
   archetypes,
-  accentColor = "#446b60",
+  accentColor = "var(--accent)",
   lang = "zh",
   introDescription,
 }: NarrativeSectionProps) {

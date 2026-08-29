@@ -30,7 +30,7 @@ export default function TestDetailClient({ testId, sampleQuestions, media }: { t
         <div className="grid gap-12 lg:grid-cols-[1fr_0.78fr] lg:items-start">
           <section>
             <div className="flex items-center gap-3 text-accent"><CategoryMark category={entry.topic.id} className="size-12" /><span className="atlas-section-kicker">{entry.topic.label[language]}</span></div>
-            <h1 className="mt-7 max-w-2xl text-5xl font-semibold leading-[0.95] tracking-[-0.065em] sm:text-7xl">{title}</h1>
+            <h1 className="mt-7 max-w-2xl text-5xl font-semibold leading-none sm:text-7xl">{title}</h1>
             <p className="mt-7 max-w-xl text-base leading-7 text-muted-foreground">{description}</p>
             <div className="mt-8 flex flex-wrap gap-2 text-xs text-muted-foreground"><span className="atlas-meta-chip"><ListChecks className="size-3.5" />{entry.questions} {language === "zh" ? "道问题" : "questions"}</span><span className="atlas-meta-chip"><Clock3 className="size-3.5" />{entry.duration} {language === "zh" ? "分钟" : "min"}</span><span className="atlas-meta-chip">{entry.kind === "type" ? (language === "zh" ? "类型结果" : "Type result") : entry.kind === "dimensions" ? (language === "zh" ? "维度结果" : "Dimension result") : (language === "zh" ? "分数结果" : "Score result")}</span><span className="atlas-meta-chip text-accent"><BadgeInfo className="size-3.5" />{entry.trust.label[language]}</span></div>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"><Link href={`/quiz/${testId}/`} className="atlas-primary-action justify-center sm:justify-start">{language === "zh" ? "开始测评" : "Start assessment"}<ArrowRight className="size-4" aria-hidden="true" /></Link><button type="button" onClick={() => toggleBookmark(testId)} className="atlas-secondary-action justify-center sm:justify-start">{saved ? <BookmarkCheck className="size-4" /> : <Bookmark className="size-4" />}{saved ? (language === "zh" ? "已收藏" : "Saved") : (language === "zh" ? "稍后再做" : "Save for later")}</button><Link href="/assessments/#routes" className="assessment-reselect-link justify-center sm:justify-start">{language === "zh" ? "重新选择测评" : "Choose another"}</Link></div>
@@ -38,7 +38,7 @@ export default function TestDetailClient({ testId, sampleQuestions, media }: { t
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="atlas-section-kicker">{language === "zh" ? "依据与边界" : "Basis and limits"}</p>
-                  <h2 id="assessment-trust-title" className="mt-2 text-xl font-semibold tracking-[-0.035em]">{language === "zh" ? "这项测评如何理解" : "How to read this assessment"}</h2>
+                  <h2 id="assessment-trust-title" className="mt-2 text-xl font-semibold">{language === "zh" ? "这项测评如何理解" : "How to read this assessment"}</h2>
                 </div>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/8 px-3 py-1.5 text-xs font-semibold text-accent"><BadgeInfo className="size-3.5" aria-hidden="true" />{entry.trust.label[language]}</span>
               </div>

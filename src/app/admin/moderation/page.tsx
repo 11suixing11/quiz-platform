@@ -168,7 +168,7 @@ export default function ModerationPage() {
         <div className="mt-7 grid grid-cols-4 rounded-lg border border-ink/12 p-1 dark:border-white/12" role="tablist" aria-label={language === "zh" ? "治理视图" : "Moderation views"}>
           {(["queue", "complaints", "accounts", "audit"] as const).map((item) => <button key={item} type="button" role="tab" aria-selected={tab === item} onClick={() => setTab(item)} className={`min-h-11 rounded-md px-2 text-xs font-semibold sm:text-sm ${tab === item ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55"}`}>{item === "queue" ? (language === "zh" ? `隐藏内容 ${queue.length}` : `Hidden ${queue.length}`) : item === "complaints" ? (language === "zh" ? `投诉 ${data.complaints.length}` : `Complaints ${data.complaints.length}`) : item === "accounts" ? (language === "zh" ? "账号" : "Accounts") : (language === "zh" ? "审计" : "Audit")}</button>)}
         </div>
-        {error && <p className="mt-5 text-sm text-[#a53f3f] dark:text-red-200" role="alert">{error}</p>}
+        {error && <p className="mt-5 text-sm text-[color:var(--danger)]" role="alert">{error}</p>}
         {loading ? <div className="community-state" role="status">{language === "zh" ? "正在读取治理记录…" : "Loading moderation records…"}</div> : <div className="mt-6">
           {tab === "queue" && (queue.length ? queue.map(({ type, row }) => <ModerationItem key={`${type}:${row.id}`} type={type} row={row} language={language} busy={busy} onAction={(targetType, targetId, action, reason) => mutate("/api/journal/admin/moderation", { targetType, targetId, action, reason })} />) : <div className="community-state"><h2>{language === "zh" ? "没有待处理的隐藏内容" : "No hidden content needs review"}</h2></div>)}
 

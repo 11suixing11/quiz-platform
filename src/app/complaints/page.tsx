@@ -76,7 +76,7 @@ export default function ComplaintsPage() {
           <span>{zh ? "说明" : "Details"}</span>
           <textarea value={details} onChange={(event) => setDetails(event.target.value)} minLength={1} maxLength={5000} required rows={8} className="atlas-account-input mt-2 min-h-44 resize-y" />
         </label>
-        {error && <p className="text-sm text-[#a53f3f] dark:text-red-200" role="alert">{error}</p>}
+        {error && <p className="text-sm text-[color:var(--danger)]" role="alert">{error}</p>}
         <button type="submit" disabled={busy} className="atlas-primary-action justify-center disabled:opacity-45"><Send className="size-4" aria-hidden="true" />{busy ? (zh ? "正在提交…" : "Submitting…") : (zh ? "提交投诉" : "Submit complaint")}</button>
       </form>}
     </PageContainer>

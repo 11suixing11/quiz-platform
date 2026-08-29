@@ -81,6 +81,15 @@ components:
 
 **Creative North Star: The quiet reflection room.**
 
+### Hallmark implementation profile
+
+- **Genre:** modern-minimal editorial reflection workspace.
+- **Marketing family:** Split Studio, with the two reflection paths kept equal in area and hierarchy.
+- **App family:** Workbench for journal, account, settings, community, and moderation surfaces.
+- **Content family:** Long Document for assessment details, quiz, results, privacy, and public journal reading.
+- **Tokens:** `tokens.css` is the drop-in implementation source for color, type, spacing, radius, and motion values. Page CSS may compose those tokens but must not introduce a parallel palette.
+- **Motion:** transform and opacity only for interface movement; focused tasks remain readable before motion runs.
+
 This is a bilingual reflection product for people arriving with a small, human question. The interface should feel like a clear desk, a notebook, and a calm guide. It supports both structured assessments and open-ended image journals. It is not a game board, clinical dashboard, productivity cockpit, or AI showcase.
 
 The homepage presents two equal paths in the first viewport: take an assessment or create an image journal. The assessment catalog then groups the reviewed routes; a detail page explains what a person will answer; the quiz keeps attention on one question at a time. Results are framed as observations from this attempt. Image journals begin in a private library, move through editing and preview, and become public only through an explicit publishing action.
@@ -202,3 +211,97 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
 - Do not add remote stock images, web fonts, third-party analytics, or runtime AI image generation for visual polish.
 - Do not make image ordering drag-only, publish private edits automatically, or present unpublish as deletion.
 - Do not animate layout properties or ship a large dependency for a small transition.
+
+## Exports
+
+`tokens.css` is the source of truth. The blocks below are portable translations of the same system.
+
+### tokens.css
+
+```css
+:root {
+  --color-paper: oklch(95.7% 0.025 75);
+  --color-paper-strong: oklch(98.2% 0.015 75);
+  --color-ink: oklch(31% 0.025 150);
+  --color-accent: oklch(50% 0.08 155);
+  --color-accent-ink: oklch(97% 0.018 80);
+  --color-muted-text: oklch(48% 0.02 70);
+  --color-danger: oklch(50% 0.16 25);
+  --font-display: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-body: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-code: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  --space-3xs: 0.25rem; --space-2xs: 0.5rem; --space-xs: 0.75rem;
+  --space-sm: 1rem; --space-md: 1.5rem; --space-lg: 2rem;
+  --space-xl: 3rem; --space-2xl: 4.5rem; --space-3xl: 7rem;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem;
+  --text-lg: 1.25rem; --text-xl: 1.75rem; --text-2xl: 2.5rem;
+  --text-display: 4rem;
+  --radius-control: 0.5rem; --radius-panel: 0.5rem; --radius-pill: 999px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-short: 180ms; --duration-medium: 280ms;
+}
+```
+
+### Tailwind v4 `@theme`
+
+```css
+@theme {
+  --color-paper: oklch(95.7% 0.025 75);
+  --color-ink: oklch(31% 0.025 150);
+  --color-accent: oklch(50% 0.08 155);
+  --color-muted-foreground: oklch(48% 0.02 70);
+  --font-display: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-body: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  --spacing-xs: 0.75rem; --spacing-sm: 1rem; --spacing-md: 1.5rem;
+  --spacing-lg: 2rem; --spacing-xl: 3rem; --spacing-2xl: 4.5rem;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem;
+  --text-lg: 1.25rem; --text-xl: 1.75rem; --text-2xl: 2.5rem;
+  --radius-lg: 0.5rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+```
+
+### DTCG `tokens.json`
+
+```json
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "color": {
+    "paper": { "$value": "oklch(95.7% 0.025 75)", "$type": "color" },
+    "ink": { "$value": "oklch(31% 0.025 150)", "$type": "color" },
+    "accent": { "$value": "oklch(50% 0.08 155)", "$type": "color" },
+    "danger": { "$value": "oklch(50% 0.16 25)", "$type": "color" }
+  },
+  "font": {
+    "display": { "$value": "Segoe UI, PingFang SC, Microsoft YaHei, sans-serif", "$type": "fontFamily" },
+    "body": { "$value": "Segoe UI, PingFang SC, Microsoft YaHei, sans-serif", "$type": "fontFamily" }
+  },
+  "space": {
+    "sm": { "$value": "1rem", "$type": "dimension" },
+    "md": { "$value": "1.5rem", "$type": "dimension" },
+    "lg": { "$value": "2rem", "$type": "dimension" },
+    "xl": { "$value": "3rem", "$type": "dimension" }
+  }
+}
+```
+
+### shadcn/ui CSS variables
+
+```css
+:root {
+  --background: 95.7% 0.025 75;
+  --foreground: 31% 0.025 150;
+  --card: 98.2% 0.015 75;
+  --card-foreground: 31% 0.025 150;
+  --primary: 50% 0.08 155;
+  --primary-foreground: 97% 0.018 80;
+  --muted: 91% 0.025 150;
+  --muted-foreground: 48% 0.02 70;
+  --destructive: 50% 0.16 25;
+  --border: 86% 0.02 150;
+  --input: 86% 0.02 150;
+  --ring: 50% 0.08 155;
+  --radius: 0.5rem;
+}
+```

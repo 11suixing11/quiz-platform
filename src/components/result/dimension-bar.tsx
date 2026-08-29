@@ -9,7 +9,7 @@ interface DimensionBarProps {
 export function DimensionBar({
   name,
   percentage,
-  accentColor = "#446b60",
+  accentColor = "var(--accent)",
   description,
 }: DimensionBarProps) {
   const clamped = Math.max(0, Math.min(100, Math.round(percentage)));

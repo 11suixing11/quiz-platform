@@ -35,7 +35,7 @@ function getCategoryLabel(category: string, lang: Lang) {
   return item ? (lang === "zh" ? item.zh : item.en) : category;
 }
 
-export function TestCard({ test, index = 0, lang = "zh" }: { test: TestCardItem; index?: number; lang?: Lang }) {
+export function TestCard({ test, index = 0, lang = "zh", variant = "card" }: { test: TestCardItem; index?: number; lang?: Lang; variant?: "card" | "catalog" }) {
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const saved = isBookmarked(test.id);
   const { title, description, duration } = getCardCopy(test, lang);
@@ -48,10 +48,10 @@ export function TestCard({ test, index = 0, lang = "zh" }: { test: TestCardItem;
   const cover = getQuizCover(test.id);
 
   return (
-    <article className={`atlas-test-card${cover ? " atlas-test-card--visual" : ""}`}>
-      <Link href={`/test/${test.id}/`} className="group block h-full">
-        {cover && <QuizVisualFrame visual={cover} lang={lang} sizes="(max-width: 640px) calc(100vw - 2.5rem), (max-width: 1024px) 45vw, 24rem" className="atlas-test-card-visual" />}
-        <div className="flex h-full flex-col gap-5 p-5 sm:p-6">
+    <article className={`atlas-test-card${cover ? " atlas-test-card--visual" : ""}${variant === "catalog" ? " atlas-test-card--catalog" : ""}`}>
+      <Link href={`/test/${test.id}/`} className="atlas-test-card-link group block h-full">
+        {cover && <QuizVisualFrame visual={cover} lang={lang} sizes={variant === "catalog" ? "(max-width: 799px) 38vw, 10rem" : "(max-width: 640px) calc(100vw - 2.5rem), (max-width: 1024px) 45vw, 24rem"} className="atlas-test-card-visual" />}
+        <div className="atlas-test-card-body flex h-full flex-col gap-5 p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-2.5">
               <CategoryMark category={category} className="text-accent" />
@@ -62,7 +62,7 @@ export function TestCard({ test, index = 0, lang = "zh" }: { test: TestCardItem;
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold tracking-[-0.025em] text-ink transition group-hover:text-accent dark:text-white">{title}</h3>
+            <h3 className="text-lg font-semibold text-ink transition group-hover:text-accent dark:text-white">{title}</h3>
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{description}</p>
           </div>
           <div className="flex items-center justify-between gap-3 border-t border-ink/14 pt-4 text-xs text-muted-foreground dark:border-white/16">

@@ -1,0 +1,12 @@
+[
+  {
+    "date": "2026-08-29",
+    "scope": "app",
+    "macrostructure": "Split Studio / Catalogue Index / Workbench / Long Document",
+    "theme": "custom",
+    "theme_axes": "warm-paper / system-sans / botanical-green",
+    "vibe": "quiet bilingual reflection workspace",
+    "enrichment": "local assessment and journal imagery",
+    "brief": "Rebuild the product shell, home, catalogue, and shared visual system without changing business logic"
+  }
+]

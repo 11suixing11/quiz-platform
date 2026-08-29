@@ -60,26 +60,26 @@ export default function SettingsPage() {
         </div>
 
         <section className="atlas-settings-section mt-12">
-          <div><h2 className="text-xl font-semibold tracking-[-0.03em]">{copy.language}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.languageDescription}</p></div>
+          <div><h2 className="text-xl font-semibold">{copy.language}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.languageDescription}</p></div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2" role="group" aria-label={copy.language}>
             {(["zh", "en"] as Lang[]).map((value) => <button type="button" key={value} onClick={() => setLanguage(value)} aria-pressed={language === value} className={cn("flex min-h-11 items-center justify-between rounded-xl border px-4 py-4 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", language === value ? "border-accent bg-accent/8" : "border-ink/12 hover:border-ink/30 dark:border-white/12 dark:hover:border-white/30")}><span><span className="block text-sm font-semibold">{value === "zh" ? copy.chinese : copy.english}</span><span className="mt-1 block text-xs text-ink/45 dark:text-white/45">{value === "zh" ? "简体中文" : "English"}</span></span>{language === value && <Check className="size-4 text-accent" aria-hidden="true" />}</button>)}
           </div>
         </section>
 
         <section className="atlas-settings-section mt-10">
-          <div><h2 className="text-xl font-semibold tracking-[-0.03em]">{copy.appearance}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.appearanceDescription}</p></div>
+          <div><h2 className="text-xl font-semibold">{copy.appearance}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.appearanceDescription}</p></div>
           <div className="mt-5 grid gap-3 sm:grid-cols-3" role="group" aria-label={copy.appearance}>
             {themes.map(({ id, icon: Icon, zh, en, descriptionZh, descriptionEn }) => <button type="button" key={id} onClick={() => setTheme(id)} aria-pressed={theme === id} className={cn("flex min-h-28 flex-col justify-between rounded-xl border p-4 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent", theme === id ? "border-accent bg-accent/8" : "border-ink/12 hover:border-ink/30 dark:border-white/12 dark:hover:border-white/30")}><span className="flex items-center justify-between"><Icon className="size-4 text-accent" aria-hidden="true" />{theme === id && <Check className="size-4 text-accent" aria-hidden="true" />}</span><span><span className="block text-sm font-semibold">{language === "zh" ? zh : en}</span><span className="mt-1 block text-xs text-ink/45 dark:text-white/45">{language === "zh" ? descriptionZh : descriptionEn}</span></span></button>)}
           </div>
         </section>
 
         <section className="atlas-settings-section mt-10">
-          <div><h2 className="text-xl font-semibold tracking-[-0.03em]">{copy.account}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.accountDescription}</p></div>
+          <div><h2 className="text-xl font-semibold">{copy.account}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.accountDescription}</p></div>
           <Link href="/account/" className="atlas-secondary-action mt-5"><UserRound className="size-4" aria-hidden="true" />{copy.accountAction}</Link>
         </section>
 
         <section className="atlas-settings-section mt-10" id="data">
-          <div><h2 className="text-xl font-semibold tracking-[-0.03em]">{copy.data}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.dataDescription}</p></div>
+          <div><h2 className="text-xl font-semibold">{copy.data}</h2><p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{copy.dataDescription}</p></div>
           <div className="mt-6"><DataManager lang={language} /></div>
         </section>
 

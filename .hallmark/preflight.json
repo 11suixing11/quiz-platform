@@ -1,0 +1,10 @@
+{
+  "date": "2026-08-29",
+  "designSystem": "DESIGN.md",
+  "fontStack": "Local system Chinese and Latin sans-serif with Cascadia Code fallback",
+  "palette": "Project palette migrated to OKLCH semantic tokens",
+  "motion": "Motion-cut; CSS transform and opacity only with reduced-motion fallbacks",
+  "spacing": "Four-point semantic scale in tokens.css",
+  "framework": "Next.js 16.3.1 App Router with Tailwind CSS 4",
+  "scope": "Multi-page application redesign"
+}

@@ -180,7 +180,7 @@ export function ProfileEditor({ userId, displayName, email, zh, syncMode }: { us
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button type="button" onClick={() => void save()} disabled={saving} className="atlas-primary-action disabled:opacity-45"><Check className="size-4" aria-hidden="true" />{saving ? (zh ? "正在保存" : "Saving") : (zh ? "保存资料" : "Save profile")}</button>
             <button type="button" onClick={cancel} disabled={saving} className="atlas-text-button disabled:opacity-45">{zh ? "取消" : "Cancel"}</button>
-            {draft.avatar && <button type="button" onClick={() => setDraft((current) => ({ ...current, avatar: "" }))} disabled={saving} className="atlas-text-button text-[#a53f3f] disabled:opacity-45"><Trash2 className="size-4" aria-hidden="true" />{zh ? "移除头像" : "Remove avatar"}</button>}
+            {draft.avatar && <button type="button" onClick={() => setDraft((current) => ({ ...current, avatar: "" }))} disabled={saving} className="atlas-text-button text-[color:var(--danger)] disabled:opacity-45"><Trash2 className="size-4" aria-hidden="true" />{zh ? "移除头像" : "Remove avatar"}</button>}
           </div>
         </div>
       )}
