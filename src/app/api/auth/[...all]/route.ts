@@ -29,7 +29,7 @@ function isEmailDeliveryFailure(error: unknown) {
 async function ready(request: Request, method: keyof typeof handler) {
   const path = authPath(request);
   if (method === "POST" && (path === "/api/auth/sign-up/email" || path === "/api/auth/send-verification-email")) {
-    const capabilities = accountCapabilities();
+    const capabilities = accountCapabilities(request);
     if (path === "/api/auth/sign-up/email" && !capabilities.registrationAvailable) {
       return unavailable("注册服务暂未开放", "REGISTRATION_UNAVAILABLE");
     }

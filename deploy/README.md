@@ -99,7 +99,7 @@ BACKUP_ROOT=/var/lib/quiz-platform/backups
 MEDIA_WORKER_POLL_MS=1000
 ```
 
-`TURNSTILE_SITE_KEY` is returned to the client at runtime by `/api/config/turnstile`; `/api/config/account` exposes only boolean email-verification and registration capabilities. Registration and resend requests fail closed with `503` when their runtime configuration is incomplete. The deployment smoke test requires both account capabilities to be `true` and the Turnstile site key to be non-empty, otherwise the release is rolled back. `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is compatibility-only and does not need to be a GitHub build variable. `SMTP_USER` and `SMTP_PASSWORD` must both be present or both be omitted. Port 465 implies secure SMTP; otherwise set `SMTP_SECURE=true` only when required by the provider. `JOURNAL_ADMIN_USER_ID` has the compatibility alias `ADMIN_USER_ID`; although the parser accepts comma-separated ids, the current production design configures exactly one operator account.
+`TURNSTILE_SITE_KEY` is returned to the client at runtime by `/api/config/turnstile`; `/api/config/account` exposes boolean email-verification, registration, and current-host support capabilities. Registration and resend requests fail closed with `503` when their runtime configuration is incomplete or the request host is outside `TURNSTILE_ALLOWED_HOSTNAMES`. The deployment smoke test requires both account capabilities to be `true` and the Turnstile site key to be non-empty on the canonical host. Maintenance probe hosts must report account capabilities as disabled and return no Turnstile site key, otherwise the release is rolled back. `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is compatibility-only and does not need to be a GitHub build variable. `SMTP_USER` and `SMTP_PASSWORD` must both be present or both be omitted. Port 465 implies secure SMTP; otherwise set `SMTP_SECURE=true` only when required by the provider. `JOURNAL_ADMIN_USER_ID` has the compatibility alias `ADMIN_USER_ID`; although the parser accepts comma-separated ids, the current production design configures exactly one operator account.
 
 ### Gmail SMTP helper
 
@@ -172,7 +172,7 @@ sudo -u caddy test -r /var/lib/quiz-platform/media/public
 sudo -u caddy test ! -r /var/lib/quiz-platform/media/private
 ```
 
-`beta.loveuu.xyz` and `quiz.107-151-246-167.sslip.io` remain no-index origin probes. Legacy `loveyourself.cc.cd` and `loveuu.xyz` hosts permanently redirect to `knowyourself.cc.cd`.
+`beta.loveuu.xyz` and `quiz.107-151-246-167.sslip.io` remain no-index origin probes. They serve page and health checks, but account registration, verification email, and Turnstile configuration are disabled because they are not public auth origins. Legacy `loveyourself.cc.cd` and `loveuu.xyz` hosts permanently redirect to `knowyourself.cc.cd`.
 
 ## GitHub Actions deployment
 

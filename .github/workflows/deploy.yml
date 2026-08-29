@@ -217,7 +217,7 @@ jobs:
           if ! ACCOUNT_CONFIGURATION="$account_configuration" TURNSTILE_CONFIGURATION="$turnstile_configuration" /usr/bin/node -e '
             const account = JSON.parse(process.env.ACCOUNT_CONFIGURATION || "null");
             const turnstile = JSON.parse(process.env.TURNSTILE_CONFIGURATION || "null");
-            if (account?.emailVerificationAvailable !== true || account?.registrationAvailable !== true) process.exit(1);
+            if (account?.emailVerificationAvailable !== true || account?.registrationAvailable !== true || account?.hostAllowed !== true) process.exit(1);
             if (typeof turnstile?.siteKey !== "string" || !turnstile.siteKey.trim()) process.exit(1);
           '; then
             echo "Email verification or registration runtime configuration is unavailable" >&2
@@ -320,8 +320,8 @@ jobs:
           ACCOUNT_CONFIGURATION="$account_configuration" TURNSTILE_CONFIGURATION="$turnstile_configuration" node -e '
             const account = JSON.parse(process.env.ACCOUNT_CONFIGURATION || "null");
             const turnstile = JSON.parse(process.env.TURNSTILE_CONFIGURATION || "null");
-            if (account?.emailVerificationAvailable !== true || account?.registrationAvailable !== true) process.exit(1);
-            if (typeof turnstile?.siteKey !== "string" || !turnstile.siteKey.trim()) process.exit(1);
+            if (account?.emailVerificationAvailable !== false || account?.registrationAvailable !== false || account?.hostAllowed !== false) process.exit(1);
+            if (turnstile?.siteKey !== null) process.exit(1);
           '
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
@@ -371,6 +371,14 @@ jobs:
               curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host$path" -o /dev/null
             done
             test "$(curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/healthz")" = ok
+            account_configuration="$(curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/api/config/account")"
+            turnstile_configuration="$(curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/api/config/turnstile")"
+            ACCOUNT_CONFIGURATION="$account_configuration" TURNSTILE_CONFIGURATION="$turnstile_configuration" node -e '
+              const account = JSON.parse(process.env.ACCOUNT_CONFIGURATION || "null");
+              const turnstile = JSON.parse(process.env.TURNSTILE_CONFIGURATION || "null");
+              if (account?.emailVerificationAvailable !== true || account?.registrationAvailable !== true || account?.hostAllowed !== true) process.exit(1);
+              if (typeof turnstile?.siteKey !== "string" || !turnstile.siteKey.trim()) process.exit(1);
+            '
             curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
             curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
             curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/sitemap.xml" | grep -F "<loc>https://$canonical_host/assessments/</loc>"

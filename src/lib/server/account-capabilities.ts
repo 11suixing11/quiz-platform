@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isAllowedAuthHostname, requestHostname } from "./auth-hosts";
 import { emailDeliveryConfigured } from "./email";
 
 export function turnstileSiteKey() {
@@ -10,10 +11,16 @@ export function turnstileRegistrationConfigured() {
   return Boolean(turnstileSiteKey() && process.env.TURNSTILE_SECRET_KEY?.trim());
 }
 
-export function accountCapabilities() {
-  const emailVerificationAvailable = emailDeliveryConfigured();
+export function accountCapabilities(request?: Request) {
+  const hostAllowed = !request || isAllowedAuthHostname(requestHostname(request));
+  const emailVerificationAvailable = hostAllowed && emailDeliveryConfigured();
   return {
     emailVerificationAvailable,
     registrationAvailable: emailVerificationAvailable && turnstileRegistrationConfigured(),
+    hostAllowed,
   };
+}
+
+export function turnstileAvailableForRequest(request?: Request) {
+  return (!request || isAllowedAuthHostname(requestHostname(request))) && turnstileRegistrationConfigured();
 }

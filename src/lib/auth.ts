@@ -5,22 +5,8 @@ import { nextCookies } from "better-auth/next-js";
 import { captcha } from "better-auth/plugins";
 import { getDatabase } from "@/lib/server/database";
 import { sendAccountVerificationEmail } from "@/lib/server/email";
+import { DEVELOPMENT_ORIGINS, PRODUCTION_HOST, PRODUCTION_ORIGIN, turnstileHostnames } from "@/lib/server/auth-hosts";
 import { prepareJournalUserDeletion, replayJournalUserDeletion } from "@/lib/server/journal";
-import { SITE_URL } from "@/lib/site-config";
-
-const PRODUCTION_ORIGIN = SITE_URL;
-const PRODUCTION_HOST = new URL(PRODUCTION_ORIGIN).hostname;
-const DEVELOPMENT_ORIGINS = [
-  "http://localhost:*",
-  "http://127.0.0.1:*",
-  PRODUCTION_ORIGIN,
-] as const;
-
-function turnstileHostnames() {
-  const configured = process.env.TURNSTILE_ALLOWED_HOSTNAMES?.split(",").map((value) => value.trim()).filter(Boolean);
-  if (configured?.length) return configured;
-  return process.env.NODE_ENV === "production" ? [PRODUCTION_HOST] : [PRODUCTION_HOST, "localhost", "127.0.0.1"];
-}
 
 function authSecret() {
   const configured = process.env.BETTER_AUTH_SECRET?.trim() || process.env.AUTH_SECRET?.trim();

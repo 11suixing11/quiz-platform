@@ -8,6 +8,7 @@ import {
   LogOut,
   MailCheck,
   RefreshCw,
+  Settings,
   ShieldCheck,
   UserPlus,
 } from "lucide-react";
@@ -20,10 +21,25 @@ import { AccountApiError, changePassword, deleteAccount, getAccountCapabilities,
 import { clearSyncBaseline } from "@/lib/account-sync";
 import { clearLocalProfile } from "@/lib/local-profile";
 import { adoptSnapshotAsGuest, readSnapshot } from "@/lib/storage";
+import { SITE_URL } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register";
 type PasswordFeedback = { tone: "success" | "error"; message: string } | null;
+const CAPABILITY_RETRY_DELAYS = [0, 500, 1_500] as const;
+
+async function loadAccountCapabilitiesWithRetry() {
+  let lastError: unknown;
+  for (const delay of CAPABILITY_RETRY_DELAYS) {
+    if (delay) await new Promise((resolve) => window.setTimeout(resolve, delay));
+    try {
+      return await getAccountCapabilities();
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("ACCOUNT_CAPABILITIES_UNAVAILABLE");
+}
 
 function readableError(error: unknown, language: "zh" | "en") {
   const message = error instanceof Error ? error.message : "";
@@ -75,6 +91,9 @@ export default function AccountPage() {
   const [confirmAccountDelete, setConfirmAccountDelete] = useState(false);
   const [emailVerificationAvailable, setEmailVerificationAvailable] = useState<boolean | null>(null);
   const [registrationAvailable, setRegistrationAvailable] = useState<boolean | null>(null);
+  const [authHostAllowed, setAuthHostAllowed] = useState<boolean | null>(null);
+  const [capabilitiesError, setCapabilitiesError] = useState(false);
+  const [capabilityRetry, setCapabilityRetry] = useState(0);
 
   const zh = language === "zh";
   const busy = action !== null;
@@ -82,17 +101,26 @@ export default function AccountPage() {
 
   useEffect(() => {
     let active = true;
-    void getAccountCapabilities().then((capabilities) => {
+    void loadAccountCapabilitiesWithRetry().then((capabilities) => {
       if (!active) return;
+      setCapabilitiesError(false);
       setEmailVerificationAvailable(capabilities.emailVerificationAvailable);
       setRegistrationAvailable(capabilities.registrationAvailable);
+      setAuthHostAllowed(capabilities.hostAllowed);
     }).catch(() => {
       if (!active) return;
-      setEmailVerificationAvailable(false);
-      setRegistrationAvailable(false);
+      setCapabilitiesError(true);
     });
     return () => { active = false; };
-  }, []);
+  }, [capabilityRetry]);
+
+  const retryCapabilities = () => {
+    setCapabilitiesError(false);
+    setEmailVerificationAvailable(null);
+    setRegistrationAvailable(null);
+    setAuthHostAllowed(null);
+    setCapabilityRetry((value) => value + 1);
+  };
 
   const submitAuth = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -116,6 +144,8 @@ export default function AccountPage() {
     if (authMode === "register" && (captchaConfigurationStatus !== "ready" || !captchaToken)) {
       setFeedback(captchaConfigurationStatus === "unavailable"
         ? (zh ? "人机验证尚未配置，当前无法注册。" : "Human verification is not configured, so registration is unavailable.")
+        : captchaConfigurationStatus === "error"
+          ? (zh ? "人机验证加载失败，请点击重试后再继续。" : "Human verification failed to load. Retry it before continuing.")
         : (zh ? "请完成人机验证后再继续。" : "Complete human verification before continuing."));
       setFeedbackTone("error");
       return;
@@ -259,6 +289,10 @@ export default function AccountPage() {
         <div className="max-w-2xl">
           <h1 className="atlas-section-title">{zh ? "账号与同步" : "Account and sync"}</h1>
           <p className="mt-4 text-base leading-7 text-ink/60 dark:text-white/60">{zh ? "游客数据默认留在本机。登录后，本机与云端数据会自动合并并在设备之间同步。" : "Guest data stays on this device by default. After signing in, device and cloud data merge automatically and stay synced across devices."}</p>
+          <Link href="/settings/" className="atlas-secondary-action mt-6 justify-center">
+            <Settings className="size-4" aria-hidden="true" />
+            {zh ? "数据与偏好设置" : "Data and preferences"}
+          </Link>
         </div>
 
         {!user ? (
@@ -269,7 +303,7 @@ export default function AccountPage() {
                 <p className="mt-3 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "登录后会自动合并本机与云端数据，并保持跨设备同步。" : "Signing in automatically merges device and cloud data and keeps it synced across devices."}</p>
                 <div className="mt-6 inline-grid grid-cols-2 rounded-lg border border-ink/12 p-1 dark:border-white/12" role="tablist" aria-label={zh ? "账号操作" : "Account action"}>
                   <button type="button" role="tab" aria-selected={authMode === "login"} onClick={() => { setAuthMode("login"); setFeedback(""); setNeedsVerification(false); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "login" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "登录" : "Sign in"}</button>
-                  <button type="button" role="tab" aria-selected={authMode === "register"} onClick={() => { setAuthMode("register"); setFeedback(""); setNeedsVerification(false); setCaptchaToken(""); setCaptchaResetSignal((value) => value + 1); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "register" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "注册" : "Register"}</button>
+                  <button type="button" role="tab" aria-selected={authMode === "register"} onClick={() => { setAuthMode("register"); setFeedback(""); setNeedsVerification(false); setCaptchaToken(""); setCaptchaConfigurationStatus("loading"); setCaptchaResetSignal((value) => value + 1); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "register" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "注册" : "Register"}</button>
                 </div>
               </div>
 
@@ -277,8 +311,18 @@ export default function AccountPage() {
                 {authMode === "register" && <label className="block text-sm font-semibold"><span>{zh ? "显示名称" : "Display name"}</span><input aria-label={zh ? "显示名称" : "Display name"} value={displayName} onChange={(event) => setDisplayName(event.target.value)} name="name" autoComplete="name" maxLength={80} required className="atlas-account-input mt-2" /></label>}
                 <label className="block text-sm font-semibold"><span>{zh ? "邮箱" : "Email"}</span><input aria-label={zh ? "邮箱" : "Email"} value={email} onChange={(event) => setEmail(event.target.value)} name="email" type="email" autoComplete="email" required className="atlas-account-input mt-2" /></label>
                 <label className="block text-sm font-semibold"><span>{zh ? "密码" : "Password"}</span><input aria-label={zh ? "密码" : "Password"} value={password} onChange={(event) => setPassword(event.target.value)} name="password" type="password" minLength={10} maxLength={128} autoComplete={authMode === "login" ? "current-password" : "new-password"} required className="atlas-account-input mt-2" /><span className="mt-2 block text-xs font-normal text-ink/45 dark:text-white/45">{zh ? "至少 10 个字符" : "At least 10 characters"}</span></label>
-                {authMode === "register" && registrationAvailable === null && <p className="text-sm text-ink/55 dark:text-white/55" role="status">{zh ? "正在检查注册服务…" : "Checking registration availability…"}</p>}
-                {authMode === "register" && registrationAvailable === false && <p className="text-sm text-[color:var(--danger)]" role="alert">{zh ? "注册服务暂未开放，请稍后再试。" : "Registration is not available yet. Try again later."}</p>}
+                {authMode === "register" && capabilitiesError && <div className="space-y-3" role="alert">
+                  <p className="text-sm leading-6 text-[color:var(--danger)]">{zh ? "暂时无法检查账号服务状态，请重试。" : "Account services could not be checked. Please retry."}</p>
+                  <button type="button" onClick={retryCapabilities} className="atlas-secondary-action justify-center">
+                    <RefreshCw className="size-4" aria-hidden="true" />
+                    {zh ? "重试" : "Retry"}
+                  </button>
+                </div>}
+                {authMode === "register" && registrationAvailable === null && !capabilitiesError && <p className="text-sm text-ink/55 dark:text-white/55" role="status">{zh ? "正在检查注册服务…" : "Checking registration availability…"}</p>}
+                {authMode === "register" && registrationAvailable === false && (authHostAllowed === false ? <div className="space-y-3" role="alert">
+                  <p className="text-sm leading-6 text-[color:var(--danger)]">{zh ? "当前域名不支持注册，请使用主站。" : "Registration is not available on this domain. Use the main site instead."}</p>
+                  <a href={`${SITE_URL}/account/`} className="atlas-secondary-action justify-center">{zh ? "打开主站注册" : "Open the main site"}</a>
+                </div> : <p className="text-sm text-[color:var(--danger)]" role="alert">{zh ? "注册服务暂未开放，请稍后再试。" : "Registration is not available yet. Try again later."}</p>)}
                 {authMode === "register" && registrationAvailable === true && <TurnstileWidget action="signup" language={language} resetSignal={captchaResetSignal} onConfigurationChange={setCaptchaConfigurationStatus} onTokenChange={setCaptchaToken} />}
                 <button type="submit" disabled={busy || (authMode === "register" && (registrationAvailable !== true || captchaConfigurationStatus !== "ready" || !captchaToken))} className="atlas-primary-action w-full justify-center disabled:cursor-not-allowed disabled:opacity-45">{authMode === "login" ? <LogIn className="size-4" aria-hidden="true" /> : <UserPlus className="size-4" aria-hidden="true" />}{action === "auth" ? (zh ? "请稍候…" : "Please wait…") : authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</button>
                 {needsVerification && <button type="button" onClick={() => void resendVerification()} disabled={busy || !email.trim() || emailVerificationAvailable !== true} className="atlas-secondary-action w-full justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "重新发送验证邮件" : "Resend verification email")}</button>}
@@ -292,6 +336,10 @@ export default function AccountPage() {
             {!user.emailVerified && <section className="atlas-settings-section mt-10" aria-labelledby="verify-email-heading">
               <h2 id="verify-email-heading" className="text-xl font-semibold">{zh ? "验证邮箱" : "Verify email"}</h2>
               <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "完成邮箱验证后才能上传图片和公开札记。" : "Email verification is required before uploading images or publishing journals."}</p>
+              {capabilitiesError && <div className="mt-3 space-y-3" role="alert">
+                <p className="text-sm leading-6 text-[color:var(--danger)]">{zh ? "暂时无法检查验证邮件服务，请重试。" : "Email verification service could not be checked. Please retry."}</p>
+                <button type="button" onClick={retryCapabilities} className="atlas-secondary-action justify-center"><RefreshCw className="size-4" aria-hidden="true" />{zh ? "重试" : "Retry"}</button>
+              </div>}
               {emailVerificationAvailable === false && <p className="mt-3 text-sm text-[color:var(--danger)]" role="alert">{zh ? "验证邮件服务暂不可用，请稍后再试。" : "Email verification is temporarily unavailable. Try again later."}</p>}
               <button type="button" onClick={() => void resendVerification()} disabled={busy || emailVerificationAvailable !== true} className="atlas-secondary-action mt-5 justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "发送验证邮件" : "Send verification email")}</button>
             </section>}

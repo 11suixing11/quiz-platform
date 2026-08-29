@@ -84,9 +84,14 @@ try {
   });
   assert.equal(email.emailDeliveryConfigured(), true, "a complete authenticated SMTP configuration is valid");
 
+  const authHosts = compile("src/lib/server/auth-hosts.ts", {
+    "server-only": {},
+    "@/lib/site-config": { SITE_URL: "https://knowyourself.cc.cd" },
+  });
   const capabilities = compile("src/lib/server/account-capabilities.ts", {
     "server-only": {},
     "./email": email,
+    "./auth-hosts": authHosts,
   });
   const accountConfigRoute = compile("src/app/api/config/account/route.ts", {
     "@/lib/server/account-capabilities": capabilities,
@@ -99,16 +104,27 @@ try {
   assert.deepEqual(capabilities.accountCapabilities(), {
     emailVerificationAvailable: true,
     registrationAvailable: false,
+    hostAllowed: true,
   }, "Turnstile must gate registration without disabling configured email delivery");
-  assert.deepEqual(accountConfigRoute.GET(), {
+  assert.deepEqual(accountConfigRoute.GET(new Request("https://knowyourself.cc.cd/api/config/account")), {
     emailVerificationAvailable: true,
     registrationAvailable: false,
-  }, "account capability API must expose only the two public capability flags");
+    hostAllowed: true,
+  }, "account capability API must expose capability and host status");
+
+  assert.deepEqual(capabilities.accountCapabilities(new Request("https://maintenance.example.test/api/config/account")), {
+    emailVerificationAvailable: false,
+    registrationAvailable: false,
+    hostAllowed: false,
+  }, "unsupported hosts must not advertise account email or registration services");
+  assert.equal(capabilities.turnstileAvailableForRequest(new Request("https://maintenance.example.test/api/config/turnstile")), false);
+  assert.equal(authHosts.requestHostname(new Request("http://127.0.0.1/api/config/account", { headers: { host: "knowyourself.cc.cd" } })), "knowyourself.cc.cd", "reverse-proxy Host must override the internal request URL");
 
   setEnvironment({ TURNSTILE_SITE_KEY: "site-key", TURNSTILE_SECRET_KEY: "secret" });
   assert.deepEqual(capabilities.accountCapabilities(), {
     emailVerificationAvailable: false,
     registrationAvailable: false,
+    hostAllowed: true,
   }, "Turnstile alone must not advertise registration when SMTP is absent");
 
   setEnvironment({
@@ -120,9 +136,11 @@ try {
   assert.deepEqual(capabilities.accountCapabilities(), {
     emailVerificationAvailable: true,
     registrationAvailable: true,
+    hostAllowed: true,
   });
 
-  let capabilityState = { emailVerificationAvailable: false, registrationAvailable: false };
+  let capabilityState = { emailVerificationAvailable: false, registrationAvailable: false, hostAllowed: true };
+  const capabilityRequests = [];
   let downstreamMode = "ok";
   const downstreamCalls = [];
   const downstreamResponse = (status = 200, body = { ok: true }) => Response.json(body, { status });
@@ -149,11 +167,17 @@ try {
   const authRoute = compile("src/app/api/auth/[...all]/route.ts", {
     "better-auth/next-js": { toNextJsHandler: () => downstreamHandler },
     "@/lib/auth": { auth: {}, ensureAuthReady: async () => {} },
-    "@/lib/server/account-capabilities": { accountCapabilities: () => capabilityState },
+    "@/lib/server/account-capabilities": { accountCapabilities: (request) => {
+      capabilityRequests.push(request);
+      if (new URL(request.url).hostname === "maintenance.example.test") {
+        return { emailVerificationAvailable: false, registrationAvailable: false, hostAllowed: false };
+      }
+      return capabilityState;
+    } },
   });
 
-  async function postAuth(endpoint) {
-    return authRoute.POST(new Request(`https://example.test${endpoint}`, {
+  async function postAuth(endpoint, hostname = "example.test") {
+    return authRoute.POST(new Request(`https://${hostname}${endpoint}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: "{}",
@@ -178,18 +202,25 @@ try {
   assert.deepEqual(await response.json(), { error: "not found" });
   assert.equal(downstreamCalls.length, 1, "only the canonical verification path is guarded");
 
-  capabilityState = { emailVerificationAvailable: true, registrationAvailable: false };
+  capabilityState = { emailVerificationAvailable: true, registrationAvailable: false, hostAllowed: true };
   response = await postAuth("/api/auth/sign-up/email");
   assert.equal(response.status, 503);
   assert.equal((await response.json()).code, "REGISTRATION_UNAVAILABLE");
 
-  capabilityState = { emailVerificationAvailable: true, registrationAvailable: true };
+  capabilityState = { emailVerificationAvailable: true, registrationAvailable: true, hostAllowed: true };
   downstreamMode = "ok";
   downstreamCalls.length = 0;
   response = await postAuth("/api/auth/sign-up/email");
   assert.equal(response.status, 201, "configured sign-up requests must be forwarded");
   assert.deepEqual(await response.json(), { forwarded: true });
   assert.equal(downstreamCalls.length, 1);
+
+  downstreamCalls.length = 0;
+  response = await postAuth("/api/auth/sign-up/email", "maintenance.example.test");
+  assert.equal(response.status, 503, "maintenance-host sign-up must fail closed");
+  assert.equal((await response.json()).code, "REGISTRATION_UNAVAILABLE");
+  assert.equal(downstreamCalls.length, 0, "maintenance-host sign-up must not reach Better Auth");
+  assert.equal(new URL(capabilityRequests.at(-1).url).hostname, "maintenance.example.test", "the auth route must pass the incoming request to capability checks");
 
   response = await postAuth("/api/auth/send-verification-email");
   assert.equal(response.status, 201, "configured verification requests must be forwarded");
@@ -276,6 +307,9 @@ try {
   assert.match(authSource, /logger:\s*\{\s*level:\s*"warn"\s*\}/, "auth logs must not include Better Auth's info-level existing-email message");
   assert.match(authSource, /sendOnSignUp:\s*false/, "signup email must be sent explicitly after registration");
   assert.match(authSource, /sendOnSignIn:\s*false/, "sign-in must not trigger an unobservable verification send");
+
+  const hostSource = readFileSync(path.join(root, "src/lib/server/auth-hosts.ts"), "utf8");
+  assert.match(hostSource, /TURNSTILE_ALLOWED_HOSTNAMES/, "auth and capability checks must share the Turnstile hostname allow-list");
 
   const accountPageSource = readFileSync(path.join(root, "src/app/account/page.tsx"), "utf8");
   const registerIndex = accountPageSource.indexOf("await registerAccount");

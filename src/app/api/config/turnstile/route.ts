@@ -1,10 +1,10 @@
 import { json } from "@/lib/server/http";
-import { turnstileSiteKey } from "@/lib/server/account-capabilities";
+import { turnstileAvailableForRequest, turnstileSiteKey } from "@/lib/server/account-capabilities";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  const siteKey = turnstileSiteKey();
+export function GET(request: Request) {
+  const siteKey = turnstileAvailableForRequest(request) ? turnstileSiteKey() : "";
   return json({ siteKey: siteKey || null });
 }

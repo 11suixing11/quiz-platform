@@ -47,6 +47,7 @@ export interface ChangePasswordResponse {
 export interface AccountCapabilities {
   emailVerificationAvailable: boolean;
   registrationAvailable: boolean;
+  hostAllowed: boolean;
 }
 
 export class AccountApiError extends Error {

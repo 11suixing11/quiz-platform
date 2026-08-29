@@ -77,9 +77,9 @@
 .atlas-section-kicker { color: color-mix(in srgb, var(--ink) 50%, transparent); font-size: .72rem; font-weight: 750; letter-spacing: 0; }
 .atlas-section-title { max-width: 44rem; font-size: 3.25rem; font-weight: 650; letter-spacing: 0; line-height: 1.02; }
 .atlas-desktop-nav { display: none; align-items: center; gap: .15rem; margin-left: auto; }
-.atlas-desktop-nav a { display: inline-flex; min-height: 2.75rem; align-items: center; border-radius: var(--radius-control); padding: .65rem .75rem; color: color-mix(in srgb, var(--ink) 58%, transparent); font-size: .72rem; font-weight: 700; white-space: nowrap; transition: background-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out); }
+.atlas-desktop-nav a { display: inline-flex; min-height: 2.75rem; align-items: center; border-radius: var(--radius-control); padding: .65rem .75rem; color: var(--muted-text); font-size: .72rem; font-weight: 700; white-space: nowrap; transition: background-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out); }
 .atlas-desktop-nav a:hover, .atlas-desktop-nav a[aria-current="page"] { background: var(--accent-wash); color: var(--accent); }
-.atlas-preference-control { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .45rem; border: 1px solid var(--soft-line); border-radius: var(--radius-control); padding: .55rem .7rem; color: color-mix(in srgb, var(--ink) 62%, transparent); font-size: .72rem; font-weight: 700; white-space: nowrap; transition: border-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out); }
+.atlas-preference-control { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .45rem; border: 1px solid var(--soft-line); border-radius: var(--radius-control); padding: .55rem .7rem; color: var(--muted-text); font-size: .72rem; font-weight: 700; white-space: nowrap; transition: border-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out); }
 .atlas-preference-control:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); color: var(--accent); }
 .atlas-preference-control-compact { min-width: 2.75rem; flex: none; justify-content: center; padding-inline: .65rem; }
 .atlas-primary-action, .atlas-secondary-action { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .55rem; border-radius: var(--radius-control); padding: .7rem 1rem; font-size: .78rem; font-weight: 750; white-space: nowrap; transition: transform var(--duration-short) var(--ease-out), background-color var(--duration-short) var(--ease-out), border-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out); }
@@ -202,8 +202,19 @@
 @media (min-width: 800px) { .atlas-desktop-nav { display: flex; } .atlas-mobile-nav { display: none; } }
 
 @media print {
+  :root, :root.dark {
+    --background: var(--color-print-paper);
+    --foreground: var(--color-print-ink);
+    --paper: var(--color-print-paper);
+    --paper-strong: var(--color-print-paper);
+    --ink: var(--color-print-ink);
+    --muted-foreground: var(--color-print-muted);
+    --muted-text: var(--color-print-muted);
+    --line: color-mix(in oklab, var(--color-print-ink) 24%, transparent);
+    --soft-line: color-mix(in oklab, var(--color-print-ink) 14%, transparent);
+  }
   .atlas-header, nav, button, .atlas-primary-action, .atlas-secondary-action { display: none !important; }
-  .atlas-page { background: var(--color-print-paper) !important; color: var(--ink) !important; }
+  .atlas-page { background: var(--color-print-paper) !important; color: var(--color-print-ink) !important; }
 }
 
 /* Reflection-room visual layer: calm, human, and intentionally flat at rest. */

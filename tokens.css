@@ -16,6 +16,8 @@
   --color-danger: oklch(50% 0.16 25);
   --color-overlay-ink: oklch(100% 0 0);
   --color-print-paper: oklch(100% 0 0);
+  --color-print-ink: oklch(27% 0.02 150);
+  --color-print-muted: oklch(44% 0.015 80);
   --color-topic-self: oklch(56% 0.07 160);
   --color-topic-emotion: oklch(60% 0.105 25);
   --color-topic-relationship: oklch(64% 0.08 75);

@@ -39,7 +39,7 @@ export default function ReflectionHomePage() {
             <div className="reflection-home-boundary"><ShieldCheck aria-hidden="true" />{localized(language, "以自我观察为目的，不替你下结论。", "For self-observation, never a verdict about who you are.")}</div>
           </header>
 
-          <div className="reflection-paths" aria-label={localized(language, "选择反思方式", "Choose a way to reflect")}>
+          <section className="reflection-paths" aria-label={localized(language, "选择反思方式", "Choose a way to reflect")}>
             <Link href="/assessments/" className="reflection-path group">
               <div className="reflection-path-visual-wrap">
                 {assessmentVisual && <QuizVisualFrame visual={assessmentVisual} lang={language} sizes="(max-width: 799px) 42vw, 22vw" className="reflection-path-visual" preload />}
@@ -65,7 +65,7 @@ export default function ReflectionHomePage() {
                 <span>{localized(language, "进入札记", "Open journal")}<ArrowRight aria-hidden="true" /></span>
               </div>
             </Link>
-          </div>
+          </section>
         </section>
 
         <nav className="reflection-home-secondary" aria-label={localized(language, "继续已有内容", "Continue existing reflections")}>

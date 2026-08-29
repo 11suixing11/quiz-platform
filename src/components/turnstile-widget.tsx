@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SCRIPT_ID = "cloudflare-turnstile-script";
@@ -11,8 +12,8 @@ interface TurnstileApi {
     sitekey: string;
     action?: string;
     theme: "auto";
-    language: "zh-CN" | "en";
-    appearance: "interaction-only";
+    language: "zh-cn" | "en";
+    appearance: "always";
     callback(token: string): void;
     "expired-callback"(): void;
     "error-callback"(): void;
@@ -27,6 +28,9 @@ declare global {
   }
 }
 
+let turnstileScriptPromise: Promise<void> | null = null;
+const SCRIPT_TIMEOUT_MS = 15_000;
+
 export interface TurnstileWidgetProps {
   action?: string;
   language?: "zh" | "en";
@@ -36,17 +40,43 @@ export interface TurnstileWidgetProps {
   onTokenChange(token: string): void;
 }
 
-export type TurnstileConfigurationStatus = "loading" | "ready" | "unavailable";
+export type TurnstileConfigurationStatus = "loading" | "ready" | "unavailable" | "error";
 
 function loadTurnstileScript() {
   if (window.turnstile) return Promise.resolve();
-  return new Promise<void>((resolve, reject) => {
+  if (turnstileScriptPromise) return turnstileScriptPromise;
+
+  const promise = new Promise<void>((resolve, reject) => {
     const existing = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
     const script = existing ?? document.createElement("script");
-    const onLoad = () => resolve();
-    const onError = () => reject(new Error("TURNSTILE_SCRIPT_FAILED"));
-    script.addEventListener("load", onLoad, { once: true });
-    script.addEventListener("error", onError, { once: true });
+    let settled = false;
+    const cleanup = () => {
+      window.clearTimeout(timeoutId);
+    };
+    const succeed = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve();
+    };
+    const fail = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      // Remove a failed script so a later retry can start a new request.
+      if (!window.turnstile && script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error("TURNSTILE_SCRIPT_FAILED"));
+    };
+    const checkReady = () => {
+      if (window.turnstile) {
+        succeed();
+        return;
+      }
+      if (!settled) window.setTimeout(checkReady, 50);
+    };
+    const timeoutId = window.setTimeout(fail, SCRIPT_TIMEOUT_MS);
+
+    script.addEventListener("error", fail, { once: true });
     if (!existing) {
       script.id = SCRIPT_ID;
       script.src = SCRIPT_SRC;
@@ -54,7 +84,14 @@ function loadTurnstileScript() {
       script.defer = true;
       document.head.appendChild(script);
     }
+    checkReady();
   });
+
+  turnstileScriptPromise = promise.catch((error) => {
+    turnstileScriptPromise = null;
+    throw error;
+  });
+  return turnstileScriptPromise;
 }
 
 export function TurnstileWidget({
@@ -70,13 +107,16 @@ export function TurnstileWidget({
   const widgetIdRef = useRef<string | null>(null);
   const callbackRef = useRef(onTokenChange);
   const [failed, setFailed] = useState(false);
+  const [retryNonce, setRetryNonce] = useState(0);
   const [runtimeSiteKey, setRuntimeSiteKey] = useState("");
   const [configurationLoaded, setConfigurationLoaded] = useState(false);
+  const [configurationFailed, setConfigurationFailed] = useState(false);
+  const [configurationRetryNonce, setConfigurationRetryNonce] = useState(0);
   const configurationStatus: TurnstileConfigurationStatus = !configurationLoaded
     ? "loading"
-    : runtimeSiteKey
-      ? "ready"
-      : "unavailable";
+    : configurationFailed || failed
+      ? "error"
+      : runtimeSiteKey ? "ready" : "unavailable";
 
   useEffect(() => {
     callbackRef.current = onTokenChange;
@@ -93,13 +133,16 @@ export function TurnstileWidget({
         if (!cancelled) setRuntimeSiteKey(typeof payload.siteKey === "string" ? payload.siteKey.trim() : "");
       })
       .catch(() => {
-        if (!cancelled) setRuntimeSiteKey("");
+        if (!cancelled) {
+          setRuntimeSiteKey("");
+          setConfigurationFailed(true);
+        }
       })
       .finally(() => {
         if (!cancelled) setConfigurationLoaded(true);
       });
     return () => { cancelled = true; };
-  }, []);
+  }, [configurationRetryNonce]);
 
   useEffect(() => {
     onConfigurationChange?.(configurationStatus);
@@ -111,19 +154,24 @@ export function TurnstileWidget({
     setFailed(false);
     void loadTurnstileScript().then(() => {
       if (cancelled || !window.turnstile || !containerRef.current) return;
-      widgetIdRef.current = window.turnstile.render(containerRef.current, {
-        sitekey: runtimeSiteKey,
-        action,
-        theme: "auto",
-        language: language === "zh" ? "zh-CN" : "en",
-        appearance: "interaction-only",
-        callback: (token) => callbackRef.current(token),
-        "expired-callback": () => callbackRef.current(""),
-        "error-callback": () => {
-          callbackRef.current("");
-          setFailed(true);
-        },
-      });
+      try {
+        widgetIdRef.current = window.turnstile.render(containerRef.current, {
+          sitekey: runtimeSiteKey,
+          action,
+          theme: "auto",
+          language: language === "zh" ? "zh-cn" : "en",
+          appearance: "always",
+          callback: (token) => callbackRef.current(token),
+          "expired-callback": () => callbackRef.current(""),
+          "error-callback": () => {
+            callbackRef.current("");
+            setFailed(true);
+          },
+        });
+      } catch {
+        callbackRef.current("");
+        setFailed(true);
+      }
     }).catch(() => {
       if (!cancelled) setFailed(true);
     });
@@ -134,14 +182,14 @@ export function TurnstileWidget({
       widgetIdRef.current = null;
       callbackRef.current("");
     };
-  }, [action, language, runtimeSiteKey]);
+  }, [action, language, retryNonce, runtimeSiteKey]);
 
   useEffect(() => {
     const widgetId = widgetIdRef.current;
     if (!widgetId || !window.turnstile) return;
     window.turnstile.reset(widgetId);
     callbackRef.current("");
-  }, [resetSignal]);
+  }, [resetSignal, runtimeSiteKey]);
 
   if (configurationStatus === "loading") {
     return <p className={cn("text-sm text-ink/55 dark:text-white/55", className)} role="status">
@@ -155,6 +203,22 @@ export function TurnstileWidget({
     </p>;
   }
 
+  if (configurationFailed) {
+    return <div className={className}>
+      <p className="text-sm text-[color:var(--danger)]" role="alert">
+        {language === "zh" ? "人机验证配置加载失败，请重试。" : "Human verification configuration failed to load. Please retry."}
+      </p>
+      <button type="button" onClick={() => {
+        setConfigurationLoaded(false);
+        setConfigurationFailed(false);
+        setConfigurationRetryNonce((value) => value + 1);
+      }} className="atlas-secondary-action mt-3 justify-center">
+        <RefreshCw className="size-4" aria-hidden="true" />
+        {language === "zh" ? "重试人机验证" : "Retry verification"}
+      </button>
+    </div>;
+  }
+
   return <div className={className}>
     <div
       ref={containerRef}
@@ -162,7 +226,11 @@ export function TurnstileWidget({
       aria-label={language === "zh" ? "人机验证" : "Human verification"}
     />
     {failed && <p className="mt-2 text-sm text-[color:var(--danger)]" role="alert">
-      {language === "zh" ? "验证加载失败，请刷新后重试。" : "Verification failed to load. Refresh and try again."}
+      {language === "zh" ? "验证加载失败，请重试。" : "Verification failed to load. Please retry."}
     </p>}
+    {failed && <button type="button" onClick={() => { setFailed(false); setRetryNonce((value) => value + 1); }} className="atlas-secondary-action mt-3 justify-center">
+      <RefreshCw className="size-4" aria-hidden="true" />
+      {language === "zh" ? "重试人机验证" : "Retry verification"}
+    </button>}
   </div>;
 }
