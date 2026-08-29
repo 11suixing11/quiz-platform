@@ -113,6 +113,25 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\deploy\configure-gmail-smtp.ps1 
 
 The helper reads the application password as a `SecureString`, sends it only through the SSH standard input stream, authenticates to Gmail over TLS using Python's standard SMTP library, and restarts the service. It does not put the password in the repository, a local temporary file, the process command line, or command output. The remote update uses root-only staging and backup files, removes them after a successful health check, and restores the previous environment automatically if the update fails.
 
+For Turnstile, use the companion helper from PowerShell 7 with a root SSH
+identity. Set the same production host and administrator key prerequisites used
+by the Gmail helper; the deploy-only `quizdeploy` key does not have permission
+to replace the protected environment file:
+
+```powershell
+$env:DEPLOY_HOST='your-vps-host-or-address'
+$env:ADMIN_KEY=Join-Path (Join-Path $HOME '.ssh') 'your-root-key'
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\deploy\configure-turnstile.ps1 -UserName root
+```
+
+The public site key may also be passed with `-SiteKey`; the secret key is read
+as a `SecureString` and is never placed in the command line, repository, local
+temporary files, or command output. The helper atomically replaces the runtime
+environment, restarts the service, and confirms that `/api/config/turnstile`
+returns the exact public site key. It does not contact Cloudflare Siteverify;
+the deployment smoke test separately requires the combined account registration
+capability after the new release is active.
+
 The unit supplies `NODE_ENV=production`, `HOSTNAME=127.0.0.1`, `PORT=3333`, and `DATABASE_PATH=/var/lib/quiz-platform/app.sqlite3`. Generate `BETTER_AUTH_SECRET` on the server, for example with `openssl rand -base64 32`. Never commit secrets or real administrator ids.
 
 ```bash
