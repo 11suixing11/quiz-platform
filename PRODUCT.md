@@ -12,7 +12,7 @@ Chinese- and English-speaking people who want a low-pressure way to reflect on p
 
 ## Product Purpose
 
-Quiz Platform supports two equally visible reflection paths:
+Know Yourself supports two equally visible reflection paths:
 
 - Structured reflection through assessments, with result imagery that helps a user understand a type, leading dimension, or score range.
 - Open-ended reflection through image journals, where a user can arrange several images, captions, and optional prose into a private or public narrative.

@@ -1,6 +1,6 @@
-# Contributing to Quiz Platform
+# Contributing to Know Yourself
 
-Thanks for improving Quiz Platform. The project is a self-reflection quiz app, not a clinical or diagnostic tool.
+Thanks for improving Know Yourself. The project is a bilingual self-reflection platform with reviewed assessments and private-by-default image journals. It is not a clinical or diagnostic tool.
 
 ## Good Contributions
 
@@ -9,6 +9,7 @@ Thanks for improving Quiz Platform. The project is a self-reflection quiz app, n
 - Improve translations without changing the product boundary.
 - Add tests or scripts that keep quiz metadata consistent.
 - Refine quiz/result copy to be clearer and less overconfident.
+- Improve journal privacy states, media handling, moderation, or account flows.
 
 User-facing language support is limited to Simplified Chinese and English. Do not add a third locale without an explicit product decision.
 
@@ -22,8 +23,10 @@ Do not add claims that the app can diagnose, treat, or clinically evaluate users
 npm install
 npm run dev
 npm run lint
+npm run typecheck
 npm test
 npm run audit:flagship
+npm run audit:a11y
 npm audit --audit-level=high
 npm run build
 ```

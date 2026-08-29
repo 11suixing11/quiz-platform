@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem in the quiz app.
+description: Report a reproducible problem in the Know Yourself platform.
 title: "[Bug] "
 labels: ["bug", "triage"]
 body:

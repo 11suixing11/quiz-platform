@@ -66,7 +66,7 @@ export default function AssessmentCatalogPage() {
       <footer className="wellness-footer">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span className="font-semibold text-ink/70 dark:text-white/70">认识你自己 / Know Yourself</span>
-          <div className="flex gap-5"><Link href="/privacy/" className="atlas-text-link">{localized(language, "隐私", "Privacy")}</Link><a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noreferrer" className="atlas-text-link">GitHub</a></div>
+          <div className="flex gap-5"><Link href="/privacy/" className="atlas-text-link">{localized(language, "隐私", "Privacy")}</Link><a href="https://github.com/11suixing11/know-yourself" target="_blank" rel="noreferrer" className="atlas-text-link">GitHub</a></div>
         </div>
       </footer>
     </div>

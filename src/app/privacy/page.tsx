@@ -102,7 +102,7 @@ export default function PrivacyPage() {
 
         <section className="atlas-detail-panel mt-10"><p className="atlas-section-kicker">{t.hosting}</p><p className="relative mt-4 text-sm leading-6 text-ink/58 dark:text-white/58">{t.hostingText}</p></section>
         <section className="atlas-settings-section mt-10" aria-labelledby="privacy-contact-heading"><h2 id="privacy-contact-heading" className="text-xl font-semibold">{t.contact}</h2><p className="mt-3 text-sm leading-6 text-ink/58 dark:text-white/58">{t.contactText}</p><Link href="/complaints/" className="atlas-text-link mt-4 justify-start font-semibold">{t.contactLink}</Link></section>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap"><Link href="/settings/#data" className="atlas-primary-action justify-center">{t.controls}</Link><Link href="/account/" className="atlas-secondary-action justify-center">{t.accountControls}</Link><a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noreferrer" className="atlas-secondary-action justify-center">{t.source}</a></div>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap"><Link href="/settings/#data" className="atlas-primary-action justify-center">{t.controls}</Link><Link href="/account/" className="atlas-secondary-action justify-center">{t.accountControls}</Link><a href="https://github.com/11suixing11/know-yourself" target="_blank" rel="noreferrer" className="atlas-secondary-action justify-center">{t.source}</a></div>
       </PageContainer>
     </div>
   );

@@ -1,6 +1,6 @@
 # Code of Conduct
 
-Quiz Platform should be a respectful place to collaborate on self-reflection tools.
+Know Yourself should be a respectful place to collaborate on self-reflection tools.
 
 ## Expected Behavior
 

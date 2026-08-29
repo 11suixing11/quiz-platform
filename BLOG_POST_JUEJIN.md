@@ -15,7 +15,7 @@
 **「认识你自己」** —— 一个提供 16 项中英双语自我反思测评的平台，零广告、零追踪，游客数据保存在浏览器里，登录后可选用跨设备同步。它用于自我反思，不是临床诊断工具。
 
 🔗 **在线体验**：https://knowyourself.cc.cd/
-⭐ **GitHub**：https://github.com/11suixing11/quiz-platform
+⭐ **GitHub**：https://github.com/11suixing11/know-yourself
 
 ---
 
@@ -495,7 +495,7 @@ export default async function ResultPage({ params }: { params: Promise<{ type: s
 
 如果你觉得这个项目有意思，或者这篇文章对你有帮助，麻烦去 GitHub 点个 Star。这会帮助更多人发现这个项目，也是我继续更新的动力。
 
-**→ [github.com/11suixing11/quiz-platform](https://github.com/11suixing11/quiz-platform)**
+**→ [github.com/11suixing11/know-yourself](https://github.com/11suixing11/know-yourself)**
 
 欢迎贡献：
 - **新测试内容**：测试模块结构清晰，加一个新测试主要是内容工作

@@ -1,8 +1,21 @@
-# 认识你自己 | Know Yourself
+# 认识你自己 · Know Yourself
 
-一个安静、双语、本地优先的自我反思平台。产品提供两条并列路径：结构化的测评，以及开放式的图像札记。
+> **一个安静的中英双语自我反思空间。** 在 16 条审阅后的测评与默认私密的图像札记之间，选择此刻适合自己的方式。
+>
+> **A calm, bilingual space for self-reflection. See patterns, not labels.** Choose between 16 reviewed assessments and private-by-default visual journals.
 
-> 测评帮助你沿着问题看见倾向，图像札记帮助你保存尚未完全说清的观察。两者都用于反思，不是诊断或固定身份。
+[在线体验 / Live demo](https://knowyourself.cc.cd/) · [浏览测评](https://knowyourself.cc.cd/assessments/) · [了解隐私边界](https://knowyourself.cc.cd/privacy/)
+
+[![认识你自己首页：测评与图像札记两条反思路径](./docs/images/know-yourself-home.png)](https://knowyourself.cc.cd/)
+
+它不是一个尽量塞满测试的目录，也不会用结果替用户下结论。测评帮助你沿着问题看见倾向；图像札记帮助你保存尚未完全说清的观察。两条路径都把结果当作反思的起点，而不是诊断、治疗建议或固定身份。
+
+## 为什么值得关注
+
+- **一种产品，两种反思方式**：结构化测评适合沿问题梳理倾向，图像札记适合保存还难以用完整语言表达的观察。
+- **精选而不是堆量**：只公开 16 条经过审阅的中英双语路线，覆盖人格、情绪、关系、工作与日常生活。
+- **隐私落实到产品状态**：游客测评数据默认留在浏览器；札记默认私密；图片处理会清除 EXIF、GPS、设备信息和原文件名，并丢弃原始上传。
+- **完整的生产级开源参考**：Next.js 16、React 19、Better Auth、SQLite、Sharp、持久任务队列、内容治理、自托管发布和自动化 smoke test 共同组成可运行的真实系统。
 
 ## 当前版本
 

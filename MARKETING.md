@@ -1,113 +1,126 @@
-# 认识你自己 | Know Yourself — Marketing Copy
+# 认识你自己 | Know Yourself - Marketing Copy
 
-Current product copy for community posts, repository listings, and launch pages.
+Current, evidence-based copy for repository listings, launch posts, and community sharing.
 
 ## Short description
 
 ### 中文
 
-一个安静的中英双语自我反思平台：16 条精选路线、数据只保存在浏览器本地。
+一个安静的中英双语自我反思空间：16 条精选测评、默认私密的图像札记，以及本地优先的数据体验。
 
 ### English
 
-A calm, bilingual self-reflection platform with 16 reviewed assessments and local-first data.
+A calm, bilingual self-reflection space with 16 reviewed assessments, private-by-default visual journals, and local-first guest data.
 
-## Repository description
+## GitHub repository description
 
 ```text
-16 curated bilingual self-reflection routes. Local-first, static, and built with Next.js 16.
+Open-source, bilingual, local-first self-reflection platform with 16 curated assessments and private-by-default image journals. Guest assessment data stays on-device; optional accounts add cross-device sync and deliberate public sharing.
 ```
+
+## One-line pitch
+
+### 中文
+
+在结构化测评与开放式图像札记之间，选择此刻适合你的反思方式。
+
+### English
+
+Choose the form of reflection that fits the moment: a reviewed assessment or a private visual journal.
 
 ## Launch post
 
 ### 中文
 
 ```markdown
-# 我重构了一个本地优先的中英双语自我反思平台
+# 我把一个测试网站重做成了双路径自我反思空间
 
-「认识你自己 | Know Yourself」把公开体验收敛成 16 项经过审阅的测评：
+「认识你自己 | Know Yourself」不再追求把尽可能多的测试堆到首页，而是提供两条清楚、平等的路径：
 
-探索方向 → 查看测试说明 → 答题 → 阅读结果 → 回到历史或收藏
+- 做一次测评：从 16 条经过审阅的中英双语路线中，观察人格、情绪、关系、工作与生活中的倾向
+- 写一篇图像札记：用 1 至 6 张图片、说明和文字，保存一篇默认私密的个人观察
 
-主要特点：
+游客的测评记录默认留在当前浏览器。可选账号用于跨设备同步与札记创作；公开札记采用不可变快照，后续编辑不会悄悄改掉已发布版本。上传图片只保留处理后的 WebP 变体，EXIF、GPS、设备信息、原文件名和原始文件都会被移除。
 
-- 16 个精选入口，避免首页直接变成测试目录
-- 16 条经过审阅的中英双语路线，覆盖人格、情绪、关系、工作与日常生活
-- type、dimensions、score 三类评分统一到同一套模型
-- 无账号、无后端、无云同步，回答和结果保存在当前浏览器
-- 支持未完成会话恢复，以及 v3 JSON 导入、导出、合并与替换
-- Next.js 静态导出，由自有 VPS 上的 Caddy 托管；GitHub Actions 验证后自动发布
+技术栈包括 Next.js 16、React 19、TypeScript、Better Auth、SQLite、Sharp、持久任务队列和自托管 GitHub Actions 发布链路。
 
-结果被设计成反思的起点，而不是诊断或固定身份。
+它用于自我反思，不是诊断、治疗建议或专业评估。
 
-在线体验：[Live URL]
-源代码：https://github.com/11suixing11/quiz-platform
+在线体验：https://knowyourself.cc.cd/
+源代码：https://github.com/11suixing11/know-yourself
 ```
 
 ### English
 
 ```markdown
-# I rebuilt a local-first bilingual self-reflection platform
+# I rebuilt a quiz site into a two-path space for self-reflection
 
-Know Yourself opens with 16 reviewed assessments. The refactor was not about adding more features. It was about making one path clear:
+Know Yourself does not try to win by putting the largest possible quiz catalog on the homepage. It gives equal weight to two clear paths:
 
-choose a direction → read the test notes → answer → understand the result → revisit history or saved quizzes
+- Take an assessment: choose from 16 reviewed bilingual routes across personality, emotion, relationships, work, and daily life
+- Create a visual journal: arrange 1-6 images, captions, and optional prose into a private-by-default observation
 
-Highlights:
+Guest assessment history stays in the current browser. Optional accounts add cross-device sync and journal creation. Public journals use immutable snapshots, so later private edits do not silently rewrite what was published. Uploaded images are converted to processed WebP variants while EXIF, GPS, device data, original filenames, and original uploads are discarded.
 
-- 16 curated starting points instead of a wall of quizzes
-- 16 reviewed Chinese and English routes across personality, emotion, relationships, work, and daily life
-- one model for type, dimensions, and score-based results
-- no account, backend, or cloud sync; answers and results stay in the current browser
-- unfinished-session recovery plus v3 JSON export, import, merge, and replace
-- static Next.js export served by Caddy on a self-hosted VPS; GitHub Actions validates and publishes releases
+The production stack includes Next.js 16, React 19, TypeScript, Better Auth, SQLite, Sharp, a persistent job queue, and a self-hosted GitHub Actions release pipeline.
 
-Results are framed as prompts for reflection, not diagnoses or fixed identities.
+It is built for reflection, not diagnosis, treatment, or professional assessment.
 
-Live: [Live URL]
-Source: https://github.com/11suixing11/quiz-platform
+Live: https://knowyourself.cc.cd/
+Source: https://github.com/11suixing11/know-yourself
 ```
 
 ## Social copy
 
-### Short post
-
-```text
-Know Yourself is a local-first set of 16 reviewed bilingual self-reflection assessments.
-
-Choose one of 16 reviewed assessments, answer in a few minutes, and leave with a result you can revisit. Guest data stays local; accounts add optional cross-device sync.
-
-[Live URL]
-https://github.com/11suixing11/quiz-platform
-```
-
 ### 中文短文案
 
 ```text
-「认识你自己」是一个本地优先的中英双语自我反思平台。
+「认识你自己」是一个安静的中英双语自我反思空间。
 
-16 条精选路线；无账号、无后端、无云同步。选择一个此刻在意的方向，完成测试，再把一个有用的问题带回日常生活。
+你可以从 16 条精选测评中梳理倾向，也可以用默认私密的图像札记保存还难以说清的观察。游客测评数据留在浏览器，上传图片会移除元数据和原始文件。
 
-[在线地址]
-https://github.com/11suixing11/quiz-platform
+https://knowyourself.cc.cd/
+https://github.com/11suixing11/know-yourself
+```
+
+### English short post
+
+```text
+Know Yourself pairs 16 reviewed bilingual assessments with private-by-default visual journals.
+
+Guest assessment data stays local. Optional accounts add sync and journal creation. Uploaded images are processed without retaining EXIF, GPS, original filenames, or original files.
+
+https://knowyourself.cc.cd/
+https://github.com/11suixing11/know-yourself
+```
+
+## Suggested GitHub topics
+
+```text
+self-reflection self-discovery personality-test quiz journaling image-journal local-first privacy-first bilingual i18n self-hosted accessibility psychology wellbeing nextjs react typescript sqlite better-auth web-app
 ```
 
 ## Product facts
 
 - Product name: `认识你自己 | Know Yourself`
-- Public routes: 16
-- Internal modules retained: 193
+- Public assessments: 16 reviewed routes
+- Internal assessment modules retained for staged review: 193
+- Reflection modes: structured assessments and image journals
 - Languages: Simplified Chinese and English
-- Scoring families: type, dimensions, score
-- Storage: browser-local `know-yourself:v3` snapshot
-- Deployment: Next.js standalone Node runtime behind Caddy on a self-hosted VPS at `https://knowyourself.cc.cd/`; GitHub Actions validates and publishes releases
+- Assessment scoring families: type, dimensions, score
+- Guest assessment storage: browser-local `know-yourself:v3` snapshot
+- Accounts: optional for assessment sync; required and email-verified for image journals
+- Journal publishing: private draft plus explicit immutable public revisions
+- Media handling: processed 320/960/1600 WebP variants; original uploads and embedded metadata are discarded
+- Deployment: Next.js standalone Node runtime behind Caddy at `https://knowyourself.cc.cd/`; GitHub Actions validates and publishes releases
 - License: MIT
 
 ## Claims to avoid
 
-- Clinical validation, diagnosis, treatment, or professional assessment
-- Usage numbers, testimonials, or performance metrics without evidence
-- Cloud sync, accounts, AI interpretation, or analytics features
-- Radar charts, dashboards, comparison tools, or other removed secondary features
+- Clinical validation, diagnosis, treatment, therapy, or professional assessment
+- Usage numbers, testimonials, customer logos, or performance metrics without evidence
+- Presenting all 193 internal modules as publicly available assessments
+- AI interpretation, automatic translation, password-reset email, or off-host disaster recovery
+- Radar charts, dashboards, comparison tools, compatibility matching, or other removed routes
 
-Last updated: August 20, 2026.
+Last updated: August 30, 2026.

@@ -3,7 +3,7 @@ title: I Built a Self-Discovery Platform — Here's What I Learned
 published: false
 description: Historical pre-v0.2 draft about the architecture and lessons behind the Know Yourself quiz platform.
 tags: nextjs, typescript, webdev, opensource
-canonical_url: https://github.com/11suixing11/quiz-platform
+canonical_url: https://github.com/11suixing11/know-yourself
 ---
 
 > **Archive note (August 20, 2026):** This is a pre-v0.2 publication draft. References to the former 100+ quiz public surface and retired features are historical, not current product claims. The current public release exposes 16 reviewed routes; see `README.md` for the source of truth.
@@ -23,7 +23,7 @@ So I built it.
 **[Know Yourself (认识你自己)](https://knowyourself.cc.cd/)** — a self-discovery platform with 16 reviewed bilingual assessments, zero ads, zero tracking, and local-first storage. It is built for reflection, not clinical diagnosis.
 
 🔗 **Live**: https://knowyourself.cc.cd/
-⭐ **GitHub**: https://github.com/11suixing11/quiz-platform
+⭐ **GitHub**: https://github.com/11suixing11/know-yourself
 
 ---
 
@@ -367,7 +367,7 @@ Start with the Big Five, MBTI, or Enneagram if you're into personality. Try the 
 
 If you found this useful or interesting, I'd really appreciate a star on GitHub. It helps more people discover the project, and it motivates me to keep adding tests.
 
-**[→ github.com/11suixing11/quiz-platform](https://github.com/11suixing11/quiz-platform)**
+**[→ github.com/11suixing11/know-yourself](https://github.com/11suixing11/know-yourself)**
 
 And if you want to contribute — whether it's new test content, translations, bug fixes, or feature ideas — PRs are welcome. The test module structure is straightforward enough that adding a new test is mostly content work.
 
