@@ -1,21 +1,22 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { Database, EyeOff, HardDrive, ShieldCheck } from "lucide-react";
+import { Database, EyeOff, HardDrive, Images, ShieldCheck } from "lucide-react";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { useLanguage } from "@/hooks/use-local-storage";
 
 const content = {
   zh: {
     title: "隐私说明",
-    updated: "更新于 2026 年 8 月 27 日",
-    intro: "认识你自己是一款本地优先的自我反思应用。游客数据留在当前设备；注册或登录后，本机与云端数据会自动合并并同步到你的账号。",
+    updated: "更新于 2026 年 8 月 28 日",
+    intro: "认识你自己是一款本地优先的自我反思应用。游客测评数据留在当前设备；注册并验证邮箱后，本机与云端测评数据会自动合并，你也可以创建私密图像札记并选择是否发布公开快照。",
     items: [
       ["登录后自动同步", "不登录时，结果、收藏、偏好和未完成进度保存在当前浏览器。注册或登录后，这些本机数据会自动与账号云端数据合并；头像、个性签名和标签也会随账号同步。"],
-      ["账号与云端数据范围", "注册需要显示名称、邮箱和密码；服务器保存密码哈希而不是明文密码。云端保存测评结果、历史、收藏、语言与主题偏好、个人资料，以及 24 小时内的未完成进度。"],
+      ["账号验证与云端数据范围", "注册需要显示名称、邮箱、密码和一次 Cloudflare Turnstile 验证；验证 token 只用于当次请求。服务器保存密码哈希而不是明文密码。上传图片与发布札记前必须完成邮箱验证。"],
       ["完成后的原始答案不进云端", "新测评只向服务器提交测评编号和答案用于重新计分；云端结果写入后不保留已完成测评的原始答案。未完成进度在同步开启时会暂存，以便跨设备继续。"],
-      ["没有应用内分析追踪", "当前版本没有接入第三方分析、广告像素或行为画像工具，也不会把测试内容发送给 AI 服务。"],
-      ["你可以带走或删除数据", "设置页支持导出、导入或清空当前设备数据，备份可包含当前账号的个人资料。历史页可删除结果；账号页支持退出登录和永久删除账号。删除账号会删除账号及全部云端数据，但不会自动删除当前设备的本地副本。"],
+      ["图像札记与媒体处理", "札记草稿、图片说明和排序保存在账号云端。上传的 JPEG、PNG 或 WebP 会被旋转到正确方向、转换为 sRGB、清除 EXIF、GPS、设备与原文件名，并生成 WebP 变体；原始上传不会保留。私密图片只能通过鉴权接口读取。"],
+      ["仅第一方聚合反馈", "本站不接入第三方分析、广告像素或行为画像工具，也不会把测评或札记内容发送给 AI 服务。结果页可匿名提交“图像是否帮助理解”的反馈，只按测评、视觉 key、是否有帮助和日期累加，不记录账号、答案、attemptId 或结果正文。"],
+      ["你可以带走或删除数据", "设置页支持导出、导入或清空当前设备的测评数据。历史结果、札记草稿、公开内容和账号可分别删除；删除账号会删除账号云端数据并通过持久删除墓碑清理媒体，但不会自动删除当前设备的本地测评副本。"],
     ],
     dataTable: "数据、保留期限与删除方式",
     tableHeaders: ["数据", "保留期限", "如何删除"],
@@ -23,28 +24,32 @@ const content = {
       ["本机数据：结果、已完成测评的回答、收藏、偏好与个人资料副本", "保留到你主动删除，或浏览器清除本站数据。", "在历史页删除记录，或在设置页清空本机数据。"],
       ["账号资料：显示名称、邮箱、密码哈希与登录会话", "账号资料保留到你删除账号；登录会话最长 30 天，并可能在持续使用时更新。", "在账号页永久删除账号。"],
       ["云端数据：结果、测评名称、完成时间、收藏、偏好、头像、个性签名与标签", "保留到你删除相关记录或删除账号。云端不保留已完成测评的原始答案。", "在历史页删除结果，或在账号页永久删除账号及全部云端数据。"],
-      ["测评分享：主动公开的结果、感想、留言和共鸣", "公开内容保留到你删除帖子、留言或账号。原始答案不会因为分享而公开。", "在测评分享区删除自己的内容，或在账号页永久删除账号。"],
+      ["私密图像札记：标题、正文、内容语言、图片变体、说明、alt、排序和修订状态", "草稿保留到你删除札记或账号。原始上传在处理后删除；私密变体不会由 Caddy 直接公开。", "在札记库删除札记，或在账号页永久删除账号。"],
+      ["公开社区：图像札记快照、测评分享、留言和共鸣", "发布后内容立即公开并可被搜索引擎索引。札记公开版是不可变快照；取消公开会停止站内访问，删除则同时进入媒体清理流程。搜索引擎或第三方缓存仍可能保留旧副本。", "在对应详情页取消公开或删除自己的内容，或删除账号。"],
+      ["举报、投诉、账号治理与审计记录", "举报用于自动隐藏和管理员处理；隐私与版权投诉可不登录提交。账号限制与管理操作写入追加式审计日志，并按运营与争议处理需要保留。", "可通过下方投诉入口请求处理；账号删除会移除账号关联内容，但必要的操作审计可能以最小化形式继续保留。"],
       ["未完成进度：当前题目与暂存回答", "云端最多保留 24 小时；每次保存后重新计算，完成测评或到期后删除。", "完成测评、等待进度到期，或删除账号以删除云端进度。"],
+      ["本机一致性备份：SQLite、私密与公开媒体、删除墓碑", "每日在同一 VPS 创建一次，滚动保留 30 天。它不构成主机或磁盘故障下的异地灾难恢复。", "备份到期后自动滚动删除；恢复时重放删除墓碑，避免恢复已经删除的媒体。"],
     ],
     hosting: "托管说明",
-    hostingText: "站点运行在自有服务器上，由 Caddy 提供 HTTPS 并转发到应用服务，账号和同步数据保存在该服务器的 SQLite 数据库中。服务器和网络服务会处理提供网站所需的标准请求元数据。",
+    hostingText: "站点运行在自有 VPS 上，由 Caddy 提供 HTTPS 并转发到应用服务。结构化数据保存在 SQLite，媒体变体保存在 /var/lib/quiz-platform/media；备份也只保存在同一台 VPS。服务器、Cloudflare Turnstile 和网络服务会处理提供网站及验证请求所需的标准请求元数据。",
     controls: "管理本地数据",
     accountControls: "管理账号与云端数据",
     source: "查看源代码",
     contact: "联系渠道",
-    contactText: "如需咨询隐私、数据访问或删除问题，请通过项目仓库联系。不要在公开问题中提交密码、测评回答或其他敏感信息。",
-    contactLink: "通过项目仓库联系",
+    contactText: "隐私泄露或版权问题可通过不要求登录的投诉表单提交。其他数据访问或删除问题可通过项目仓库联系；不要在公开问题中提交密码、测评回答或其他敏感信息。",
+    contactLink: "提交隐私或版权投诉",
   },
   en: {
     title: "Privacy notes",
-    updated: "Updated August 27, 2026",
-    intro: "Know Yourself is a local-first reflection app. Guest data stays on the current device; after registration or sign-in, device and cloud data are merged automatically and synced with your account.",
+    updated: "Updated August 28, 2026",
+    intro: "Know Yourself is a local-first reflection app. Guest assessment data stays on the current device. After registering and verifying email, assessment data can sync with your account, and you can create private image journals with optional public snapshots.",
     items: [
       ["Automatic sync after sign-in", "Without signing in, results, bookmarks, preferences, and unfinished progress stay in this browser. Registration or sign-in automatically merges this device data with the account cloud copy. Avatar, bio, and personality tags also sync with the account."],
-      ["Account and cloud data", "Registration requires a display name, email address, and password. The server stores a password hash, not the plain password. It stores results, history, bookmarks, language and theme preferences, profile data, and unfinished progress for up to 24 hours."],
+      ["Account verification and cloud data", "Registration requires a display name, email address, password, and one Cloudflare Turnstile check. The verification token is used only for that request. The server stores a password hash, not the plain password. Email verification is required before image uploads and journal publishing."],
       ["Completed raw answers stay off the cloud", "A new completion sends only the assessment id and answers for server-side scoring. After the result is stored, completed raw answers are not retained in cloud storage. Unfinished progress may be stored while sync is enabled so another device can continue."],
-      ["No in-app analytics tracking", "This release does not include third-party analytics, advertising pixels, behavioral profiles, or any service that sends quiz content to AI."],
-      ["You can take or delete your data", "Settings lets you export, import, or clear data on the current device, including the current account profile in backups. History lets you delete results. Account controls let you sign out or permanently delete the account and all cloud data. Deleting an account does not automatically erase local device copies."],
+      ["Image journals and media processing", "Journal drafts, captions, and ordering are stored with the account. Uploaded JPEG, PNG, or WebP files are rotated, converted to sRGB, stripped of EXIF, GPS, device, and original filename metadata, and converted to WebP variants. Originals are not retained. Private variants require an authenticated request."],
+      ["First-party aggregate feedback only", "The site has no third-party analytics, advertising pixels, or behavioral profiling, and does not send assessment or journal content to AI services. Optional result-image feedback is aggregated only by assessment, visual key, helpfulness, and day, without account ids, answers, attempt ids, or result text."],
+      ["You can take or delete your data", "Settings lets you export, import, or clear on-device assessment data. Results, journal drafts, public content, and the account can be deleted separately. Account deletion removes cloud data and uses persistent tombstones to clean media, but does not erase local assessment copies on this device."],
     ],
     dataTable: "Data, retention, and deletion",
     tableHeaders: ["Data", "Retention", "How to delete"],
@@ -52,21 +57,24 @@ const content = {
       ["On-device data: results, completed answers, bookmarks, preferences, and local profile copies", "Kept until you delete it or the browser clears this site's data.", "Delete records in History, or clear device data in Settings."],
       ["Account data: display name, email, password hash, and sign-in sessions", "Account data is kept until you delete the account. Sign-in sessions last up to 30 days and may refresh while you keep using the service.", "Permanently delete the account on the Account page."],
       ["Cloud data: results, assessment name, completion time, bookmarks, preferences, avatar, bio, and tags", "Kept until you delete the related records or delete the account. Completed raw answers are not retained in the cloud.", "Delete results in History, or permanently delete the account and all cloud data on the Account page."],
-      ["Community: results, reflections, responses, and resonances you choose to publish", "Public content remains until you delete the post, response, or account. Raw assessment answers are never published.", "Delete your content in Community, or permanently delete the account on the Account page."],
+      ["Private image journals: title, body, language, image variants, captions, alt text, order, and revision state", "Drafts remain until the journal or account is deleted. Originals are discarded after processing; private variants are not served directly by Caddy.", "Delete the journal in your library, or permanently delete the account."],
+      ["Public community: image-journal snapshots, assessment shares, responses, and resonances", "Publication is immediate and indexable. A journal's public version is an immutable snapshot. Unpublishing stops site access; deletion also enters the media cleanup flow. Search engines or third-party caches may retain copies.", "Unpublish or delete from the relevant detail page, or delete the account."],
+      ["Reports, complaints, account governance, and audit records", "Reports support automatic hiding and admin decisions. Privacy and copyright complaints can be submitted without an account. Account restrictions and admin actions are written to an append-only audit log and retained as needed for operations and disputes.", "Use the complaint form below for content issues. Account deletion removes account-linked content, while minimal operational audit records may remain."],
       ["Unfinished progress: current question and draft answers", "Cloud drafts are kept for up to 24 hours. The period restarts after each save; completion or expiry removes the draft.", "Finish the assessment, wait for the draft to expire, or delete the account to remove cloud drafts."],
+      ["Local consistency backups: SQLite, private and public media, and deletion tombstones", "Created daily on the same VPS and retained on a 30-day rolling basis. This is not off-host disaster recovery for server or disk failure.", "Expired snapshots are rotated automatically. Restore replays deletion tombstones so deleted media is not revived."],
     ],
     hosting: "Hosting note",
-    hostingText: "The site runs on a self-managed server. Caddy provides HTTPS and forwards requests to the application, while account and sync data are stored in a SQLite database on that server. The server and network providers process standard request metadata needed to deliver the site.",
+    hostingText: "The site runs on a self-managed VPS. Caddy provides HTTPS and forwards requests to the application. Structured data is stored in SQLite, media variants under /var/lib/quiz-platform/media, and backups on the same VPS. The server, Cloudflare Turnstile, and network providers process standard request metadata needed to deliver and verify requests.",
     controls: "Manage local data",
     accountControls: "Manage account and cloud data",
     source: "View source code",
     contact: "Contact",
-    contactText: "For privacy, data access, or deletion questions, contact the project through its repository. Do not post passwords, assessment answers, or other sensitive data in a public issue.",
-    contactLink: "Contact via project repository",
+    contactText: "Use the no-login complaint form for privacy exposure or copyright issues. For other data access or deletion questions, contact the project repository. Do not post passwords, assessment answers, or other sensitive data in a public issue.",
+    contactLink: "Submit a privacy or copyright complaint",
   },
 } as const;
 
-const icons = [HardDrive, ShieldCheck, Database, EyeOff, Database];
+const icons = [HardDrive, ShieldCheck, Database, Images, EyeOff, Database];
 
 export default function PrivacyPage() {
   const { language } = useLanguage();
@@ -93,7 +101,7 @@ export default function PrivacyPage() {
         </section>
 
         <section className="atlas-detail-panel mt-10"><p className="atlas-section-kicker">{t.hosting}</p><p className="relative mt-4 text-sm leading-6 text-ink/58 dark:text-white/58">{t.hostingText}</p></section>
-        <section className="atlas-settings-section mt-10" aria-labelledby="privacy-contact-heading"><h2 id="privacy-contact-heading" className="text-xl font-semibold">{t.contact}</h2><p className="mt-3 text-sm leading-6 text-ink/58 dark:text-white/58">{t.contactText}</p><a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noreferrer" className="atlas-text-link mt-4 justify-start font-semibold">{t.contactLink}</a></section>
+        <section className="atlas-settings-section mt-10" aria-labelledby="privacy-contact-heading"><h2 id="privacy-contact-heading" className="text-xl font-semibold">{t.contact}</h2><p className="mt-3 text-sm leading-6 text-ink/58 dark:text-white/58">{t.contactText}</p><Link href="/complaints/" className="atlas-text-link mt-4 justify-start font-semibold">{t.contactLink}</Link></section>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap"><Link href="/settings/#data" className="atlas-primary-action justify-center">{t.controls}</Link><Link href="/account/" className="atlas-secondary-action justify-center">{t.accountControls}</Link><a href="https://github.com/11suixing11/quiz-platform" target="_blank" rel="noreferrer" className="atlas-secondary-action justify-center">{t.source}</a></div>
       </PageContainer>
     </div>

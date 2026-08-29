@@ -1,4 +1,5 @@
 import legacy from "../tests/animal-personality";
+import { QUIZ_MEDIA } from "../quiz-media";
 import { defineQuiz, normalizeLegacyQuestions } from "../../core/quiz/definition";
 import type { DimensionData, TypeData } from "../../core/quiz/types";
 
@@ -74,6 +75,7 @@ const definition = defineQuiz({
     zh: "用四种动物意象回看你的行动、关系与独处倾向。",
     en: "Use four animal archetypes to reflect on how you act, connect, and recharge alone.",
   },
+  media: QUIZ_MEDIA["animal-personality"],
   questions,
   resultContent: {
     uiText: legacy.uiText,

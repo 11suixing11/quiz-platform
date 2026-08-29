@@ -29,6 +29,7 @@ const dimensions: Record<string, DimensionData> = {
 
 const scoreBands: ScoreBand[] = [
   {
+    id: "under-pressure",
     min: 0,
     max: 30,
     icon: "🚧",
@@ -44,6 +45,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "context-dependent",
     min: 31,
     max: 60,
     icon: "🛡️",
@@ -55,6 +57,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "steady-expression",
     min: 61,
     max: 100,
     icon: "🏡",

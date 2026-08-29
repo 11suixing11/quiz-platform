@@ -111,8 +111,12 @@ function validateScoreBands(definition, warnings) {
     return;
   }
   const sorted = [...bands].sort((a, b) => a.min - b.min);
+  const ids = new Set();
   for (let index = 0; index < sorted.length; index++) {
     const band = sorted[index];
+    if (!band.id?.trim()) addIssue(warnings, `score band ${index + 1} has no stable id`);
+    else if (ids.has(band.id)) addIssue(warnings, `duplicate score band id ${band.id}`);
+    else ids.add(band.id);
     if (!Number.isFinite(band.min) || !Number.isFinite(band.max) || band.min > band.max) addIssue(warnings, `invalid score band ${index + 1}`);
     if (!band.title?.zh || !band.title?.en || !band.description?.zh || !band.description?.en) addIssue(warnings, `score band ${index + 1} is not bilingual`);
     if (index > 0 && sorted[index - 1].max + 1 !== band.min) addIssue(warnings, `score bands are not contiguous at ${band.min}`);

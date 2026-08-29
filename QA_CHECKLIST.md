@@ -1,77 +1,137 @@
 # Release QA Checklist
 
-Keep every item unchecked until it has been verified manually in the named browser, viewport, language, or assistive technology.
+Keep every item unchecked until it has been verified in the named environment. Automated checks are necessary but do not replace browser, assistive-technology, media-lifecycle, or production verification.
 
-## Desktop browsers
+## Automated release gate
 
-- [ ] Windows Chrome: discovery → test detail → quiz → result completes without layout, focus, or console errors.
-- [ ] Windows Edge: discovery → test detail → quiz → result completes without layout, focus, or console errors.
-- [ ] Windows Firefox: discovery → test detail → quiz → result completes without layout, focus, or console errors.
-- [ ] Light, dark, and system themes remain readable across discovery, quiz, result, history, bookmarks, settings, and privacy.
+- [ ] Run `npm ci` from a clean dependency state.
+- [ ] Run `npm audit --audit-level=high`.
+- [ ] Run `npm run lint`.
+- [ ] Run `npm run typecheck`.
+- [ ] Run `npm test`, including registry, scoring, quiz-media, Storage v3, cloud revision, community, journal, governance, runtime Turnstile configuration, and share suites.
+- [ ] Run `npm run audit:flagship` and confirm all 16 public assessments meet the ready threshold.
+- [ ] Run `npm run audit:a11y`.
+- [ ] Run `npm run build` and `npm run package:standalone`.
+- [ ] Confirm the standalone artifact contains the application runtime, public assets, `.next/static`, media-worker runtime, and required Linux x64 native addons for both `better-sqlite3` and `sharp`.
 
-## Narrow viewports
+## Desktop product flows
 
-- [ ] 360px width: no horizontal scrolling, clipped copy, or overlapping controls.
-- [ ] 390px width: no horizontal scrolling, clipped copy, or overlapping controls.
-- [ ] 412px width: no horizontal scrolling, clipped copy, or overlapping controls.
-- [ ] At 360px, 390px, and 412px, primary actions and icon controls remain at least 44×44px.
-- [ ] Mobile bottom navigation identifies the current page and does not cover page content.
-- [ ] Quiz and result routes suppress the mobile bottom navigation as intended.
+- [ ] Windows Chrome: home -> assessments -> detail -> quiz -> result completes without layout, focus, network, or console errors.
+- [ ] Windows Chrome: home -> journal library -> new journal -> upload -> private preview -> publish -> community -> detail completes without layout, focus, network, or console errors.
+- [ ] Windows Edge: both assessment and image-journal flows complete successfully.
+- [ ] Windows Firefox: both assessment and image-journal flows complete successfully.
+- [ ] Light, dark, and system themes remain readable across home, assessments, quiz, result, journal library/editor/detail, community, account, moderation, complaints, settings, and privacy.
 
-## Keyboard
+## Homepage, routes, and navigation
+
+- [ ] The first viewport presents “Take an assessment” and “Create an image journal” with equivalent hierarchy.
+- [ ] The full reviewed catalog is available at `/assessments/` and is not duplicated as a mixed homepage feed.
+- [ ] Header and mobile navigation link to Home, Assessments, Journal, Community, History, and Account with correct current-page state.
+- [ ] `/community/` has separate Image Journals and Assessment Shares tabs; switching tabs never mixes ranking or item types.
+- [ ] Private routes and `/admin/moderation/` use noindex metadata; public journals are indexable only while published and visible.
+
+## Assessment result imagery
+
+- [ ] Animal Personality selects the correct type image, including the mixed result.
+- [ ] Emotion Regulation selects the unique leading-dimension image and uses the cover fallback for a tie or missing key.
+- [ ] Attachment Style selects the correct type image, including the mixed result.
+- [ ] Life Satisfaction selects the correct stable score-band image at every lower/upper boundary.
+- [ ] Missing media, an unknown result key, and an unsupported assessment render a consistent cover or text-only fallback without affecting score or saved history.
+- [ ] Pilot catalog cards, detail pages, and result pages use the same asset language and remain coherent in light and dark themes.
+- [ ] Every bundled assessment visual has the declared intrinsic size and meaningful bilingual alt text; no explanatory text is embedded in the bitmap.
+- [ ] Anonymous “did this image help?” feedback accepts yes/no once per rendered result state and stores no account id, answers, attempt id, or result copy.
+
+## Journal creation and recovery
+
+- [ ] A signed-in but unverified account cannot create a draft, request an upload batch, upload, or publish; verification completion unlocks the flow.
+- [ ] Create and publish valid journals with exactly 1, 3, and 6 images.
+- [ ] A missing title, zero images, more than 6 images, or a non-decorative image without alt text cannot publish and receives actionable feedback.
+- [ ] Optional body, per-image caption, content language, comment toggle, decorative flag, and alt text save and reopen correctly.
+- [ ] Autosave handles rapid edits without losing the newest revision or overwriting a newer server revision.
+- [ ] Refresh or close during editing, then return and verify interrupted-session recovery restores words and image order without publishing them.
+- [ ] Upload progress is visible; processing remains distinct from upload completion; a processing image cannot be published.
+- [ ] A network-interrupted transfer can retry from the client-held file; a server-side processing failure requires a newly selected replacement because the original was discarded. Neither path creates duplicate visible images or an invalid order slot.
+- [ ] Drag reordering works as an enhancement; move-up and move-down buttons produce the same persisted order with keyboard only.
+- [ ] Private preview reflects the latest draft; public preview clearly represents what an explicit publication would expose.
+
+## Media validation and privacy
+
+- [ ] Valid static JPEG, PNG, and WebP files are accepted below 8 MiB and 25 MP.
+- [ ] SVG, GIF, HEIC, animated WebP, remote URL input, corrupt files, MIME spoofing, files over 8 MiB, and images over 25 MP are rejected.
+- [ ] File names and crafted ids cannot escape `private`, `public`, or `tmp` media roots; path traversal attempts return an error and create no outside file.
+- [ ] Output variants are WebP at requested 320, 960, and 1600 pixel bounds without upscaling beyond source dimensions.
+- [ ] Output contains no EXIF, GPS, device, orientation, or original-filename metadata; the original upload is removed after processing.
+- [ ] Private media requires an authenticated owner request and is not directly served by Caddy.
+- [ ] Daily 20-upload, daily 3-publication, and 250 MiB total-account quotas persist across process restarts.
+- [ ] Fixed one-minute API rate-limit windows persist across process restarts, expire automatically, and store only hashed keys rather than raw IP or account identifiers.
+- [ ] Concurrent upload or publish requests cannot bypass quotas, create more than 6 ordered images, or double-consume one upload batch.
+- [ ] A claimed processing job recovers after worker interruption, stale leases are reclaimed, and terminal failures expose a retryable failed state.
+
+## Publication lifecycle
+
+- [ ] First publication creates a public immutable revision with the account display name and default-enabled comments.
+- [ ] Editing a published journal changes only the private draft until “Update public version” is explicitly confirmed.
+- [ ] Updating the public version creates a new immutable revision and does not mutate the previous snapshot in place.
+- [ ] Unpublishing removes the item from Feed, public detail, direct public media, OG metadata, and sitemap while retaining the private draft.
+- [ ] Deleting removes the journal from the owner library and public surfaces and schedules all associated private/public media for tombstone-backed cleanup.
+- [ ] Account deletion removes journal records and interactions, then replays pending media tombstones without restoring deleted files.
+- [ ] Hidden, unpublished, and deleted content returns a real unavailable/not-found response to non-owners; no cached HTML or direct media URL remains usable from the application origin.
+
+## Community and interactions
+
+- [ ] Image-journal Feed cards show only cover, title, author display name, image count, date, and excerpt; full images and interactions appear only on detail.
+- [ ] Assessment Share cards remain in their independent tab and never expose raw answers.
+- [ ] Resonance add/remove, comment creation, one-level reply, owner deletion, and closed-comments behavior work for both supported content types.
+- [ ] Read-only, suspended, and banned accounts cannot create community writes; upload-blocked accounts can still perform allowed non-upload writes.
+- [ ] Report dialogs have a name, initial focus, Escape behavior, focus containment, focus return, and recoverable submission feedback.
+
+## Moderation and complaints
+
+- [ ] One high-risk report (`illegal`, `minor_sexual`, `nonconsensual_intimate`, `privacy`, or `explicit_harm`) hides the target immediately.
+- [ ] Three distinct reporters are required to auto-hide an ordinary category; duplicate reports from one account do not increase the threshold.
+- [ ] An environment-configured administrator can list hidden journal entries, journal comments, assessment shares, and assessment comments.
+- [ ] Admin restore makes eligible content public again; permanent removal keeps it unavailable and cleans public media where applicable.
+- [ ] Account states normal, upload-blocked, read-only, suspended, and banned take effect across journal and assessment-community writes.
+- [ ] Every system/admin hide, restore, removal, account-state change, complaint-state change, and cleanup action appends an audit record.
+- [ ] `/complaints/` accepts privacy or copyright complaints without authentication, rate-limits abuse, and exposes them in the admin queue without leaking contact details publicly.
+
+## Narrow viewports and zoom
+
+- [ ] At 360px, 390px, and 412px widths, home, assessment catalog, editor, vertical journal detail, both community tabs, report dialog, and account verification have no horizontal scroll, clipped text, or overlapping controls.
+- [ ] At those widths, image previews keep stable aspect ratios and processing overlays do not resize surrounding layout.
+- [ ] At those widths, all primary actions and icon controls remain at least 44 by 44 CSS pixels.
+- [ ] Mobile navigation identifies the current page and does not cover final content or editor actions.
+- [ ] Quiz and result routes suppress mobile primary navigation as intended.
+- [ ] At 200% browser zoom, text reflows, the editor remains operable, modal content remains reachable, and no label or button text is clipped.
+
+## Keyboard and screen reader
 
 - [ ] The first Tab reveals the skip link and moves focus to `#main-content` when activated.
-- [ ] Every interactive control is reachable in a logical order with visible focus.
-- [ ] Search, filters, bookmarks, language, theme, import, export, and destructive confirmations work without a pointer.
-- [ ] Quiz number keys and arrow keys work outside editable controls and do not override browser or dialog interactions.
-- [ ] Moving between quiz questions places focus on the new question heading without stealing focus on initial load.
-- [ ] No page, menu, or future dialog traps keyboard focus unintentionally.
-
-## Narrator and accessibility tree
-
+- [ ] Every interactive control is reachable in a logical order with visible focus, including upload, replacement, ordering, preview, publish, unpublish, delete, reaction, comment, report, and moderation controls.
+- [ ] Assessment number keys and arrow keys work outside editable controls and do not override browser or dialog interactions.
+- [ ] Moving between assessment questions focuses the new question heading without stealing focus on initial load.
 - [ ] Windows Narrator announces one main landmark and a clear page-level heading on every public route.
-- [ ] Navigation landmarks have localized names and the current destination is announced.
-- [ ] Search and file inputs expose stable accessible names.
-- [ ] Stateful controls announce selected, pressed, or current state.
-- [ ] Quiz progress announces its name, current question, and total question count.
-- [ ] Loading, success, error, empty, and recovery messages are announced without duplicate speech.
-- [ ] Decorative icons and geometry are absent from the accessibility tree.
-- [ ] Result headings follow a logical `h1` → `h2` → `h3` hierarchy.
-- [ ] Any share dialog exposes a name, description, focus entry, focus return, and Escape behavior.
+- [ ] Navigation landmarks have localized names and current destination; tabs announce selected state.
+- [ ] Upload/processing/saved/error/recovery messages are announced once, without duplicate speech.
+- [ ] Decorative assessment and journal images are absent from the accessibility tree; meaningful user images announce authored alt text.
+- [ ] Heading hierarchy remains logical across results, editor previews, public journals, moderation, privacy, and complaints.
 
-## Motion and contrast
+## Motion, contrast, language, and print
 
-- [ ] With Windows reduced-motion enabled, content renders in its final readable state and no ambient or entrance motion persists.
-- [ ] Hover-only movement is not required to understand or operate any control.
-- [ ] Text, controls, focus indicators, selected states, and error feedback meet WCAG 2.2 AA contrast in both themes.
-- [ ] Content remains usable at 200% browser zoom and with increased text size.
+- [ ] With reduced motion enabled, content renders in its final readable state and no ambient or entrance motion persists.
+- [ ] Hover and drag are never required to understand or operate a control.
+- [ ] Text, controls, focus indicators, selected states, processing states, and errors meet WCAG 2.2 AA contrast in both themes.
+- [ ] Complete assessment and journal flows work in Simplified Chinese and English UI.
+- [ ] Language changes update document language, navigation, statuses, errors, empty states, editor controls, and moderation labels without translating user-authored content.
+- [ ] Result print preview remains clean and readable; interactive controls and transient feedback are hidden.
 
-## Chinese and English
+## Data, backup, and production regression
 
-- [ ] The complete flagship flow works in Simplified Chinese.
-- [ ] The complete flagship flow works in English.
-- [ ] Language changes update document language, navigation labels, theme labels, statuses, errors, and empty states.
-- [ ] Chinese and English copy reflow without truncating essential instructions or actions.
-
-## Sharing
-
-- [ ] Native share succeeds where supported and canceling it does not show an error.
-- [ ] Clipboard fallback copies the intended bilingual share text and public test URL.
-- [ ] Share failure presents a recoverable status message.
-- [ ] SVG and PNG exports are visually correct, legible, and contain no local result data beyond the intended share card.
-- [ ] QR code resolves to the public test route and remains scannable in both themes.
-
-## Print
-
-- [ ] Result print preview uses a clean white page with dark readable text.
-- [ ] Navigation, interactive controls, transient feedback, and decorative motion are hidden in print.
-- [ ] Headings, interpretation blocks, dimension bars, and reflection guidance do not split awkwardly across pages.
-- [ ] Printed Chinese and English results preserve hierarchy and do not clip at page margins.
-
-## Data and release regression
-
-- [ ] Export, merge import, replace import, and clear-data confirmation work with storage v3.
-- [ ] History and bookmarks update after storage changes without a reload.
-- [ ] All 16 public flagship routes load, score, save, reopen, and retake successfully.
-- [ ] No non-flagship route is exposed through navigation, sitemap, or generated public routes.
-- [ ] Static export works at the custom-domain root path with no broken internal asset or route links.
+- [ ] Storage v3 export, merge import, replace import, and clear-data confirmation still work after enabling journals.
+- [ ] All 16 public assessments load, score, save, reopen, retake, and synchronize without image URLs entering `QuizResult` or historical records.
+- [ ] A daily consistency snapshot contains SQLite, private/public media, and pending deletion tombstones; it excludes raw queued/running uploads and marks those snapshot jobs failed for re-selection; rotation retains no more than 30 daily snapshots.
+- [ ] Restore validates and stages a complete database/media set, rejects symlinks or malformed scopes without touching live data, replays deletion tombstones, and removes the restore marker before public service resumes.
+- [ ] Production `/healthz` returns `ok`; `/api/auth/get-session` returns JSON `null` when unauthenticated.
+- [ ] Production smoke tests cover `/`, `/assessments/`, one pilot detail/result route, `/journal/`, `/community/`, `/complaints/`, `/privacy/`, `robots.txt`, and `sitemap.xml`.
+- [ ] Canonical URLs use `https://knowyourself.cc.cd/`; `www` and legacy hosts return `301` while preserving path and query.
+- [ ] A newly published visible journal appears in the sitemap; hidden, unpublished, and deleted journals do not.

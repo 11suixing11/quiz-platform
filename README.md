@@ -1,82 +1,83 @@
-﻿# 认识你自己 | Know Yourself
+# 认识你自己 | Know Yourself
 
-一个安静、双语、本地优先、支持账号自动合并同步的自我反思测试平台。
+一个安静、双语、本地优先的自我反思平台。产品提供两条并列路径：结构化的测评，以及开放式的图像札记。
 
-> 先找到此刻在意的方向，再用几分钟回答问题。结果是一张可以带回日常生活的地图，不是诊断，也不是固定身份。
+> 测评帮助你沿着问题看见倾向，图像札记帮助你保存尚未完全说清的观察。两者都用于反思，不是诊断或固定身份。
 
 ## 当前版本
 
-- **16 条精选路线**：首页先给方向，再进入经过审阅的公开路线
-- **193 个内部测试模块**：保留在源码中，按内容质量逐批审阅，不自动进入产品入口
-- **三类评分**：type、dimensions、score
-- **核心闭环**：探索 → 测试说明 → 答题 → 结果 → 历史 / 收藏
-- **测评分享**：登录用户可选择性公开测评结果，其他登录用户可以共鸣、留言和一级回复；原始答案不会公开
-- **中英双语**：中文与 English 共用同一套导航、状态和数据模型
-- **本地优先**：游客无需账号，结果默认保存在当前浏览器；登录后会自动与账号云端数据合并
-- **账号与自动同步**：支持邮箱密码注册 / 登录；登录后自动合并结果、收藏、偏好、未完成进度和个人资料
-- **账号安全**：登录后可验证当前密码并设置新密码；改密会撤销其他设备会话。当前暂未提供忘记密码邮件找回流程
-- **可携带数据**：设置页支持 v3 JSON 导入、导出、合并、替换和清空，登录时也可带上账号个人资料
-- **自托管部署**：Next.js standalone Node 服务运行在自有 VPS，由 Caddy 提供 HTTPS 并反向代理到应用
+- **双入口首页**：从“做一次测评”或“写一篇图像札记”开始，完整测评目录位于 `/assessments/`
+- **16 条公开测评路线**：覆盖 type、dimensions、score 三类评分；193 个内部模块继续按质量逐批审阅
+- **四条结果图像试点**：动物人格、情绪调节、依恋风格和生活满意度使用无内嵌文字的隐喻场景；类型、主导维度或稳定 score-band 决定结果图，缺失或并列结果回退到封面
+- **图像札记**：邮箱已验证的登录用户可以创作包含 1 至 6 张有序图片的私密草稿，设置每图说明、替代文字或装饰标记，并使用自动保存、中断恢复、上传进度、网络中断重传、处理失败替换和键盘排序
+- **不可变公开修订**：发布会创建独立公开快照；后续编辑先留在私密草稿，只有显式“更新公开版”才替换公开修订；取消公开与永久删除是不同操作
+- **社区双流**：`/community/` 分别展示“图像札记”和“测评分享”，不混合排序；札记 Feed 只展示封面、标题、作者、图片数量和摘要
+- **互动与治理**：公开内容支持共鸣、留言和举报；高危举报首次即自动隐藏，普通举报由 3 名独立举报者触发临时隐藏，管理员可恢复或永久下架
+- **账号与验证**：支持邮箱密码账号、验证邮件、注册及上传 Turnstile、个人资料、改密、自动同步和账号删除
+- **本地优先**：游客测评结果默认留在当前浏览器；登录后自动与账号云端数据合并，Storage v3 和既有测评历史协议保持不变
+- **媒体最小化**：只接受静态 JPEG、PNG、WebP；处理后生成 320、960、1600 像素 WebP 变体，清除 EXIF/GPS/设备信息和原文件名，不保留原始上传
+- **自托管发布架构**：standalone 产物包含 Node 应用和媒体 worker；生产需要在自有 VPS 配置 SQLite、持久媒体目录、Caddy 与外部验证/邮件服务
 
 ## 体验路线
 
 | 页面 | 作用 |
 | --- | --- |
-| `/` | 首页探索、四条核心路径、精选路线 |
-| `/test/[id]/` | 测试详情、题量、时长、示例问题、收藏 |
+| `/` | 在结构化测评与开放式图像札记之间选择 |
+| `/assessments/` | 浏览、搜索和筛选 16 条公开测评路线 |
+| `/test/[id]/` | 测评详情、题量、时长、示例问题、收藏和试点视觉 |
 | `/quiz/[type]/` | 答题、进度、键盘操作、未完成会话恢复 |
-| `/result/[type]/` | 结果解读、反思引导、分享、重新测试 |
-| `/history/` | 完成记录（游客保存在本机；登录后自动同步到账号） |
-| `/bookmarks/` | 收藏的测试 |
-| `/community/` | 测评分享：浏览公开结果、共鸣、留言与回复 |
-| `/settings/` | 语言、主题、本地数据管理与账号入口 |
-| `/account/` | 注册、登录、自动同步、个人资料与账号管理 |
-| `/privacy/` | 数据与隐私说明 |
+| `/result/[type]/` | 结果解读、结果视觉、匿名图像帮助度反馈、分享和重新测评 |
+| `/journal/` | 私密札记库、草稿与已发布状态、账号配额 |
+| `/journal/new/` | 创建图像札记 |
+| `/journal/[id]/edit/` | 编辑、私密预览、公开预览和公开修订管理 |
+| `/journal/[id]/` | 已发布札记详情；隐藏、取消公开或删除后不可公开访问 |
+| `/community/` | 独立浏览图像札记与测评分享 |
+| `/history/` | 完成记录；游客保存在本机，登录后自动同步 |
+| `/bookmarks/` | 收藏的测评 |
+| `/settings/` | 语言、主题、本地数据导入导出与清理 |
+| `/account/` | 注册、邮箱验证、登录、自动同步、个人资料与账号管理 |
+| `/privacy/` | 数据、媒体、公开索引和备份说明 |
+| `/complaints/` | 无需登录的隐私与版权投诉 |
+| `/admin/moderation/` | 环境配置指定管理员使用的治理后台 |
 
-已移除的 secondary routes 不再生成：analytics、dashboard、stats、trends、compare、compat 以及其他旧的内容型页面。旧 URL 不做兼容跳转。
+已移除的 secondary routes 不再生成：analytics、dashboard、stats、trends、compare、compat 及其他旧内容型页面。旧 URL 不做兼容跳转。
 
 ## 技术栈
 
-- Next.js 16 App Router + standalone Node server
-- React 19 + TypeScript
+- Next.js 16 App Router + React 19 + TypeScript
 - Tailwind CSS v4 + 原生 CSS tokens
-- Framer Motion（仅用于答题与结果中的必要过渡）
-- lucide-react
-- 自有 VPS + Node standalone 服务与 Caddy HTTPS 反向代理；GitHub Actions 验证后自动发布到 VPS
+- Better Auth + better-sqlite3
+- Sharp 媒体处理 + 持久 SQLite 任务队列
+- Nodemailer SMTP 验证邮件 + Cloudflare Turnstile
+- 自有 VPS、Node standalone 服务、媒体 worker 与 Caddy HTTPS
 
 ## 目录结构
 
 ```text
 src/
-├─ app/
-│  ├─ page.tsx                 # 首页地图
-│  ├─ test/[id]/               # 测试详情
-│  ├─ quiz/[type]/             # 答题
-│  ├─ result/[type]/           # 结果
-│  ├─ history/                 # 历史
-│  ├─ bookmarks/               # 收藏
-│  ├─ account/                 # 注册、登录、同步与账号管理
-│  ├─ api/                     # 认证与账号云端数据接口
-│  ├─ settings/                # 设置与数据管理
-│  └─ privacy/                 # 隐私
-├─ components/
-│  ├─ shell/                   # header、移动导航、偏好同步
-│  ├─ quiz/                    # 答题引擎与分类标记
-│  └─ result/                  # 结果叙事与反思引导
-├─ core/quiz/
-│  ├─ types.ts                 # QuizDefinition 与统一类型
-│  ├─ catalog.ts               # 内部测试目录与公开路线筛选
-│  ├─ scoring.ts               # 三类评分适配器
-│  └─ validation.ts            # 数据定义校验
-├─ lib/
-│  ├─ test-registry.ts         # 唯一测试注册入口
-│  ├─ quiz-definitions/        # 16 个旗舰测试的标准定义
-│  ├─ tests/                   # 193 个测试内容模块
-│  ├─ auth.ts                  # Better Auth 服务端配置
-│  ├─ server/                  # SQLite、鉴权与云端数据逻辑
-│  ├─ storage.ts               # know-yourself:v3 snapshot
-│  └─ data-manager.ts          # v3 导入导出
-└─ hooks/use-local-storage.ts  # 语言、主题、历史、收藏 hooks
+|- app/
+|  |- page.tsx                 # 双入口首页
+|  |- assessments/             # 完整测评目录
+|  |- test/[id]/               # 测评详情
+|  |- quiz/[type]/             # 答题
+|  |- result/[type]/           # 结果
+|  |- journal/                 # 札记库、编辑器与公开详情
+|  |- community/               # 图像札记 / 测评分享双流
+|  |- admin/moderation/        # 单一运营管理员后台
+|  |- complaints/              # 无登录投诉
+|  |- account/                 # 注册、验证、登录与账号管理
+|  `- api/                     # 认证、同步、札记、治理和指标接口
+|- components/
+|  |- journal/                 # 札记编辑、预览、详情与互动
+|  |- community/               # 两类社区 Feed
+|  |- quiz/                    # 答题引擎与测评视觉
+|  `- result/                  # 结果叙事、视觉和反馈
+|- core/quiz/                  # QuizDefinition、媒体契约与评分
+`- lib/
+   |- quiz-definitions/        # 16 个公开测评定义
+   |- tests/                   # 193 个内部测评模块
+   |- server/                  # SQLite、鉴权、札记、治理与邮件
+   `- storage.ts               # know-yourself:v3 snapshot
 ```
 
 ## 本地开发
@@ -86,48 +87,80 @@ npm install
 npm run dev
 ```
 
-打开 `http://localhost:3333/`。
+另开一个终端启动持久媒体任务：
+
+```bash
+npm run media:worker
+```
+
+打开 `http://localhost:3333/`。默认开发数据库、媒体和备份位于 `.data/`；可通过 `DATABASE_PATH`、`MEDIA_ROOT` 和 `BACKUP_ROOT` 覆盖。媒体 worker 每小时检查一次备份状态，每个 UTC 日期最多创建一个自动快照；`npm run media:backup -- --force` 可用于显式快照测试。
+
+要完整测试注册、验证和上传，还需配置：
+
+```dotenv
+BETTER_AUTH_SECRET=replace-with-a-long-random-secret
+BETTER_AUTH_URL=http://localhost:3333
+TURNSTILE_SITE_KEY=...
+TURNSTILE_SECRET_KEY=...
+TURNSTILE_ALLOWED_HOSTNAMES=localhost,127.0.0.1
+SMTP_HOST=...
+SMTP_PORT=587
+SMTP_FROM=...
+SMTP_USER=...
+SMTP_PASSWORD=...
+SMTP_SECURE=false
+JOURNAL_ADMIN_USER_ID=...
+```
+
+客户端通过运行时 `/api/config/turnstile` 读取 `TURNSTILE_SITE_KEY`；`NEXT_PUBLIC_TURNSTILE_SITE_KEY` 仅作为本地或旧部署兼容项。`SMTP_USER` 和 `SMTP_PASSWORD` 必须同时提供或同时省略；`JOURNAL_ADMIN_USER_ID` 也可使用兼容变量 `ADMIN_USER_ID`，当前生产设计只配置一个管理员用户 ID。生产密钥只放在服务器环境文件中，不提交到仓库。
+
+Turnstile、SMTP、管理员 ID、媒体目录和备份目录都是生产发布的必需运行时配置或验收项。仓库提供相应代码路径，但不能据此推断生产服务器已经填入有效密钥或完成外部服务验证。
+
+## 媒体边界
+
+- 每篇札记必须有标题和 1 至 6 张图片；正文、图片说明可选，非装饰图片必须提供 alt
+- 单图最多 8 MiB、25 MP；拒绝 SVG、GIF、动画 WebP、HEIC、远程 URL、损坏文件和 MIME 伪造
+- 每个账号每日最多上传 20 张、公开发布 3 次，总媒体配额 250 MiB；配额与一分钟 API 限流持久化到 SQLite，限流键只保存 SHA-256 摘要
+- 私密变体通过 owner 鉴权 API 读取；公开修订只引用处理后的公开变体
+- 结构化记录存入 SQLite，图片文件不以 BLOB 或 base64 写入数据库
 
 ## 验证命令
 
 ```bash
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm test
 npm run audit:flagship
+npm run audit:a11y
 npm audit --audit-level=high
 npm run build
 npm run package:standalone
-npm run start
 ```
 
-`npm test` 包含：
+`npm test` 串行覆盖 registry、三类评分、测评视觉选择、Storage v3、云端 revision、社区、札记媒体与治理、Turnstile 运行时配置契约，以及分享输出。`audit:flagship` 只审阅 16 条公开测评路线；`audit:a11y` 检查静态无障碍约束。发布前仍需按 [QA_CHECKLIST.md](./QA_CHECKLIST.md) 完成浏览器、窄屏、媒体、权限、治理和生产 smoke test。
 
-1. `check:registry`：检查 193 个内部 registry loader、源文件和 16 条旗舰路线
-2. `test:scoring`：运行 10,212 个答案边界场景
-3. `test:storage`：验证 v3 snapshot、历史、收藏、会话、导入导出和旧命名空间隔离
+生产构建产物位于 `.next/standalone/`。部署时由 Node 服务和媒体 worker 处理应用请求及持久任务，Caddy 负责 HTTPS、公开媒体和反向代理；这些生产条件必须按 [deploy/README.md](./deploy/README.md) 配置并验收。`scripts/serve-static.mjs` 仅用于本地静态预览，不是生产入口。
 
-`audit:flagship` 只审阅首页的 16 个旗舰测试，不会把“能运行”误认为“已达到推荐质量”。当前 16 个旗舰入口均已通过 ready 门槛。
+## 添加测评与视觉
 
-生产构建产物位于 `.next/standalone/`（使用 `npm run package:standalone` 打包）。生产环境由 Node 服务处理页面和 `/api/*`，Caddy 负责 HTTPS 与反向代理；`scripts/serve-static.mjs` 仅用于本地静态预览，不是生产入口。
-
-## 添加测试
-
-1. 在 `src/lib/tests/<id>.ts` 创建双语测试模块；迁移中的标准定义放在 `src/lib/quiz-definitions/<id>.ts`。
-2. 在 `src/lib/test-registry.ts` 添加一条带 `loader` 的注册项。
-3. 如需首页精选入口，再在 `src/lib/core-tests.ts` 明确加入。
-4. 运行 `npm test`、`npm run audit:flagship` 和 `npm run build`。
+1. 在 `src/lib/tests/<id>.ts` 创建双语测评模块；标准定义放在 `src/lib/quiz-definitions/<id>.ts`。
+2. 在 `src/lib/test-registry.ts` 添加带 `loader` 的注册项。
+3. 如需公开入口，在 `src/lib/core-tests.ts` 明确加入。
+4. 可选 `QuizDefinition.media` 只保存封面、result key 和稳定 score-band ID 到 `QuizVisual` 的映射；不要把图片 URL 写入 `QuizResult` 或历史记录。
+5. 为每张视觉提供固有宽高、双语 alt 和可选焦点，并运行 `npm run test:quiz-media`。
 
 不要另建第二份测试 ID 数组、动态 import map 或页面专用评分逻辑。
 
 ## 产品边界
 
-- 不强制账号：游客模式保持本地优先；注册、登录和自动跨设备同步由自托管服务提供
-- 登录后自动合并并上传需要同步的本机数据；账号云端数据保存在 VPS 的 SQLite 数据库。游客数据在登录前仍只保存在本机
-- 登录后可修改密码并撤销其他设备会话；当前不提供忘记密码邮件找回
-- 不做 AI 生成解读
-- 不把结果表述为临床诊断、治疗建议或专业评估
-- 不自动迁移旧 localStorage 数据；新版本使用 `know-yourself:v3` 命名空间
+- 游客仍可完成测评；图像札记要求登录且邮箱已验证
+- SMTP 当前只用于邮箱验证；仍未提供忘记密码邮件找回流程
+- 首版札记不支持 Markdown、HTML、视频、滤镜、贴纸、自由画布、远程图片或运行时 AI 生图
+- 用户内容只记录所选内容语言，不要求中英双份，也不自动翻译
+- 首版不做发布前内容审核或合法敏感内容遮罩；违法内容、未成年人性内容、非自愿私密影像、隐私泄露和明确伤害内容仍可被举报并按治理规则处理
+- 发布内容会立即公开并允许搜索引擎索引；站内取消公开或删除不能撤回第三方缓存
+- 不做 AI 生成解读，不把结果表述为临床诊断、治疗建议或专业评估
+- 不迁移旧 localStorage 数据；继续使用 `know-yourself:v3` 命名空间
 
 ## License
 

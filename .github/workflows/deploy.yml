@@ -44,7 +44,7 @@ jobs:
         run: npm run build
       - name: Prepare standalone assets
         run: npm run package:standalone
-      - name: Verify Linux native addon
+      - name: Verify Linux native addons and media runtime
         run: |
           set -euo pipefail
           addon=.next/standalone/node_modules/better-sqlite3/build/Release/better_sqlite3.node
@@ -64,15 +64,29 @@ jobs:
           PY
           file "$addon"
           file "$addon" | grep -E 'ELF 64-bit.*x86-64'
+          sharp_addon="$(find .next/standalone/node_modules/@img -path '*sharp-linux-x64*/lib/sharp-linux-x64.node' -print -quit)"
+          test -n "$sharp_addon"
+          test -f "$sharp_addon"
+          file "$sharp_addon" | grep -E 'ELF 64-bit.*x86-64'
+          test -f .next/standalone/next-server.js
+          test -f .next/standalone/media-worker.mjs
+          test -f .next/standalone/media-backup.mjs
+          test -f .next/standalone/media-restore.mjs
           node <<'NODE'
           const Database = require("./.next/standalone/node_modules/better-sqlite3");
+          const sharp = require("./.next/standalone/node_modules/sharp");
           const database = new Database(":memory:");
           database.exec("SELECT 1");
           database.close();
+          sharp({ create: { width: 1, height: 1, channels: 3, background: "#fff" } }).webp().toBuffer()
+            .then((buffer) => { if (!buffer.length) process.exit(1); })
+            .catch((error) => { console.error(error); process.exit(1); });
           NODE
       - name: Package standalone release
         run: |
           test -f .next/standalone/server.js
+          test -f .next/standalone/next-server.js
+          test -f .next/standalone/media-worker.mjs
           test -d .next/standalone/public
           test -d .next/standalone/.next/static
           tar -C .next/standalone -czf quiz-platform.tar.gz .
@@ -142,6 +156,10 @@ jobs:
             mkdir "$staging"
             tar -xzf "$archive" -C "$staging"
             test -f "$staging/server.js"
+            test -f "$staging/next-server.js"
+            test -f "$staging/media-worker.mjs"
+            test -f "$staging/media-backup.mjs"
+            test -f "$staging/media-restore.mjs"
             test -d "$staging/public"
             test -d "$staging/.next/static"
             test -f "$staging/node_modules/better-sqlite3/build/Release/better_sqlite3.node"
@@ -152,9 +170,13 @@ jobs:
           fi
           TARGET="$target" /usr/bin/node <<'NODE'
           const Database = require(`${process.env.TARGET}/node_modules/better-sqlite3`);
+          const sharp = require(`${process.env.TARGET}/node_modules/sharp`);
           const database = new Database(":memory:");
           database.exec("SELECT 1");
           database.close();
+          sharp({ create: { width: 1, height: 1, channels: 3, background: "#fff" } }).webp().toBuffer()
+            .then((buffer) => { if (!buffer.length) process.exit(1); })
+            .catch((error) => { console.error(error); process.exit(1); });
           NODE
           if [ -n "$previous" ] && [ "$previous" != "$target" ]; then
             rm -f "$releases/.previous-$release"
@@ -165,19 +187,78 @@ jobs:
           ln -s "$target" "$releases/.current-$release"
           mv -Tf "$releases/.current-$release" "$releases/current"
           rm -f "$archive"
-          application_origin=http://127.0.0.1:3333
-          if ! sudo -n systemctl restart quiz-platform || ! sudo -n systemctl is-active quiz-platform >/dev/null || \
-             ! curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-all-errors -H 'Host: knowyourself.cc.cd' "$application_origin/" -o /dev/null || \
-             ! curl --fail --silent --show-error --retry 5 --retry-delay 1 --retry-all-errors -H 'Host: knowyourself.cc.cd' "$application_origin/test/big-five/" -o /dev/null || \
-             ! test "$(curl --fail --silent --show-error -H 'Host: knowyourself.cc.cd' "$application_origin/api/auth/get-session")" = null; then
+          rollback_release() {
             if [ -n "$previous" ] && [ -d "$previous" ]; then
               rm -f "$releases/.rollback"
               ln -s "$previous" "$releases/.rollback"
               mv -Tf "$releases/.rollback" "$releases/current"
               sudo -n systemctl restart quiz-platform || true
             fi
+          }
+          application_origin=http://127.0.0.1:3333
+          if ! sudo -n systemctl restart quiz-platform || ! sudo -n systemctl is-active quiz-platform >/dev/null || \
+             ! curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-all-errors -H 'Host: knowyourself.cc.cd' "$application_origin/" -o /dev/null || \
+             ! test "$(curl --fail --silent --show-error -H 'Host: knowyourself.cc.cd' "$application_origin/api/auth/get-session")" = null; then
+            rollback_release
             exit 1
           fi
+          for path in /test/big-five/ /assessments/ /journal/ /community/ /privacy/ /complaints/ /api/config/turnstile /quiz-media/animal-personality/cover.webp; do
+            if ! curl --fail --silent --show-error --retry 5 --retry-delay 1 --retry-all-errors \
+              -H 'Host: knowyourself.cc.cd' "$application_origin$path" -o /dev/null; then
+              rollback_release
+              exit 1
+            fi
+          done
+          # The auth probe above runs database migrations. Verify that the
+          # supervisor and its worker then remain the same live processes.
+          media_worker_pids() {
+            local supervisor_pid="$1"
+            local candidate candidate_pid parent_pid
+            for candidate in /proc/[0-9]*; do
+              [ -r "$candidate/status" ] && [ -r "$candidate/cmdline" ] || continue
+              candidate_pid="${candidate##*/}"
+              parent_pid="$(awk '$1 == "PPid:" { print $2; exit }' "$candidate/status" 2>/dev/null || true)"
+              [ "$parent_pid" = "$supervisor_pid" ] || continue
+              if grep -zEq '(^|/)media-worker\.mjs$' "$candidate/cmdline"; then
+                printf '%s\n' "$candidate_pid"
+              fi
+            done
+          }
+          if ! supervisor_pid="$(systemctl show --property MainPID --value quiz-platform)" || \
+             ! [[ "$supervisor_pid" =~ ^[1-9][0-9]*$ ]] || ! kill -0 "$supervisor_pid" 2>/dev/null; then
+            echo "quiz-platform supervisor PID is unavailable after restart" >&2
+            rollback_release
+            exit 1
+          fi
+          worker_pid=""
+          for attempt in {1..20}; do
+            mapfile -t worker_pids < <(media_worker_pids "$supervisor_pid")
+            if [ "${#worker_pids[@]}" -eq 1 ]; then
+              worker_pid="${worker_pids[0]}"
+              break
+            fi
+            sleep 1
+          done
+          if ! [[ "$worker_pid" =~ ^[1-9][0-9]*$ ]] || ! kill -0 "$worker_pid" 2>/dev/null; then
+            echo "media worker did not become healthy after restart" >&2
+            rollback_release
+            exit 1
+          fi
+          sleep 10
+          if ! stable_supervisor_pid="$(systemctl show --property MainPID --value quiz-platform)"; then
+            echo "quiz-platform supervisor PID could not be re-read" >&2
+            rollback_release
+            exit 1
+          fi
+          mapfile -t stable_worker_pids < <(media_worker_pids "$supervisor_pid")
+          if [ "$stable_supervisor_pid" != "$supervisor_pid" ] || ! kill -0 "$supervisor_pid" 2>/dev/null || \
+             [ "${#stable_worker_pids[@]}" -ne 1 ] || [ "${stable_worker_pids[0]:-}" != "$worker_pid" ] || \
+             ! kill -0 "$worker_pid" 2>/dev/null; then
+            echo "quiz-platform supervisor or media worker restarted during the health window" >&2
+            rollback_release
+            exit 1
+          fi
+          echo "quiz-platform supervisor $supervisor_pid and media worker $worker_pid remained stable"
           REMOTE
       - name: Smoke test public origin
         env:
@@ -190,9 +271,12 @@ jobs:
           legacy_host=loveyourself.cc.cd
           maintenance_host=quiz.107-151-246-167.sslip.io
           test_path=/test/big-five/
+          smoke_paths=("$test_path" /assessments/ /journal/ /community/ /privacy/ /complaints/ /api/config/turnstile /quiz-media/animal-personality/cover.webp)
 
           curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/" -o /dev/null
-          curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host$test_path" -o /dev/null
+          for path in "${smoke_paths[@]}"; do
+            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host$path" -o /dev/null
+          done
           test "$(curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/healthz")" = ok
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
           curl --fail --silent --show-error --resolve "$maintenance_host:443:$VPS_HOST" "https://$maintenance_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"
@@ -216,7 +300,9 @@ jobs:
             test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --resolve "$www_host:443:$VPS_HOST" "https://$www_host$test_path")" = 301
             test "$(curl --silent --show-error --head --resolve "$www_host:443:$VPS_HOST" "https://$www_host$test_path" | tr -d '\r' | awk 'BEGIN { IGNORECASE=1 } /^location:/ { print $2; exit }')" = "https://$canonical_host$test_path"
             curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/" -o /dev/null
-            curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host$test_path" -o /dev/null
+            for path in "${smoke_paths[@]}"; do
+              curl --fail --silent --show-error --retry 5 --retry-all-errors --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host$path" -o /dev/null
+            done
             test "$(curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/healthz")" = ok
             curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/robots.txt" | grep -F "Sitemap: https://$canonical_host/sitemap.xml"
             curl --fail --silent --show-error --resolve "$canonical_host:443:$VPS_HOST" "https://$canonical_host/sitemap.xml" | grep -F "<loc>https://$canonical_host$test_path</loc>"

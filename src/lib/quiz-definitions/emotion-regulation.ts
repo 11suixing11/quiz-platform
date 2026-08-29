@@ -1,4 +1,5 @@
 import legacy from "../tests/emotion-regulation";
+import { QUIZ_MEDIA } from "../quiz-media";
 import { defineQuiz, dimensionResults, normalizeLegacyQuestions, scoreDimensions } from "../../core/quiz/definition";
 import type { DimensionData, NarrativeResult } from "../../core/quiz/types";
 
@@ -66,6 +67,7 @@ const definition = defineQuiz({
     zh: "看看你如何重新理解情境、接纳感受，以及何时会压住情绪表达。",
     en: "See how you reframe situations, accept feelings, and sometimes hold emotional expression back.",
   },
+  media: QUIZ_MEDIA["emotion-regulation"],
   questions,
   resultContent: {
     uiText: legacy.uiText,

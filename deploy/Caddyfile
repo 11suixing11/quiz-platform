@@ -15,6 +15,16 @@
 	}
 }
 
+(public_media) {
+	@public_media path_regexp ^/media/public/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+/(320|960|1600)\.webp$
+	handle @public_media {
+		uri strip_prefix /media/public
+		root * /var/lib/quiz-platform/media/public
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+}
+
 # The Next.js standalone server owns both rendered pages and /api routes.
 # Caddy remains the public TLS endpoint and reverse proxy.
 # Canonical production host.
@@ -31,8 +41,13 @@ knowyourself.cc.cd {
 		respond "ok" 200
 	}
 
+	import public_media
+
 	handle {
-		reverse_proxy 127.0.0.1:3333
+		reverse_proxy 127.0.0.1:3333 {
+			header_up X-Real-IP {remote_host}
+			header_up -CF-Connecting-IP
+		}
 	}
 }
 
@@ -63,8 +78,13 @@ beta.loveuu.xyz {
 		respond "ok" 200
 	}
 
+	import public_media
+
 	handle {
-		reverse_proxy 127.0.0.1:3333
+		reverse_proxy 127.0.0.1:3333 {
+			header_up X-Real-IP {remote_host}
+			header_up -CF-Connecting-IP
+		}
 	}
 }
 
@@ -84,7 +104,12 @@ quiz.107-151-246-167.sslip.io {
 		respond "ok" 200
 	}
 
+	import public_media
+
 	handle {
-		reverse_proxy 127.0.0.1:3333
+		reverse_proxy 127.0.0.1:3333 {
+			header_up X-Real-IP {remote_host}
+			header_up -CF-Connecting-IP
+		}
 	}
 }

@@ -2,14 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, Check, Cloud, RefreshCw, Share2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Cloud, RefreshCw, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { loadQuizDefinition, getQuizEntry, getResultKey, getResultScore, getScoreBand, type QuizDefinition, type QuizResult } from "@/core/quiz";
+import { loadQuizDefinition, getQuizEntry, getQuizVisualSelection, getResultKey, getResultScore, getScoreBand, type QuizDefinition, type QuizResult } from "@/core/quiz";
 import { useAccount } from "@/components/account-provider";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { NarrativeSection } from "@/components/result/narrative-section";
 import { ReflectionGuide } from "@/components/result/reflection-guide";
 import { ResultDetails } from "@/components/result/result-details";
+import { QuizVisualFrame } from "@/components/quiz/quiz-visual";
 import { useLanguage } from "@/hooks/use-local-storage";
 import { getAttemptById, getLatestAttempt } from "@/lib/storage";
 import { copyOrShare } from "@/lib/share";
@@ -348,6 +349,7 @@ export default function ResultClient({ testId }: { testId: string }) {
   const [shareError, setShareError] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
   const [syncWarning, setSyncWarning] = useState(false);
+  const [visualFeedback, setVisualFeedback] = useState<"idle" | "sending" | "yes" | "no" | "error">("idle");
   const [loadedAccountScope, setLoadedAccountScope] = useState<string | null>();
   const entry = getQuizEntry(testId);
   const accountScope = user?.id ?? null;
@@ -359,6 +361,7 @@ export default function ResultClient({ testId }: { testId: string }) {
     loadQuizDefinition(testId).then((loaded) => {
       if (cancelled) return;
       setDefinition(loaded);
+      setVisualFeedback("idle");
       const queryAttempt = new URLSearchParams(window.location.search).get("attempt");
       setSyncWarning(new URLSearchParams(window.location.search).get("sync") === "failed");
       const attempt = queryAttempt ? getAttemptById(queryAttempt) : getLatestAttempt(testId);
@@ -420,6 +423,7 @@ export default function ResultClient({ testId }: { testId: string }) {
       summary: getResultSummary(definition, result, language),
       lead: getResultLead(entry?.topic.id ?? "self", language),
       details: getResultDetails(definition, result, language, narrative, typeData, archetype, scoreBand),
+      visualSelection: getQuizVisualSelection(definition, result),
     };
   }, [definition, entry, language, result]);
 
@@ -454,6 +458,27 @@ export default function ResultClient({ testId }: { testId: string }) {
     nextUrl.searchParams.delete("sync");
     window.history.replaceState(window.history.state, "", nextUrl);
   }, []);
+
+  const submitVisualFeedback = useCallback(async (helpful: boolean) => {
+    if (!content?.visualSelection || visualFeedback === "sending" || visualFeedback === "yes" || visualFeedback === "no") return;
+    setVisualFeedback("sending");
+    try {
+      const response = await fetch("/api/metrics/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "quiz_visual_helpfulness",
+          quizId: testId,
+          visualKey: content.visualSelection.key,
+          helpful,
+        }),
+      });
+      if (!response.ok) throw new Error("Feedback request failed");
+      setVisualFeedback(helpful ? "yes" : "no");
+    } catch {
+      setVisualFeedback("error");
+    }
+  }, [content, testId, visualFeedback]);
 
   if (loading || syncState === "loading" || loadedAccountScope !== accountScope) return <Loading language={language} />;
   if (!definition || !entry || !result || !content) {
@@ -498,13 +523,16 @@ export default function ResultClient({ testId }: { testId: string }) {
         </section>
         <div className="atlas-result-intro-block" style={{ "--result-accent": accent } as React.CSSProperties}>
           <p className="atlas-result-question">{content.lead}</p>
-          <div className="atlas-result-identity mt-6">
-            <span className="atlas-result-identity-label">{content.resultLabel}</span>
-            <h1 className="atlas-result-identity-title">{content.title}</h1>
-            {content.description && <p className="atlas-result-identity-description">{content.description}</p>}
+          <div className={`atlas-result-visual-layout${content.visualSelection ? " atlas-result-visual-layout--active" : ""}`}>
+            {content.visualSelection && <QuizVisualFrame visual={content.visualSelection.visual} lang={language} sizes="(max-width: 720px) calc(100vw - 2.5rem), 26rem" className="atlas-result-visual" preload />}
+            <div className="atlas-result-identity">
+              <span className="atlas-result-identity-label">{content.resultLabel}</span>
+              <h1 className="atlas-result-identity-title">{content.title}</h1>
+              {content.description && <p className="atlas-result-identity-description">{content.description}</p>}
+            </div>
           </div>
           {content.summary.length > 0 && (
-            <div className="atlas-result-summary" aria-label={language === "zh" ? "结果摘要" : "Result summary"}>
+            <div className={`atlas-result-summary${content.summary.length === 4 ? " atlas-result-summary--four" : ""}`} aria-label={language === "zh" ? "结果摘要" : "Result summary"}>
               {content.summary.map((item) => (
                 <div key={item.label} className="atlas-result-summary-item">
                   <span>{item.label}</span>
@@ -514,6 +542,16 @@ export default function ResultClient({ testId }: { testId: string }) {
             </div>
           )}
           <p className="atlas-result-identity-note">{content.identityNote}</p>
+          {content.visualSelection && (
+            <fieldset className="quiz-visual-feedback" disabled={visualFeedback === "sending" || visualFeedback === "yes" || visualFeedback === "no"}>
+              <legend>{language === "zh" ? "图像是否帮助理解这次结果" : "Did the image help you understand this result?"}</legend>
+              <div>
+                <button type="button" onClick={() => submitVisualFeedback(true)} aria-pressed={visualFeedback === "yes"}><ThumbsUp aria-hidden="true" />{language === "zh" ? "有帮助" : "Yes"}</button>
+                <button type="button" onClick={() => submitVisualFeedback(false)} aria-pressed={visualFeedback === "no"}><ThumbsDown aria-hidden="true" />{language === "zh" ? "没有帮助" : "No"}</button>
+              </div>
+              <p role="status" aria-live="polite">{visualFeedback === "sending" ? (language === "zh" ? "正在记录…" : "Saving…") : visualFeedback === "yes" || visualFeedback === "no" ? (language === "zh" ? "谢谢，你的选择已匿名计入汇总。" : "Thank you. Your choice was added to the anonymous total.") : visualFeedback === "error" ? (language === "zh" ? "暂时无法记录，请重试。" : "Could not save that choice. Please try again.") : ""}</p>
+            </fieldset>
+          )}
         </div>
 
         {content.details && <ResultDetails {...content.details} />}

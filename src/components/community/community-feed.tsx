@@ -3,15 +3,47 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Heart, MessageCircle, Reply, ShieldAlert, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Reply, ShieldAlert, Trash2, X } from "lucide-react";
 import { useAccount } from "@/components/account-provider";
 import { addCommunityComment, deleteCommunityComment, deleteCommunityPost, getCommunityPosts, reportCommunityContent, setCommunityReaction, type CommunityComment, type CommunityPost } from "@/lib/community";
 import type { Lang } from "@/core/quiz";
 
 function initials(name: string) { return Array.from(name.trim()).slice(0, 2).join("").toUpperCase() || "ME"; }
 
+const REPORT_REASONS = [
+  ["illegal", "违法内容", "Illegal content"],
+  ["minor_sexual", "涉及未成年人性内容", "Sexual content involving minors"],
+  ["nonconsensual_intimate", "非自愿私密影像", "Non-consensual intimate content"],
+  ["privacy", "隐私泄露", "Privacy exposure"],
+  ["explicit_harm", "明确伤害内容", "Explicit harm"],
+  ["spam", "垃圾广告", "Spam"],
+  ["abuse", "攻击或骚扰", "Abuse or harassment"],
+  ["sexual", "不适当性内容", "Inappropriate sexual content"],
+  ["copyright", "版权问题", "Copyright"],
+  ["other", "其他", "Other"],
+] as const;
+
 function timeLabel(timestamp: number, language: Lang) {
   return new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en", { year: "numeric", month: "short", day: "numeric" }).format(timestamp);
+}
+
+function ReportDialog({ language, onSubmit }: { language: Lang; onSubmit: (reason: string) => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("other");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  return <>
+    <button type="button" onClick={() => setOpen(true)}><ShieldAlert />{language === "zh" ? "举报" : "Report"}</button>
+    {open && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-4 sm:items-center" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) setOpen(false); }}>
+      <section className="w-full max-w-md rounded-lg bg-paper p-5 shadow-2xl dark:bg-night" role="dialog" aria-modal="true" aria-labelledby="community-report-title" aria-describedby="community-report-description">
+        <div className="flex items-center justify-between gap-4"><h2 id="community-report-title" className="text-lg font-semibold">{language === "zh" ? "举报内容" : "Report content"}</h2><button type="button" className="community-icon-action" onClick={() => setOpen(false)} disabled={busy} aria-label={language === "zh" ? "关闭" : "Close"} title={language === "zh" ? "关闭" : "Close"}><X aria-hidden="true" /></button></div>
+        <p id="community-report-description" className="sr-only">{language === "zh" ? "选择最符合这项内容的举报原因。" : "Choose the reason that best describes this content."}</p>
+        <label className="mt-5 block text-sm font-semibold"><span>{language === "zh" ? "原因" : "Reason"}</span><select value={reason} onChange={(event) => setReason(event.target.value)} className="atlas-account-input mt-2">{REPORT_REASONS.map(([value, zh, en]) => <option key={value} value={value}>{language === "zh" ? zh : en}</option>)}</select></label>
+        {error && <p className="mt-3 text-sm text-[#a53f3f] dark:text-red-200" role="alert">{error}</p>}
+        <div className="mt-6 flex justify-end gap-3"><button type="button" className="atlas-text-button" onClick={() => setOpen(false)} disabled={busy}>{language === "zh" ? "取消" : "Cancel"}</button><button type="button" className="atlas-danger-action disabled:opacity-45" disabled={busy} onClick={async () => { setBusy(true); setError(""); try { await onSubmit(reason); setOpen(false); } catch (cause) { setError(cause instanceof Error ? cause.message : (language === "zh" ? "举报失败" : "Report failed")); } finally { setBusy(false); } }}><ShieldAlert aria-hidden="true" />{busy ? (language === "zh" ? "提交中…" : "Submitting…") : (language === "zh" ? "提交举报" : "Submit report")}</button></div>
+      </section>
+    </div>}
+  </>;
 }
 
 function CommentForm({ postId, parentId, language, onSaved }: { postId: string; parentId?: string; language: Lang; onSaved: () => void }) {
@@ -36,20 +68,12 @@ function CommentItem({ comment, post, language, refresh }: { comment: CommunityC
   const { user } = useAccount();
   const [replying, setReplying] = useState(false);
   const replies = post.comments.filter((item) => item.parentId === comment.id);
-  const report = async () => {
-    if (!user) return;
-    const reason = window.prompt(language === "zh" ? "举报原因：垃圾广告 / 攻击 / 隐私泄露 / 其他" : "Report reason: spam / abuse / privacy / other", "other");
-    if (!reason) return;
-    const normalized = reason.includes("垃圾") || reason === "spam" ? "spam" : reason.includes("攻击") || reason === "abuse" ? "abuse" : reason.includes("隐私") || reason === "privacy" ? "privacy" : "other";
-    await reportCommunityContent(user.id, { commentId: comment.id, reason: normalized });
-    window.alert(language === "zh" ? "已收到举报。" : "Report received.");
-  };
   return <div className="community-comment">
     <div className="community-comment-meta"><strong>{comment.author.displayName}</strong><span>{timeLabel(comment.createdAt, language)}</span></div>
     <p>{comment.body}</p>
     <div className="community-comment-actions">
       {user && !comment.parentId && <button type="button" onClick={() => setReplying((value) => !value)}><Reply />{language === "zh" ? "回复" : "Reply"}</button>}
-      {user && <button type="button" onClick={report}><ShieldAlert />{language === "zh" ? "举报" : "Report"}</button>}
+      {user && <ReportDialog language={language} onSubmit={async (reason) => { await reportCommunityContent(user.id, { commentId: comment.id, reason }); refresh(); }} />}
       {comment.canDelete && user && <button type="button" onClick={async () => { if (window.confirm(language === "zh" ? "删除这条留言？" : "Delete this response?")) { await deleteCommunityComment(user.id, comment.id); refresh(); } }}><Trash2 />{language === "zh" ? "删除" : "Delete"}</button>}
     </div>
     {replying && <CommentForm postId={post.id} parentId={comment.id} language={language} onSaved={() => { setReplying(false); refresh(); }} />}
@@ -93,7 +117,7 @@ export function CommunityFeed({ language }: { language: Lang }) {
         <div className="community-post-actions">
           <button disabled={!user} className={post.reacted ? "is-active" : ""} title={!user ? (language === "zh" ? "登录后可以共鸣" : "Sign in to resonate") : undefined} onClick={async () => { if (!user) return; await setCommunityReaction(user.id, post.id, !post.reacted); load(); }}><Heart fill={post.reacted ? "currentColor" : "none"} />{language === "zh" ? "共鸣" : "Resonate"}<span>{post.reactionCount}</span></button>
           <span><MessageCircle />{language === "zh" ? `${post.commentCount} 条留言` : `${post.commentCount} responses`}</span>
-          {user && !post.isAuthor && <button onClick={async () => { await reportCommunityContent(user.id, { postId: post.id, reason: "other" }); window.alert(language === "zh" ? "已收到举报。" : "Report received."); }}><ShieldAlert />{language === "zh" ? "举报" : "Report"}</button>}
+          {user && !post.isAuthor && <ReportDialog language={language} onSubmit={async (reason) => { await reportCommunityContent(user.id, { postId: post.id, reason }); await load(); }} />}
         </div>
         {post.allowComments && <section className="community-comments" aria-label={language === "zh" ? "留言" : "Responses"}>
           {roots.map((comment) => <CommentItem key={comment.id} comment={comment} post={post} language={language} refresh={load} />)}

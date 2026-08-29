@@ -6,6 +6,7 @@ import {
   KeyRound,
   LogIn,
   LogOut,
+  MailCheck,
   RefreshCw,
   ShieldCheck,
   UserPlus,
@@ -13,8 +14,9 @@ import {
 import { useAccount } from "@/components/account-provider";
 import { ProfileEditor } from "@/components/profile-editor";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
+import { TurnstileWidget, type TurnstileConfigurationStatus } from "@/components/turnstile-widget";
 import { useLanguage } from "@/hooks/use-local-storage";
-import { changePassword, deleteAccount, loginAccount, registerAccount } from "@/lib/account";
+import { changePassword, deleteAccount, loginAccount, registerAccount, sendVerificationEmail } from "@/lib/account";
 import { clearSyncBaseline } from "@/lib/account-sync";
 import { clearLocalProfile } from "@/lib/local-profile";
 import { adoptSnapshotAsGuest, readSnapshot } from "@/lib/storage";
@@ -34,6 +36,9 @@ function readableError(error: unknown, language: "zh" | "en") {
   if (normalized.includes("RATE_LIMIT") || normalized.includes("TOO_MANY_REQUESTS")) return language === "zh" ? "操作过于频繁，请稍后再试。" : "Too many attempts. Please try again later.";
   if (normalized.includes("UNAUTHORIZED") || normalized.includes("NOT_AUTHENTICATED") || normalized.includes("FAILED_TO_GET_SESSION")) return language === "zh" ? "登录状态已失效，请重新登录。" : "Your session has expired. Please sign in again.";
   if (normalized.includes("INVALID_NAME")) return language === "zh" ? "显示名称需要为 1 至 80 个字符。" : "Use 1 to 80 characters for your display name.";
+  if (normalized.includes("EMAIL_NOT_VERIFIED")) return language === "zh" ? "请先完成邮箱验证。" : "Verify your email before signing in.";
+  if (normalized.includes("MISSING_RESPONSE") || normalized.includes("CAPTCHA")) return language === "zh" ? "请完成人机验证后再继续。" : "Complete human verification before continuing.";
+  if (normalized.includes("VERIFICATION_EMAIL") || normalized.includes("EMAIL_DELIVERY")) return language === "zh" ? "验证邮件暂时无法发送，请稍后重试。" : "The verification email could not be sent. Try again later.";
   return message || (language === "zh" ? "操作失败，请稍后重试。" : "The request failed. Please try again.");
 }
 
@@ -59,6 +64,11 @@ export default function AccountPage() {
   const [deletePassword, setDeletePassword] = useState("");
   const [action, setAction] = useState<string | null>(null);
   const [feedback, setFeedback] = useState("");
+  const [feedbackTone, setFeedbackTone] = useState<"success" | "error">("error");
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaResetSignal, setCaptchaResetSignal] = useState(0);
+  const [captchaConfigurationStatus, setCaptchaConfigurationStatus] = useState<TurnstileConfigurationStatus>("loading");
   const [confirmAccountDelete, setConfirmAccountDelete] = useState(false);
 
   const zh = language === "zh";
@@ -67,6 +77,7 @@ export default function AccountPage() {
   const submitAuth = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFeedback("");
+    setNeedsVerification(false);
     if (password.length < 10) {
       setFeedback(zh ? "密码至少需要 10 个字符。" : "Use at least 10 characters for your password.");
       return;
@@ -75,16 +86,57 @@ export default function AccountPage() {
       setFeedback(zh ? "请输入显示名称。" : "Enter a display name.");
       return;
     }
+    if (authMode === "register" && (captchaConfigurationStatus !== "ready" || !captchaToken)) {
+      setFeedback(captchaConfigurationStatus === "unavailable"
+        ? (zh ? "人机验证尚未配置，当前无法注册。" : "Human verification is not configured, so registration is unavailable.")
+        : (zh ? "请完成人机验证后再继续。" : "Complete human verification before continuing."));
+      setFeedbackTone("error");
+      return;
+    }
     setAction("auth");
     try {
       if (authMode === "register") {
-        await registerAccount({ email: email.trim(), password, displayName: displayName.trim() });
+        await registerAccount({ email: email.trim(), password, displayName: displayName.trim(), captchaToken });
+        setPassword("");
+        setCaptchaToken("");
+        setCaptchaResetSignal((value) => value + 1);
+        setAuthMode("login");
+        setNeedsVerification(true);
+        setFeedbackTone("success");
+        setFeedback(zh ? "账号已创建。请打开验证邮件，完成后再登录。" : "Account created. Open the verification email, then sign in.");
+        return;
       } else {
         await loginAccount({ email: email.trim(), password });
       }
       setPassword("");
       await refreshAccount();
     } catch (error) {
+      const message = readableError(error, language);
+      setFeedbackTone("error");
+      setFeedback(message);
+      const normalized = error instanceof Error ? error.message.toUpperCase().replaceAll(" ", "_") : "";
+      setNeedsVerification(normalized.includes("EMAIL_NOT_VERIFIED"));
+      if (authMode === "register") {
+        setCaptchaToken("");
+        setCaptchaResetSignal((value) => value + 1);
+      }
+    } finally {
+      setAction(null);
+    }
+  };
+
+  const resendVerification = async () => {
+    const targetEmail = user?.email ?? email.trim();
+    if (!targetEmail) return;
+    setAction("verify-email");
+    setFeedback("");
+    try {
+      await sendVerificationEmail(targetEmail);
+      setFeedbackTone("success");
+      setFeedback(zh ? "验证邮件已重新发送，请检查收件箱。" : "Verification email sent. Check your inbox.");
+      setNeedsVerification(true);
+    } catch (error) {
+      setFeedbackTone("error");
       setFeedback(readableError(error, language));
     } finally {
       setAction(null);
@@ -173,8 +225,8 @@ export default function AccountPage() {
                 <h2 id="auth-heading" className="text-2xl font-semibold">{authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</h2>
                 <p className="mt-3 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "登录后会自动合并本机与云端数据，并保持跨设备同步。" : "Signing in automatically merges device and cloud data and keeps it synced across devices."}</p>
                 <div className="mt-6 inline-grid grid-cols-2 rounded-lg border border-ink/12 p-1 dark:border-white/12" role="tablist" aria-label={zh ? "账号操作" : "Account action"}>
-                  <button type="button" role="tab" aria-selected={authMode === "login"} onClick={() => { setAuthMode("login"); setFeedback(""); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "login" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "登录" : "Sign in"}</button>
-                  <button type="button" role="tab" aria-selected={authMode === "register"} onClick={() => { setAuthMode("register"); setFeedback(""); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "register" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "注册" : "Register"}</button>
+                  <button type="button" role="tab" aria-selected={authMode === "login"} onClick={() => { setAuthMode("login"); setFeedback(""); setNeedsVerification(false); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "login" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "登录" : "Sign in"}</button>
+                  <button type="button" role="tab" aria-selected={authMode === "register"} onClick={() => { setAuthMode("register"); setFeedback(""); setNeedsVerification(false); setCaptchaToken(""); setCaptchaResetSignal((value) => value + 1); }} className={cn("min-h-10 rounded-md px-4 text-sm font-semibold", authMode === "register" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55")}>{zh ? "注册" : "Register"}</button>
                 </div>
               </div>
 
@@ -182,13 +234,21 @@ export default function AccountPage() {
                 {authMode === "register" && <label className="block text-sm font-semibold"><span>{zh ? "显示名称" : "Display name"}</span><input aria-label={zh ? "显示名称" : "Display name"} value={displayName} onChange={(event) => setDisplayName(event.target.value)} name="name" autoComplete="name" maxLength={80} required className="atlas-account-input mt-2" /></label>}
                 <label className="block text-sm font-semibold"><span>{zh ? "邮箱" : "Email"}</span><input aria-label={zh ? "邮箱" : "Email"} value={email} onChange={(event) => setEmail(event.target.value)} name="email" type="email" autoComplete="email" required className="atlas-account-input mt-2" /></label>
                 <label className="block text-sm font-semibold"><span>{zh ? "密码" : "Password"}</span><input aria-label={zh ? "密码" : "Password"} value={password} onChange={(event) => setPassword(event.target.value)} name="password" type="password" minLength={10} maxLength={128} autoComplete={authMode === "login" ? "current-password" : "new-password"} required className="atlas-account-input mt-2" /><span className="mt-2 block text-xs font-normal text-ink/45 dark:text-white/45">{zh ? "至少 10 个字符" : "At least 10 characters"}</span></label>
-                <button type="submit" disabled={busy} className="atlas-primary-action w-full justify-center disabled:cursor-not-allowed disabled:opacity-45">{authMode === "login" ? <LogIn className="size-4" aria-hidden="true" /> : <UserPlus className="size-4" aria-hidden="true" />}{action === "auth" ? (zh ? "请稍候…" : "Please wait…") : authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</button>
+                {authMode === "register" && <TurnstileWidget action="signup" language={language} resetSignal={captchaResetSignal} onConfigurationChange={setCaptchaConfigurationStatus} onTokenChange={setCaptchaToken} />}
+                <button type="submit" disabled={busy || (authMode === "register" && (captchaConfigurationStatus !== "ready" || !captchaToken))} className="atlas-primary-action w-full justify-center disabled:cursor-not-allowed disabled:opacity-45">{authMode === "login" ? <LogIn className="size-4" aria-hidden="true" /> : <UserPlus className="size-4" aria-hidden="true" />}{action === "auth" ? (zh ? "请稍候…" : "Please wait…") : authMode === "login" ? (zh ? "登录" : "Sign in") : (zh ? "创建账号" : "Create account")}</button>
+                {needsVerification && <button type="button" onClick={() => void resendVerification()} disabled={busy || !email.trim()} className="atlas-secondary-action w-full justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "重新发送验证邮件" : "Resend verification email")}</button>}
               </form>
             </div>
           </section>
         ) : (
           <>
             <ProfileEditor key={user.id} userId={user.id} displayName={user.displayName} email={user.email} zh={zh} syncMode="merge" />
+
+            {!user.emailVerified && <section className="atlas-settings-section mt-10" aria-labelledby="verify-email-heading">
+              <h2 id="verify-email-heading" className="text-xl font-semibold">{zh ? "验证邮箱" : "Verify email"}</h2>
+              <p className="mt-2 text-sm leading-6 text-ink/55 dark:text-white/55">{zh ? "完成邮箱验证后才能上传图片和公开札记。" : "Email verification is required before uploading images or publishing journals."}</p>
+              <button type="button" onClick={() => void resendVerification()} disabled={busy} className="atlas-secondary-action mt-5 justify-center disabled:opacity-45"><MailCheck className="size-4" aria-hidden="true" />{action === "verify-email" ? (zh ? "正在发送…" : "Sending…") : (zh ? "发送验证邮件" : "Send verification email")}</button>
+            </section>}
 
             <section className="atlas-settings-section mt-10" aria-labelledby="sync-heading">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -243,7 +303,7 @@ export default function AccountPage() {
           </>
         )}
 
-        {!user && feedback && <p className="mt-5 text-sm text-[#a53f3f] dark:text-red-200" role="alert">{feedback}</p>}
+        {!user && feedback && <p className={cn("mt-5 text-sm", feedbackTone === "success" ? "text-accent" : "text-[#a53f3f] dark:text-red-200")} role={feedbackTone === "success" ? "status" : "alert"}>{feedback}</p>}
         <p className="mt-10 text-sm text-ink/45 dark:text-white/45"><Link href="/privacy/" className="atlas-text-link justify-start font-semibold">{zh ? "查看隐私说明" : "Read privacy notes"}</Link></p>
       </PageContainer>
     </div>

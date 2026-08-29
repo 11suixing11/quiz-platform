@@ -17,7 +17,7 @@ async function mutate(request: Request, context: { params: Promise<{ id: string 
     setCommunityReaction(user.id, (await context.params).id, active);
     return json({ ok: true });
   } catch (cause) {
-    if (cause instanceof CommunityValidationError) return error(cause.message, 404, cause.code);
+    if (cause instanceof CommunityValidationError) return error(cause.message, cause.status, cause.code);
     return error("暂时无法更新共鸣", 500);
   }
 }

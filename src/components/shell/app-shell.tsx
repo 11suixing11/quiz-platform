@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { ArrowLeft, Bookmark, History, House, Languages, MessageCircle, Moon, Settings, Sun, UserRound } from "lucide-react";
+import { ArrowLeft, ClipboardList, History, House, Languages, MessageCircle, Moon, NotebookPen, Settings, Sun, UserRound } from "lucide-react";
 import { useAccount } from "@/components/account-provider";
 import { useLanguage, useTheme } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
@@ -27,10 +27,10 @@ function AccountAvatar({ displayName, avatar, compact = false }: { displayName: 
 
 const navItems = [
   { href: "/", label: "首页", labelEn: "Home", icon: House },
-  { href: "/community/", label: "测评分享", labelEn: "Shared", icon: MessageCircle },
+  { href: "/assessments/", label: "测评", labelEn: "Assess", icon: ClipboardList },
+  { href: "/journal/", label: "札记", labelEn: "Journal", icon: NotebookPen },
+  { href: "/community/", label: "社区", labelEn: "Community", icon: MessageCircle },
   { href: "/history/", label: "记录", labelEn: "History", icon: History },
-  { href: "/bookmarks/", label: "收藏", labelEn: "Saved", icon: Bookmark },
-  { href: "/settings/", label: "设置", labelEn: "Settings", icon: Settings },
   { href: "/account/", label: "账号", labelEn: "Account", icon: UserRound },
 ];
 
@@ -98,7 +98,7 @@ export function AppHeader({ backHref, backLabel, section, narrow = false }: { ba
           {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span className="sm:hidden">认识你自己</span><span className="hidden sm:inline">认识你自己 <span className="text-muted-foreground">/</span> Know Yourself</span></Link>}
           {section && <span className="hidden truncate text-xs font-medium tracking-[0.08em] text-muted-foreground sm:inline">{section}</span>}
         </div>
-        <div className="flex shrink-0 items-center gap-1.5"><Link href="/community/" className="atlas-icon-link atlas-header-community-link gap-1.5 px-2.5" aria-label={language === "zh" ? "查看公开的测评分享" : "View shared reflections"} title={language === "zh" ? "测评分享" : "Shared reflections"}><MessageCircle className="size-4" aria-hidden="true" /><span className="text-xs font-semibold">{language === "zh" ? "测评分享" : "Shared"}</span></Link><Link href="/account/" className={cn("atlas-icon-link", user && "atlas-account-link")} aria-label={accountLabel} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}>{user ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} /> : <UserRound className="size-4" aria-hidden="true" />}</Link><ThemeToggle compact /><LanguageToggle compact /></div>
+        <div className="flex shrink-0 items-center gap-1.5"><Link href="/community/" className="atlas-icon-link atlas-header-community-link gap-1.5 px-2.5" aria-label={language === "zh" ? "查看社区" : "View community"} title={language === "zh" ? "社区" : "Community"}><MessageCircle className="size-4" aria-hidden="true" /><span className="text-xs font-semibold">{language === "zh" ? "社区" : "Community"}</span></Link><Link href="/account/" className={cn("atlas-icon-link", user && "atlas-account-link")} aria-label={accountLabel} title={user ? user.displayName : (language === "zh" ? "账号" : "Account")}>{user ? <AccountAvatar displayName={user.displayName} avatar={profile?.avatar} /> : <UserRound className="size-4" aria-hidden="true" />}</Link><ThemeToggle compact /><LanguageToggle compact /></div>
       </div>
     </header>
   );

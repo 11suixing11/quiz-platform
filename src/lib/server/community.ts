@@ -3,6 +3,7 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { getResultKey, getResultScore, getScoreBand, loadQuizDefinition, type QuizDefinition, type QuizResult } from "@/core/quiz";
 import { asRow, getDatabase, withTransaction } from "./database";
+import { assertAccountCanWrite, GovernanceError } from "./governance";
 
 export const COMMUNITY_LIMITS = {
   reflection: 500,
@@ -12,9 +13,21 @@ export const COMMUNITY_LIMITS = {
 } as const;
 
 export class CommunityValidationError extends Error {
-  constructor(message: string, public readonly code = "INVALID_DATA") {
+  constructor(message: string, public readonly code = "INVALID_DATA", public readonly status = 400) {
     super(message);
     this.name = "CommunityValidationError";
+  }
+}
+
+const HIGH_RISK_REPORT_REASONS = new Set(["illegal", "minor_sexual", "nonconsensual_intimate", "privacy", "explicit_harm"]);
+const REPORT_REASONS = new Set([...HIGH_RISK_REPORT_REASONS, "spam", "abuse", "sexual", "copyright", "other"]);
+
+function assertCommunityWrite(userId: string) {
+  try {
+    assertAccountCanWrite(userId);
+  } catch (cause) {
+    if (cause instanceof GovernanceError) throw new CommunityValidationError(cause.message, cause.code, cause.status);
+    throw cause;
   }
 }
 
@@ -119,6 +132,7 @@ function parseDimensions(value: unknown): DimensionSummary[] {
 }
 
 export async function createCommunityPost(userId: string, value: unknown) {
+  assertCommunityWrite(userId);
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new CommunityValidationError("请求格式无效");
   const input = value as Record<string, unknown>;
   const attemptId = text(input.attemptId, 180);
@@ -155,12 +169,12 @@ export function listCommunityPosts(viewerId: string | null, sort: "latest" | "re
   const rows = database.prepare(`
     SELECT p.*, u.name AS display_name, pr.avatar,
       (SELECT COUNT(*) FROM community_reactions r WHERE r.post_id = p.id) AS reaction_count,
-      (SELECT COUNT(*) FROM community_comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL) AS comment_count,
+      (SELECT COUNT(*) FROM community_comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL AND c.moderation_status = 'visible') AS comment_count,
       CASE WHEN ? IS NOT NULL AND EXISTS (SELECT 1 FROM community_reactions vr WHERE vr.post_id = p.id AND vr.user_id = ?) THEN 1 ELSE 0 END AS reacted
     FROM community_posts p
     JOIN "user" u ON u.id = p.user_id
     LEFT JOIN profiles pr ON pr.user_id = p.user_id
-    WHERE p.deleted_at IS NULL
+    WHERE p.deleted_at IS NULL AND p.moderation_status = 'visible'
     ORDER BY ${order}
     LIMIT ?
   `).all(viewerId, viewerId, COMMUNITY_LIMITS.pageSize) as Array<Record<string, unknown>>;
@@ -172,7 +186,7 @@ export function listCommunityPosts(viewerId: string | null, sort: "latest" | "re
     FROM community_comments c
     JOIN "user" u ON u.id = c.user_id
     JOIN community_posts p ON p.id = c.post_id
-    WHERE c.post_id IN (${placeholders}) AND c.deleted_at IS NULL
+    WHERE c.post_id IN (${placeholders}) AND c.deleted_at IS NULL AND c.moderation_status = 'visible'
     ORDER BY c.created_at ASC
   `).all(...postIds) as Array<Record<string, unknown>>;
   const comments = new Map<string, CommunityComment[]>();
@@ -201,30 +215,33 @@ export function listCommunityPosts(viewerId: string | null, sort: "latest" | "re
 }
 
 export function deleteCommunityPost(userId: string, postId: string) {
+  assertCommunityWrite(userId);
   const result = getDatabase().prepare("DELETE FROM community_posts WHERE id = ? AND user_id = ?").run(postId, userId);
   return result.changes > 0;
 }
 
 export function setCommunityReaction(userId: string, postId: string, active: boolean) {
+  assertCommunityWrite(userId);
   const database = getDatabase();
-  const post = asRow(database.prepare("SELECT id FROM community_posts WHERE id = ? AND deleted_at IS NULL").get(postId));
+  const post = asRow(database.prepare("SELECT id FROM community_posts WHERE id = ? AND deleted_at IS NULL AND moderation_status = 'visible'").get(postId));
   if (!post) throw new CommunityValidationError("分享内容不存在", "POST_NOT_FOUND");
   if (active) database.prepare("INSERT OR IGNORE INTO community_reactions (post_id, user_id, created_at) VALUES (?, ?, ?)").run(postId, userId, Date.now());
   else database.prepare("DELETE FROM community_reactions WHERE post_id = ? AND user_id = ?").run(postId, userId);
 }
 
 export function createCommunityComment(userId: string, postId: string, value: unknown) {
+  assertCommunityWrite(userId);
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new CommunityValidationError("请求格式无效");
   const input = value as Record<string, unknown>;
   const body = text(input.body, COMMUNITY_LIMITS.comment);
   const parentId = input.parentId == null || input.parentId === "" ? null : text(input.parentId, 100);
   return withTransaction(() => {
     const database = getDatabase();
-    const post = asRow(database.prepare("SELECT allow_comments FROM community_posts WHERE id = ? AND deleted_at IS NULL").get(postId));
+    const post = asRow(database.prepare("SELECT allow_comments FROM community_posts WHERE id = ? AND deleted_at IS NULL AND moderation_status = 'visible'").get(postId));
     if (!post) throw new CommunityValidationError("分享内容不存在", "POST_NOT_FOUND");
     if (!post.allow_comments) throw new CommunityValidationError("这篇分享没有开放留言", "COMMENTS_CLOSED");
     if (parentId) {
-      const parent = asRow(database.prepare("SELECT parent_id FROM community_comments WHERE id = ? AND post_id = ? AND deleted_at IS NULL").get(parentId, postId));
+      const parent = asRow(database.prepare("SELECT parent_id FROM community_comments WHERE id = ? AND post_id = ? AND deleted_at IS NULL AND moderation_status = 'visible'").get(parentId, postId));
       if (!parent || parent.parent_id) throw new CommunityValidationError("只能回复第一层留言", "INVALID_PARENT");
     }
     const commentId = id("comment");
@@ -234,6 +251,7 @@ export function createCommunityComment(userId: string, postId: string, value: un
 }
 
 export function deleteCommunityComment(userId: string, commentId: string) {
+  assertCommunityWrite(userId);
   const result = getDatabase().prepare(`
     DELETE FROM community_comments WHERE id = ? AND deleted_at IS NULL
       AND (user_id = ? OR post_id IN (SELECT id FROM community_posts WHERE user_id = ?))
@@ -242,22 +260,38 @@ export function deleteCommunityComment(userId: string, commentId: string) {
 }
 
 export function createCommunityReport(userId: string, value: unknown) {
+  assertCommunityWrite(userId);
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new CommunityValidationError("请求格式无效");
   const input = value as Record<string, unknown>;
   const postId = typeof input.postId === "string" && input.postId ? input.postId : null;
   const commentId = typeof input.commentId === "string" && input.commentId ? input.commentId : null;
-  const reasons = new Set(["spam", "abuse", "sexual", "privacy", "other"]);
-  const reason = typeof input.reason === "string" && reasons.has(input.reason) ? input.reason : "other";
+  const reason = typeof input.reason === "string" && REPORT_REASONS.has(input.reason) ? input.reason : "other";
   if (Boolean(postId) === Boolean(commentId)) throw new CommunityValidationError("请选择要举报的内容");
-  const database = getDatabase();
-  const exists = postId
-    ? asRow(database.prepare("SELECT id FROM community_posts WHERE id = ? AND deleted_at IS NULL").get(postId))
-    : asRow(database.prepare("SELECT id FROM community_comments WHERE id = ? AND deleted_at IS NULL").get(commentId));
-  if (!exists) throw new CommunityValidationError("内容不存在");
-  try {
-    database.prepare("INSERT INTO community_reports (id, reporter_id, post_id, comment_id, reason, created_at) VALUES (?, ?, ?, ?, ?, ?)").run(id("report"), userId, postId, commentId, reason, Date.now());
-  } catch (cause) {
-    if (cause instanceof Error && cause.message.includes("UNIQUE constraint failed")) return;
-    throw cause;
-  }
+  return withTransaction(() => {
+    const database = getDatabase();
+    const exists = postId
+      ? asRow(database.prepare("SELECT id FROM community_posts WHERE id = ? AND deleted_at IS NULL AND moderation_status = 'visible'").get(postId))
+      : asRow(database.prepare("SELECT id FROM community_comments WHERE id = ? AND deleted_at IS NULL AND moderation_status = 'visible'").get(commentId));
+    if (!exists) throw new CommunityValidationError("内容不存在", "CONTENT_NOT_FOUND", 404);
+    try {
+      database.prepare("INSERT INTO community_reports (id, reporter_id, post_id, comment_id, reason, created_at) VALUES (?, ?, ?, ?, ?, ?)").run(id("report"), userId, postId, commentId, reason, Date.now());
+    } catch (cause) {
+      if (cause instanceof Error && cause.message.includes("UNIQUE constraint failed")) return { hidden: false, duplicate: true };
+      throw cause;
+    }
+    const count = Number(asRow(database.prepare(postId
+      ? "SELECT COUNT(DISTINCT reporter_id) AS count FROM community_reports WHERE post_id = ?"
+      : "SELECT COUNT(DISTINCT reporter_id) AS count FROM community_reports WHERE comment_id = ?").get(postId ?? commentId))?.count ?? 0);
+    const hidden = HIGH_RISK_REPORT_REASONS.has(reason) || count >= 3;
+    if (hidden) {
+      const now = Date.now();
+      if (postId) database.prepare("UPDATE community_posts SET moderation_status = 'hidden', hidden_at = ? WHERE id = ? AND moderation_status = 'visible'").run(now, postId);
+      else database.prepare("UPDATE community_comments SET moderation_status = 'hidden', hidden_at = ? WHERE id = ? AND moderation_status = 'visible'").run(now, commentId);
+      database.prepare(`
+        INSERT INTO moderation_audit_log (id, actor_type, action, target_type, target_id, reason, metadata_json, created_at)
+        VALUES (?, 'system', 'auto_hide', ?, ?, ?, ?, ?)
+      `).run(id("audit"), postId ? "community_post" : "community_comment", postId ?? commentId, reason, JSON.stringify({ independentReporters: count }), now);
+    }
+    return { hidden, duplicate: false };
+  });
 }

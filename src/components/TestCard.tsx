@@ -10,6 +10,8 @@ import { TEST_CATEGORIES } from "@/lib/constants";
 import { getCoreTestGroup } from "@/lib/core-tests";
 import { useBookmarks } from "@/hooks/use-local-storage";
 import { CategoryMark } from "@/components/quiz/category-mark";
+import { QuizVisualFrame } from "@/components/quiz/quiz-visual";
+import { getQuizCover } from "@/lib/quiz-media";
 
 type TestCardItem = TestRegistryEntry | PublicQuizCatalogEntry;
 
@@ -43,10 +45,12 @@ export function TestCard({ test, index = 0, lang = "zh" }: { test: TestCardItem;
   const category = group?.id ?? fallbackGroup?.id ?? test.category;
   const trust = "trust" in test ? (test as TestCardItem & { trust?: QuizTrustProfile }).trust : undefined;
   const trustLabel = trust?.label[lang];
+  const cover = getQuizCover(test.id);
 
   return (
-    <article className="atlas-test-card">
+    <article className={`atlas-test-card${cover ? " atlas-test-card--visual" : ""}`}>
       <Link href={`/test/${test.id}/`} className="group block h-full">
+        {cover && <QuizVisualFrame visual={cover} lang={lang} sizes="(max-width: 640px) calc(100vw - 2.5rem), (max-width: 1024px) 45vw, 24rem" className="atlas-test-card-visual" />}
         <div className="flex h-full flex-col gap-5 p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-2.5">

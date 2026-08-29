@@ -2,7 +2,10 @@ import "server-only";
 
 import { APIError, betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { captcha } from "better-auth/plugins";
 import { getDatabase } from "@/lib/server/database";
+import { sendAccountVerificationEmail } from "@/lib/server/email";
+import { prepareJournalUserDeletion, replayJournalUserDeletion } from "@/lib/server/journal";
 import { SITE_URL } from "@/lib/site-config";
 
 const PRODUCTION_ORIGIN = SITE_URL;
@@ -12,6 +15,12 @@ const DEVELOPMENT_ORIGINS = [
   "http://127.0.0.1:*",
   PRODUCTION_ORIGIN,
 ] as const;
+
+function turnstileHostnames() {
+  const configured = process.env.TURNSTILE_ALLOWED_HOSTNAMES?.split(",").map((value) => value.trim()).filter(Boolean);
+  if (configured?.length) return configured;
+  return process.env.NODE_ENV === "production" ? [PRODUCTION_HOST] : [PRODUCTION_HOST, "localhost", "127.0.0.1"];
+}
 
 function authSecret() {
   const configured = process.env.BETTER_AUTH_SECRET?.trim() || process.env.AUTH_SECRET?.trim();
@@ -60,7 +69,17 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 10,
     maxPasswordLength: 128,
-    autoSignIn: true,
+    autoSignIn: false,
+    requireEmailVerification: true,
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+    autoSignInAfterVerification: true,
+    expiresIn: 60 * 60 * 24,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendAccountVerificationEmail({ email: user.email, displayName: user.name, url });
+    },
   },
   databaseHooks: {
     user: {
@@ -71,6 +90,10 @@ export const auth = betterAuth({
         before: async (user) => user.name === undefined
           ? undefined
           : { data: { ...user, name: normalizeDisplayName(user.name) } },
+      },
+      delete: {
+        before: async (user) => { prepareJournalUserDeletion(user.id); },
+        after: async (user) => { replayJournalUserDeletion(user.id); },
       },
     },
   },
@@ -86,7 +109,16 @@ export const auth = betterAuth({
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production",
   },
-  plugins: [nextCookies()],
+  plugins: [
+    captcha({
+      provider: "cloudflare-turnstile",
+      secretKey: process.env.TURNSTILE_SECRET_KEY?.trim() || "",
+      endpoints: ["/sign-up/email"],
+      expectedAction: "signup",
+      allowedHostnames: turnstileHostnames(),
+    }),
+    nextCookies(),
+  ],
 });
 
 let authReadyPromise: Promise<void> | undefined;
@@ -111,6 +143,7 @@ export interface AuthUser {
   id: string;
   email: string;
   displayName: string;
+  emailVerified: boolean;
   createdAt: number;
 }
 
@@ -125,11 +158,12 @@ export interface AuthSession {
   };
 }
 
-function mapUser(user: { id: string; email: string; name: string; createdAt: Date }) : AuthUser {
+function mapUser(user: { id: string; email: string; name: string; emailVerified: boolean; createdAt: Date }) : AuthUser {
   return {
     id: user.id,
     email: user.email,
     displayName: user.name,
+    emailVerified: user.emailVerified,
     createdAt: user.createdAt.getTime(),
   };
 }
@@ -160,7 +194,9 @@ export async function getCurrentUser() {
 }
 
 export function requestAddress(request: Request) {
-  return request.headers.get("cf-connecting-ip") || request.headers.get("x-real-ip") || "unknown";
+  const proxyAddress = request.headers.get("x-real-ip");
+  if (proxyAddress) return proxyAddress;
+  return process.env.NODE_ENV === "production" ? "unknown" : request.headers.get("cf-connecting-ip") || "unknown";
 }
 
 /** Restrict state-changing requests to the canonical site (and local dev). */

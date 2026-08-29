@@ -1,4 +1,4 @@
-import type { QuizDefinition, QuizKind, QuizResult, ScoringAdapter, ScoreBand } from "./types";
+import type { QuizDefinition, QuizKind, QuizResult, QuizVisual, ScoringAdapter, ScoreBand } from "./types";
 
 function executeCalculator(definition: QuizDefinition, answers: number[]): QuizResult {
   if (answers.length !== definition.questions.length) {
@@ -54,6 +54,40 @@ export function getScoreBand(definition: QuizDefinition, result: QuizResult): Sc
   const score = getResultScore(result);
   if (score === null) return undefined;
   return definition.resultContent.scoreBands?.find((band) => score >= band.min && score <= band.max);
+}
+
+export interface QuizVisualSelection {
+  key: string;
+  source: "result" | "score-band" | "cover";
+  visual: QuizVisual;
+}
+
+function getDominantVisualKey(result: QuizResult): string | undefined {
+  const percentages = result.percentages
+    ?? (result.dimensions?.length
+      ? Object.fromEntries(result.dimensions.map((dimension) => [dimension.name, dimension.score]))
+      : undefined);
+  if (!percentages) return undefined;
+  const ranked = Object.entries(percentages).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  if (!ranked.length || (ranked[1] && ranked[0][1] === ranked[1][1])) return undefined;
+  return ranked[0][0];
+}
+
+export function getQuizVisualSelection(definition: QuizDefinition, result: QuizResult): QuizVisualSelection | undefined {
+  const media = definition.media;
+  if (!media) return undefined;
+
+  if (definition.kind === "score") {
+    const band = getScoreBand(definition, result);
+    const visual = band ? media.byScoreBand?.[band.id] : undefined;
+    if (band && visual) return { key: band.id, source: "score-band", visual };
+  } else {
+    const key = getResultKey(result) || (definition.kind === "dimensions" ? getDominantVisualKey(result) : "");
+    const visual = key ? media.byResult?.[key] : undefined;
+    if (key && visual) return { key, source: "result", visual };
+  }
+
+  return { key: "cover", source: "cover", visual: media.cover };
 }
 
 export function normalizeQuizResult(result: QuizResult): QuizResult {

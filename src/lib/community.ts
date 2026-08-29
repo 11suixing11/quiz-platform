@@ -46,5 +46,5 @@ export async function deleteCommunityComment(userId: string, commentId: string) 
 }
 
 export async function reportCommunityContent(userId: string, input: { postId?: string; commentId?: string; reason: string }) {
-  return responseJson<{ ok: true }>(await fetch("/api/community/reports", { method: "POST", credentials: "include", headers: headers(userId, true), body: JSON.stringify(input) }));
+  return responseJson<{ ok: true; hidden?: boolean; duplicate?: boolean }>(await fetch("/api/community/reports", { method: "POST", credentials: "include", headers: headers(userId, true), body: JSON.stringify(input) }));
 }

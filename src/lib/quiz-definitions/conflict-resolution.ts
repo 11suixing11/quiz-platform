@@ -6,6 +6,7 @@ const questions = normalizeLegacyQuestions(legacy.questions);
 
 const scoreBands: ScoreBand[] = [
   {
+    id: "needs-support",
     min: 20,
     max: 25,
     title: { zh: "冲突中需要更多支持", en: "More Support May Help" },
@@ -19,6 +20,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "developing",
     min: 26,
     max: 50,
     title: { zh: "冲突处理正在形成", en: "Conflict Skills Developing" },
@@ -28,6 +30,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "constructive",
     min: 51,
     max: 75,
     title: { zh: "冲突处理较有建设性", en: "Constructive Conflict Skills" },
@@ -37,6 +40,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "well-resourced",
     min: 76,
     max: 100,
     title: { zh: "冲突中拥有较多可用资源", en: "Strong Conflict Resources" },

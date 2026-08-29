@@ -7,6 +7,7 @@ export interface AccountUser {
   id: string;
   email: string;
   displayName: string;
+  emailVerified: boolean;
   createdAt: number;
 }
 
@@ -14,6 +15,7 @@ interface BetterAuthUser {
   id: string;
   email: string;
   name: string;
+  emailVerified?: boolean;
   createdAt: string | Date;
 }
 
@@ -84,6 +86,7 @@ function mapUser(value: BetterAuthUser | null | undefined): AccountUser | null {
     id: value.id,
     email: value.email,
     displayName: value.name,
+    emailVerified: value.emailVerified === true,
     createdAt: Number.isFinite(createdAt) ? createdAt : 0,
   };
 }
@@ -111,15 +114,28 @@ export async function getAccount() {
   return authUserResponse(payload);
 }
 
-export async function registerAccount(input: { email: string; password: string; displayName: string }) {
+export async function registerAccount(input: { email: string; password: string; displayName: string; captchaToken: string }) {
   const payload = await responseJson<{ user: BetterAuthUser }>(await fetch("/api/auth/sign-up/email", {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-Captcha-Response": input.captchaToken,
+    },
     body: JSON.stringify({ name: input.displayName, email: input.email, password: input.password }),
   }));
   notifyAuthSessionChanged();
   return authUserResponse({ user: payload.user, session: null });
+}
+
+export async function sendVerificationEmail(email: string) {
+  return responseJson<{ status: boolean }>(await fetch("/api/auth/send-verification-email", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ email, callbackURL: "/account/" }),
+  }));
 }
 
 export async function loginAccount(input: { email: string; password: string }) {

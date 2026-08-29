@@ -6,6 +6,7 @@ const questions = normalizeLegacyQuestions(legacy.questions);
 
 const scoreBands: ScoreBand[] = [
   {
+    id: "fewer-resources",
     min: 20,
     max: 30,
     icon: "🌱",
@@ -21,6 +22,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "in-progress",
     min: 31,
     max: 60,
     icon: "🌿",
@@ -32,6 +34,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "stronger-resources",
     min: 61,
     max: 100,
     icon: "🌳",

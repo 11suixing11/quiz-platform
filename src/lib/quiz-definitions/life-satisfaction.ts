@@ -1,4 +1,5 @@
 import legacy from "../tests/life-satisfaction";
+import { QUIZ_MEDIA } from "../quiz-media";
 import { defineQuiz, normalizeLegacyQuestions } from "../../core/quiz/definition";
 import type { ScoreBand } from "../../core/quiz/types";
 
@@ -6,6 +7,7 @@ const questions = normalizeLegacyQuestions(legacy.questions);
 
 const scoreBands: ScoreBand[] = [
   {
+    id: "low",
     min: 20,
     max: 30,
     icon: "😞",
@@ -17,6 +19,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "moderate",
     min: 31,
     max: 60,
     icon: "😐",
@@ -28,6 +31,7 @@ const scoreBands: ScoreBand[] = [
     },
   },
   {
+    id: "high",
     min: 61,
     max: 100,
     icon: "🌟",
@@ -54,6 +58,7 @@ const definition = defineQuiz({
     zh: "回看此刻对生活各方面的感受，找到满足感与摩擦感分别来自哪里。",
     en: "Check in with how life feels right now and notice where satisfaction or friction may be coming from.",
   },
+  media: QUIZ_MEDIA["life-satisfaction"],
   questions,
   resultContent: {
     uiText: legacy.uiText,

@@ -1,4 +1,5 @@
 import legacy from "../tests/attachment-style";
+import { QUIZ_MEDIA } from "../quiz-media";
 import { defineQuiz, dimensionResults, normalizeLegacyQuestions, rankDimensions, scoreDimensions } from "../../core/quiz/definition";
 import type { DimensionData, NarrativeResult, TypeData } from "../../core/quiz/types";
 
@@ -139,6 +140,7 @@ const definition = defineQuiz({
     zh: "回看你在靠近、寻求确认、保持距离和关系不确定感中的常见反应。",
     en: "Reflect on how you respond to closeness, reassurance, distance, and uncertainty in important relationships.",
   },
+  media: QUIZ_MEDIA["attachment-style"],
   questions,
   resultContent: {
     uiText: legacy.uiText,

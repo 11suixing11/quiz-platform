@@ -16,10 +16,15 @@ export async function generateMetadata({ params }: TestPageProps): Promise<Metad
   const { id } = await params;
   const entry = getQuizEntry(id);
   if (!entry) notFound();
+  const definition = await loadQuizDefinition(id);
 
   const title = `${entry.title.zh} | ${entry.title.en}`;
   const description = `${entry.description.zh} ${entry.description.en}`;
   const canonical = siteUrl(`/test/${entry.id}/`);
+  const cover = definition?.media?.cover;
+  const socialImage = cover
+    ? { url: siteUrl(cover.src), width: cover.width, height: cover.height, alt: `${cover.alt.zh} ${cover.alt.en}` }
+    : { url: OG_IMAGE_URL, width: 1200, height: 630, alt: title };
   return {
     title: { absolute: title },
     description,
@@ -30,9 +35,9 @@ export async function generateMetadata({ params }: TestPageProps): Promise<Metad
       type: "article",
       url: canonical,
       siteName: SITE_NAME,
-      images: [{ url: OG_IMAGE_URL, width: 1200, height: 630, alt: title }],
+      images: [socialImage],
     },
-    twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE_URL] },
+    twitter: { card: "summary_large_image", title, description, images: [socialImage.url] },
   };
 }
 
@@ -57,5 +62,5 @@ export default async function TestPage({ params }: TestPageProps) {
       targetDescription: entry.trust.source.en,
     },
   };
-  return <><TestDetailClient testId={id} sampleQuestions={sampleQuestions} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} /></>;
+  return <><TestDetailClient testId={id} sampleQuestions={sampleQuestions} media={definition.media} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} /></>;
 }

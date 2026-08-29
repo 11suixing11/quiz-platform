@@ -536,6 +536,81 @@
   .quiz-actions { margin-top: 1.8rem; }
 }
 
+/* Rich assessment imagery */
+.quiz-visual-frame { position: relative; display: block; width: 100%; overflow: hidden; border: 1px solid var(--soft-line); border-radius: .75rem; background: var(--warm-surface); }
+.quiz-visual-image { display: block; width: 100%; height: 100%; object-fit: cover; }
+.quiz-visual-frame--fallback { display: grid; place-items: center; background: color-mix(in srgb, var(--warm-surface) 76%, var(--accent-wash)); }
+.quiz-visual-fallback { position: relative; display: block; width: 58%; height: 52%; }
+.quiz-visual-fallback span { position: absolute; display: block; border-radius: 999px; }
+.quiz-visual-fallback span:nth-child(1) { left: 2%; bottom: 10%; width: 58%; height: 32%; background: color-mix(in srgb, var(--accent) 42%, var(--paper)); transform: rotate(-7deg); }
+.quiz-visual-fallback span:nth-child(2) { right: 2%; top: 8%; width: 40%; height: 40%; background: color-mix(in srgb, var(--warm-ink) 36%, var(--paper)); }
+.quiz-visual-fallback span:nth-child(3) { left: 36%; top: 8%; width: 12%; height: 74%; background: color-mix(in srgb, var(--ink) 58%, transparent); transform: rotate(31deg); }
+
+.atlas-test-card--visual { min-height: 25rem; }
+.atlas-test-card-visual { border: 0; border-bottom: 1px solid var(--soft-line); border-radius: 0; }
+.atlas-test-card--visual .atlas-card-save { border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); background: color-mix(in srgb, var(--paper-strong) 92%, transparent); color: var(--ink); }
+.atlas-test-card--visual .atlas-card-save:hover { background: var(--paper-strong); color: var(--accent); }
+.atlas-detail-panel--visual { padding: 0; }
+.assessment-detail-visual { border: 0; border-bottom: 1px solid var(--soft-line); border-radius: 0; }
+.atlas-detail-panel--visual .assessment-detail-question-preview { padding: 1.5rem; }
+
+.atlas-result-visual-layout { margin-top: 1.5rem; }
+.atlas-result-visual-layout--active { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr); gap: 1rem; align-items: stretch; }
+.atlas-result-visual { height: 100%; min-height: 24rem; border-radius: 1rem; }
+.atlas-result-visual-layout--active .atlas-result-identity { display: flex; max-width: none; min-height: 24rem; flex-direction: column; justify-content: center; }
+.atlas-result-visual-layout--active .atlas-result-identity-title { font-size: 3rem; letter-spacing: 0; line-height: 1.02; }
+.atlas-result-summary--four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.quiz-visual-feedback { margin-top: 1.35rem; border-top: 1px solid var(--soft-line); padding-top: 1rem; }
+.quiz-visual-feedback legend { color: var(--ink); font-size: .78rem; font-weight: 750; line-height: 1.5; }
+.quiz-visual-feedback > div { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+.quiz-visual-feedback button { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .4rem; border: 1px solid var(--line); border-radius: .7rem; padding: .55rem .8rem; color: var(--muted-text); font-size: .72rem; font-weight: 750; transition: border-color .18s ease, background-color .18s ease, color .18s ease; }
+.quiz-visual-feedback button svg { width: .95rem; height: .95rem; }
+.quiz-visual-feedback button:hover, .quiz-visual-feedback button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-wash); color: var(--accent); }
+.quiz-visual-feedback button:disabled { cursor: default; opacity: .7; }
+.quiz-visual-feedback > p { min-height: 1.25rem; margin-top: .55rem; color: var(--muted-text); font-size: .68rem; line-height: 1.5; }
+
+/* Two equal front doors: structured assessment and open image reflection. */
+.reflection-home { background: var(--paper); }
+.reflection-home-shell { padding-top: 4.5rem; padding-bottom: 5rem; }
+.reflection-home-intro { max-width: 54rem; }
+.reflection-home-intro h1 { color: var(--ink); font-size: 5rem; font-weight: 600; letter-spacing: 0; line-height: 1; text-wrap: balance; }
+.reflection-home-intro p { max-width: 44rem; margin-top: 1.35rem; color: var(--muted-text); font-size: 1rem; line-height: 1.85; }
+.reflection-paths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 3.5rem; }
+.reflection-path { overflow: hidden; border: 1px solid var(--line); border-radius: .5rem; background: var(--paper-strong); transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.reflection-path:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); transform: translateY(-3px); box-shadow: 0 18px 38px rgba(45, 53, 48, .1); }
+.reflection-path-visual { border: 0; border-bottom: 1px solid var(--soft-line); border-radius: 0; }
+.reflection-path-copy { padding: 1.5rem; }
+.reflection-path-copy > svg { width: 1.2rem; height: 1.2rem; color: var(--accent); stroke-width: 1.7; }
+.reflection-path-copy h2 { margin-top: 1.15rem; color: var(--ink); font-size: 2rem; font-weight: 650; letter-spacing: 0; line-height: 1.08; }
+.reflection-path-copy p { max-width: 36rem; margin-top: .75rem; color: var(--muted-text); font-size: .85rem; line-height: 1.75; }
+.reflection-path-copy > span { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .4rem; margin-top: 1.25rem; color: var(--accent); font-size: .75rem; font-weight: 750; }
+.reflection-path-copy > span svg { width: .95rem; height: .95rem; transition: transform .18s ease; }
+.reflection-path:hover .reflection-path-copy > span svg { transform: translateX(.2rem); }
+.reflection-home-secondary { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; margin-top: 1.25rem; border-top: 1px solid var(--soft-line); padding-top: 1.25rem; }
+.reflection-home-secondary a { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .45rem; color: var(--muted-text); font-size: .74rem; font-weight: 700; }
+.reflection-home-secondary a:hover { color: var(--accent); }
+.reflection-home-secondary svg { width: .95rem; height: .95rem; }
+
+@media (max-width: 800px) {
+  .atlas-result-visual-layout--active { grid-template-columns: 1fr; }
+  .atlas-result-visual { min-height: 0; }
+  .atlas-result-visual-layout--active .atlas-result-identity { min-height: 0; }
+  .reflection-paths { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .reflection-home-shell { padding-top: 2.75rem; }
+  .reflection-home-intro h1 { font-size: 3.25rem; }
+  .reflection-home-intro p { font-size: .92rem; }
+  .reflection-paths { margin-top: 2.25rem; }
+  .reflection-path-copy h2 { font-size: 1.7rem; }
+  .atlas-result-visual-layout--active .atlas-result-identity-title { font-size: 2.45rem; }
+  .atlas-result-summary--four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reflection-path, .reflection-path-copy > span svg { transition: none; }
+  .reflection-path:hover { transform: none; }
+}
+
 /* Community */
 .community-page { --community-rule: color-mix(in srgb, var(--ink) 12%, transparent); }
 .community-intro { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(16rem, .8fr); gap: 3rem; align-items: end; padding: 2rem 0 3rem; border-bottom: 1px solid var(--community-rule); }

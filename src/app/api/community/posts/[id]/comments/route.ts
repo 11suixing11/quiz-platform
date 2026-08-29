@@ -17,7 +17,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const id = createCommunityComment(user.id, (await context.params).id, await readJson(request, 8_000));
     return json({ id }, 201);
   } catch (cause) {
-    if (cause instanceof CommunityValidationError) return error(cause.message, 400, cause.code);
+    if (cause instanceof CommunityValidationError) return error(cause.message, cause.status, cause.code);
     console.error("Community comment creation failed", cause);
     return error("暂时无法留言，请稍后再试", 500);
   }

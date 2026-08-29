@@ -7,15 +7,27 @@ const nextConfig: NextConfig = {
   // Keep the native SQLite package outside the webpack bundle. Output file
   // tracing then copies its JavaScript loader and native addon into the
   // standalone release.
-  serverExternalPackages: ["better-sqlite3"],
+  serverExternalPackages: ["better-sqlite3", "sharp"],
   outputFileTracingIncludes: {
     "/*": [
       "./node_modules/better-sqlite3/**/*",
       "./node_modules/bindings/**/*",
+      "./node_modules/sharp/**/*",
+      "./node_modules/@img/**/*",
+      "./scripts/media-worker.mjs",
+      "./scripts/media-backup.mjs",
+      "./scripts/media-restore.mjs",
+      "./scripts/standalone-supervisor.cjs",
     ],
   },
   images: {
     unoptimized: true,
+  },
+  rewrites() {
+    return [{
+      source: "/media/public/:revisionId/:assetId/:width.webp",
+      destination: "/api/journal/media/public/:revisionId/:assetId/:width",
+    }];
   },
   trailingSlash: true,
   // Better Auth endpoints are slashless. Let the catch-all route receive the

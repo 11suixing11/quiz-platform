@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const id = await createCommunityPost(user.id, await readJson(request, 16_000));
     return json({ id }, 201);
   } catch (cause) {
-    if (cause instanceof CommunityValidationError) return error(cause.message, 400, cause.code);
+    if (cause instanceof CommunityValidationError) return error(cause.message, cause.status, cause.code);
     console.error("Community post creation failed", cause);
     return error("暂时无法发布，请稍后再试", 500);
   }

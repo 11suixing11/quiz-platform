@@ -14,10 +14,9 @@ export async function POST(request: Request) {
   if (accountError) return accountError;
   if (!allowRateLimitedRequest(request, `community-report:${user.id}`, 10)) return rateLimitResponse();
   try {
-    createCommunityReport(user.id, await readJson(request, 4_000));
-    return json({ ok: true }, 201);
+    return json({ ok: true, ...createCommunityReport(user.id, await readJson(request, 4_000)) }, 201);
   } catch (cause) {
-    if (cause instanceof CommunityValidationError) return error(cause.message, 400, cause.code);
+    if (cause instanceof CommunityValidationError) return error(cause.message, cause.status, cause.code);
     return error("暂时无法提交举报", 500);
   }
 }

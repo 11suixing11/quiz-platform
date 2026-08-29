@@ -45,6 +45,7 @@ export interface QuizDefinitionInput {
   duration: string;
   title: LocalizedText;
   description: LocalizedText;
+  media?: QuizDefinition["media"];
   questions: QuizQuestion[];
   resultContent: QuizDefinition["resultContent"];
   calculate: QuizCalculator;
@@ -60,6 +61,7 @@ export function defineQuiz(input: QuizDefinitionInput): QuizDefinition {
     duration: input.duration,
     title: input.title,
     description: input.description,
+    media: input.media,
     questions: input.questions,
     resultContent: input.resultContent,
     scoring: {

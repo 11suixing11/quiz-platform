@@ -7,6 +7,23 @@ export interface LocalizedText {
   en: string;
 }
 
+export interface QuizVisual {
+  src: string;
+  width: number;
+  height: number;
+  alt: LocalizedText;
+  focus?: {
+    x: number;
+    y: number;
+  };
+}
+
+export interface QuizMedia {
+  cover: QuizVisual;
+  byResult?: Record<string, QuizVisual>;
+  byScoreBand?: Record<string, QuizVisual>;
+}
+
 export type QuizTrustLevel = "research-adapted" | "self-exploration" | "playful-inspiration";
 export type QuizTopicId = "self" | "emotion" | "relationship" | "life";
 
@@ -104,6 +121,7 @@ export interface DimensionData {
 }
 
 export interface ScoreBand {
+  id: string;
   min: number;
   max: number;
   title: LocalizedText;
@@ -219,6 +237,7 @@ export interface QuizDefinition {
   duration: string;
   title: LocalizedText;
   description: LocalizedText;
+  media?: QuizMedia;
   questions: QuizQuestion[];
   resultContent: {
     uiText: { zh: Record<string, string>; en: Record<string, string> };
