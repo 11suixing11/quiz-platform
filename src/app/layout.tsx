@@ -1,5 +1,6 @@
 ﻿import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./rebuild.css";
 import { MobileNav, PreferenceSync } from "@/components/shell/app-shell";
 import { AccountProvider } from "@/components/account-provider";
 import { OG_IMAGE_URL, serializeJsonLd, SITE_DESCRIPTION, SITE_DESCRIPTION_EN, SITE_NAME, SITE_URL, siteUrl } from "@/lib/site-config";
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   other: { "apple-mobile-web-app-capable": "yes", "apple-mobile-web-app-status-bar-style": "default", "apple-mobile-web-app-title": "认识你自己" },
 };
 
-export const viewport: Viewport = { themeColor: [{ media: "(prefers-color-scheme: light)", color: "#FAF0E5" }, { media: "(prefers-color-scheme: dark)", color: "#17201E" }], colorScheme: "light dark" };
+export const viewport: Viewport = { themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F4F0E8" }, { media: "(prefers-color-scheme: dark)", color: "#18231F" }], colorScheme: "light dark" };
 
 const jsonLd = {
   "@context": "https://schema.org",

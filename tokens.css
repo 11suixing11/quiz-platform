@@ -1,27 +1,33 @@
-/* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V4 · macrostructure: Split Studio / Catalogue Index / Workbench / Long Document · tone: quiet editorial · anchor hue: botanical green */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · macrostructure: Index-First / Workbench / Split Studio · tone: lucid editorial reflection · anchor hue: coral + deep teal */
 :root {
-  --color-paper: oklch(95.7% 0.025 75);
-  --color-paper-strong: oklch(98.2% 0.015 75);
-  --color-ink: oklch(31% 0.025 150);
-  --color-night: oklch(20% 0.025 160);
-  --color-night-ink: oklch(93% 0.014 80);
-  --color-accent: oklch(50% 0.08 155);
-  --color-accent-ink: oklch(97% 0.018 80);
-  --color-muted: oklch(91% 0.025 150);
-  --color-muted-text: oklch(48% 0.02 70);
-  --color-warm-wash: oklch(88% 0.05 55);
-  --color-warm-surface: oklch(96% 0.027 63);
-  --color-warm-ink: oklch(54% 0.075 45);
-  --color-blue-wash: oklch(92% 0.02 235);
-  --color-danger: oklch(50% 0.16 25);
+  --color-paper: oklch(96.2% 0.019 82);
+  --color-paper-strong: oklch(99.1% 0.009 84);
+  --color-ink: oklch(24% 0.028 165);
+  --color-night: oklch(18% 0.028 165);
+  --color-night-ink: oklch(95% 0.014 82);
+  --color-accent: oklch(55% 0.16 35);
+  --color-accent-ink: oklch(98% 0.012 84);
+  --color-accent-soft: oklch(91% 0.045 35);
+  --color-teal: oklch(48% 0.085 170);
+  --color-teal-soft: oklch(89% 0.035 170);
+  --color-signal: oklch(77% 0.13 86);
+  --color-signal-ink: oklch(26% 0.04 90);
+  --color-sky: oklch(78% 0.065 220);
+  --color-muted: oklch(91% 0.021 165);
+  --color-muted-text: oklch(46% 0.025 150);
+  --color-warm-wash: oklch(90% 0.06 48);
+  --color-warm-surface: oklch(97% 0.026 65);
+  --color-warm-ink: oklch(45% 0.105 38);
+  --color-blue-wash: oklch(91% 0.03 225);
+  --color-danger: oklch(52% 0.16 25);
   --color-overlay-ink: oklch(100% 0 0);
   --color-print-paper: oklch(100% 0 0);
   --color-print-ink: oklch(27% 0.02 150);
   --color-print-muted: oklch(44% 0.015 80);
-  --color-topic-self: oklch(56% 0.07 160);
-  --color-topic-emotion: oklch(60% 0.105 25);
-  --color-topic-relationship: oklch(64% 0.08 75);
-  --color-topic-life: oklch(59% 0.06 120);
+  --color-topic-self: oklch(48% 0.085 170);
+  --color-topic-emotion: oklch(61% 0.16 35);
+  --color-topic-relationship: oklch(69% 0.12 78);
+  --color-topic-life: oklch(55% 0.07 125);
 
   --background: var(--color-paper);
   --foreground: var(--color-ink);
@@ -39,6 +45,13 @@
   --blue-wash: var(--color-blue-wash);
   --danger: var(--color-danger);
   --accent-wash: color-mix(in oklab, var(--accent) 13%, var(--paper));
+  --surface-contrast: var(--color-ink);
+  --surface-contrast-ink: var(--color-paper);
+  --teal: var(--color-teal);
+  --teal-soft: var(--color-teal-soft);
+  --signal: var(--color-signal);
+  --signal-ink: var(--color-signal-ink);
+  --sky: var(--color-sky);
   --line: color-mix(in oklab, var(--ink) 18%, transparent);
   --soft-line: color-mix(in oklab, var(--ink) 11%, transparent);
   --warm-line: color-mix(in oklab, var(--warm-ink) 22%, transparent);
@@ -67,29 +80,42 @@
   --text-2xl: 2.5rem;
   --text-display: 4rem;
 
-  --radius-control: 0.5rem;
-  --radius-panel: 0.5rem;
-  --radius-media: 0.375rem;
+  --radius-control: 0.4rem;
+  --radius-panel: 0.65rem;
+  --radius-media: 0.3rem;
   --radius-pill: 999px;
-  --shadow-card-hover: 0 1rem 2rem color-mix(in oklab, var(--ink) 8%, transparent);
+  --shadow-card-hover: 0 1.25rem 2.5rem color-mix(in oklab, var(--ink) 15%, transparent);
   --shadow-feedback: 0 0.875rem 2rem color-mix(in oklab, var(--ink) 18%, transparent);
   --shadow-dialog: 0 1.5rem 4rem color-mix(in oklab, var(--night) 22%, transparent);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-short: 180ms;
   --duration-medium: 280ms;
+  --layout-max: 80rem;
+  --header-height: 4.5rem;
+  --banner-height: 4.5rem;
+  --shadow-soft: 0 1.25rem 2.75rem color-mix(in oklab, var(--ink) 12%, transparent);
+  --shadow-lift: 0 1.75rem 3.5rem color-mix(in oklab, var(--ink) 18%, transparent);
 }
 
 .dark {
   --color-paper: var(--color-night);
-  --color-paper-strong: oklch(24% 0.025 160);
+  --color-paper-strong: oklch(23% 0.03 165);
   --color-ink: var(--color-night-ink);
-  --color-accent: oklch(76% 0.07 155);
-  --color-accent-ink: oklch(20% 0.025 160);
-  --color-muted: oklch(29% 0.035 155);
-  --color-muted-text: oklch(73% 0.018 85);
-  --color-warm-wash: oklch(32% 0.055 42);
-  --color-warm-surface: oklch(27% 0.035 42);
-  --color-warm-ink: oklch(75% 0.08 48);
+  --color-accent: oklch(73% 0.14 35);
+  --color-accent-ink: oklch(19% 0.028 165);
+  --color-accent-soft: oklch(31% 0.065 35);
+  --color-teal: oklch(72% 0.08 170);
+  --color-teal-soft: oklch(29% 0.045 170);
+  --color-signal: oklch(82% 0.12 86);
+  --color-signal-ink: oklch(23% 0.03 90);
+  --color-sky: oklch(73% 0.06 220);
+  --color-muted: oklch(29% 0.035 165);
+  --color-muted-text: oklch(76% 0.018 85);
+  --color-warm-wash: oklch(33% 0.06 42);
+  --color-warm-surface: oklch(27% 0.04 42);
+  --color-warm-ink: oklch(78% 0.08 48);
   --color-blue-wash: oklch(29% 0.03 225);
   --color-danger: oklch(74% 0.12 25);
+  --surface-contrast: var(--color-night);
+  --surface-contrast-ink: var(--color-night-ink);
 }

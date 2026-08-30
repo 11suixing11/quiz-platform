@@ -1,0 +1,2076 @@
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5
+ * genre: modern-minimal editorial reflection
+ * macrostructure: Index-First / Workbench / Split Studio
+ * theme: ink, paper, coral, and deep teal · nav: N6 · footer: Ft1
+ * contrast: pass (40-41) · mobile: pass (34, 49, 50-57)
+ */
+
+/* Shared canvas and type */
+html,
+body {
+  overflow-x: clip;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.atlas-page {
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.atlas-page-container {
+  width: min(100%, var(--layout-max));
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+  padding-top: clamp(2rem, 4vw, 3.5rem);
+  padding-bottom: clamp(6.5rem, 10vw, 8rem);
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Navigation: dark masthead instead of a pale utility strip */
+.atlas-header {
+  position: sticky;
+  top: 0;
+  z-index: 300;
+  min-height: var(--header-height);
+  border: 0;
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--surface-contrast-ink) 12%, transparent);
+}
+
+.wellness-page .atlas-header,
+.atlas-page .atlas-header {
+  border: 0;
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+}
+
+.atlas-header-inner {
+  min-height: var(--header-height);
+  width: min(100%, var(--layout-max));
+}
+
+.atlas-wordmark {
+  min-height: 2.75rem;
+  gap: 0.7rem;
+  color: var(--surface-contrast-ink);
+  transition: color var(--duration-short) var(--ease-out), transform var(--duration-short) var(--ease-out);
+}
+
+.atlas-wordmark:hover {
+  color: var(--color-accent-soft);
+  transform: translateY(-1px);
+}
+
+.atlas-wordmark-mark {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid color-mix(in oklab, var(--surface-contrast-ink) 45%, transparent);
+  border-radius: 0.35rem;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.atlas-wordmark-mark::before {
+  width: 0.6rem;
+  height: 0.6rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.atlas-wordmark-mark span {
+  position: absolute;
+  width: 0.22rem;
+  height: 0.22rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.atlas-wordmark-copy {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.15;
+}
+
+.atlas-wordmark-copy strong {
+  font-size: 0.83rem;
+  font-weight: 800;
+}
+
+.atlas-wordmark-copy small {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 58%, transparent);
+  font-size: 0.58rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.atlas-header-section {
+  max-width: 16rem;
+  border-left: 1px solid color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
+  padding-left: 0.85rem;
+  color: color-mix(in oklab, var(--surface-contrast-ink) 62%, transparent);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.atlas-back-link {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 72%, transparent);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.atlas-back-link:hover {
+  color: var(--color-accent-soft);
+}
+
+.atlas-desktop-nav {
+  display: none;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.atlas-desktop-nav a {
+  min-height: 2.6rem;
+  border-radius: 0.3rem;
+  padding: 0.55rem 0.8rem;
+  color: color-mix(in oklab, var(--surface-contrast-ink) 62%, transparent);
+  font-size: 0.72rem;
+  font-weight: 750;
+  transition: background-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out);
+}
+
+.atlas-desktop-nav a:hover,
+.atlas-desktop-nav a[aria-current="page"] {
+  background: color-mix(in oklab, var(--surface-contrast-ink) 12%, transparent);
+  color: var(--surface-contrast-ink);
+}
+
+.atlas-desktop-nav a[aria-current="page"] {
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+}
+
+.atlas-header-actions .atlas-icon-link,
+.atlas-header-actions .atlas-preference-control {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 78%, transparent);
+}
+
+.atlas-header-actions .atlas-icon-link:hover,
+.atlas-header-actions .atlas-preference-control:hover {
+  background: color-mix(in oklab, var(--surface-contrast-ink) 12%, transparent);
+  color: var(--surface-contrast-ink);
+}
+
+.atlas-preference-control {
+  min-height: 2.6rem;
+  border-color: color-mix(in oklab, var(--surface-contrast-ink) 18%, transparent);
+  border-radius: 0.3rem;
+  padding-inline: 0.7rem;
+  font-size: 0.68rem;
+}
+
+.atlas-icon-link {
+  min-width: 2.6rem;
+  min-height: 2.6rem;
+  border-radius: 0.3rem;
+}
+
+.atlas-mobile-nav {
+  border-top: 1px solid color-mix(in oklab, var(--surface-contrast-ink) 16%, transparent);
+  background: var(--surface-contrast);
+  box-shadow: 0 -1rem 2rem color-mix(in oklab, var(--surface-contrast) 18%, transparent);
+}
+
+.atlas-mobile-nav-link {
+  min-height: 3.35rem;
+  border-radius: 0.3rem;
+  color: color-mix(in oklab, var(--surface-contrast-ink) 63%, transparent);
+  font-size: 0.62rem;
+}
+
+.atlas-mobile-nav-link:hover {
+  background: color-mix(in oklab, var(--surface-contrast-ink) 10%, transparent);
+  color: var(--surface-contrast-ink);
+}
+
+.atlas-mobile-nav-link[aria-current="page"] {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+/* Controls */
+.atlas-primary-action,
+.atlas-secondary-action,
+.atlas-danger-action {
+  min-height: 2.85rem;
+  border-radius: 0.35rem;
+  padding: 0.72rem 1rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.atlas-primary-action {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  box-shadow: 0 0.35rem 0 color-mix(in oklab, var(--color-accent) 38%, transparent);
+}
+
+.atlas-primary-action:hover {
+  background: color-mix(in oklab, var(--color-accent) 88%, var(--ink));
+  color: var(--color-accent-ink);
+  transform: translateY(-2px);
+}
+
+.atlas-secondary-action {
+  border: 1px solid color-mix(in oklab, var(--ink) 28%, transparent);
+  background: transparent;
+  color: var(--ink);
+}
+
+.atlas-secondary-action:hover {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+  color: var(--color-teal);
+  transform: translateY(-2px);
+}
+
+.atlas-danger-action {
+  border: 1px solid color-mix(in oklab, var(--danger) 48%, transparent);
+  color: var(--danger);
+}
+
+.atlas-danger-action:hover {
+  background: color-mix(in oklab, var(--danger) 10%, transparent);
+}
+
+.atlas-text-link,
+.atlas-inline-action,
+.atlas-text-button {
+  min-height: 2.6rem;
+  color: var(--color-teal);
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.atlas-text-link:hover,
+.atlas-inline-action:hover,
+.atlas-text-button:hover {
+  color: var(--color-accent);
+}
+
+.atlas-section-kicker {
+  color: var(--color-teal);
+  font-family: var(--font-code);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.atlas-section-title {
+  max-width: 50rem;
+  font-size: 2.6rem;
+  font-weight: 780;
+  line-height: 0.98;
+}
+
+.atlas-meta-chip {
+  border: 1px solid color-mix(in oklab, var(--ink) 17%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--paper-strong) 70%, transparent);
+  padding: 0.38rem 0.65rem;
+  color: color-mix(in oklab, var(--ink) 68%, transparent);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.atlas-account-input,
+.journal-editor-section input,
+.journal-editor-section textarea,
+.journal-image-fields textarea,
+.journal-publish-rail select,
+.journal-report-dialog select,
+.journal-report-dialog textarea,
+.journal-comment-form textarea,
+.community-comment-form textarea {
+  border: 1px solid color-mix(in oklab, var(--ink) 24%, transparent);
+  border-radius: 0.35rem;
+  background: var(--paper-strong);
+  color: var(--ink);
+}
+
+.atlas-account-input:focus,
+.journal-editor-section input:focus,
+.journal-editor-section textarea:focus,
+.journal-image-fields textarea:focus,
+.journal-publish-rail select:focus,
+.journal-report-dialog select:focus,
+.journal-report-dialog textarea:focus,
+.journal-comment-form textarea:focus,
+.community-comment-form textarea:focus {
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-teal) 18%, transparent);
+  outline: 0;
+}
+
+/* Home: split studio with a strong editorial index */
+.reflection-home-page .atlas-page-container {
+  padding-top: clamp(1.5rem, 3vw, 3rem);
+}
+
+.home-hero {
+  display: grid;
+  align-items: end;
+  gap: clamp(2.5rem, 6vw, 6rem);
+  padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.home-hero-copy {
+  position: relative;
+  max-width: 34rem;
+  padding-left: clamp(1rem, 2vw, 2rem);
+}
+
+.home-hero-copy::before {
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0;
+  left: 0;
+  width: 0.25rem;
+  background: var(--color-accent);
+  content: "";
+}
+
+.home-hero-copy h1 {
+  color: var(--ink);
+  font-size: 3.8rem;
+  font-weight: 820;
+  line-height: 0.98;
+}
+
+.home-hero-copy h1 span {
+  color: var(--color-teal);
+}
+
+.home-hero-lede {
+  max-width: 31rem;
+  margin-top: 2rem;
+  color: color-mix(in oklab, var(--ink) 71%, transparent);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.home-paths {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  align-items: start;
+  gap: clamp(0.8rem, 2vw, 1.5rem);
+}
+
+.home-path {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: 0.65rem;
+  background: var(--paper-strong);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--duration-medium) var(--ease-out), box-shadow var(--duration-medium) var(--ease-out), border-color var(--duration-medium) var(--ease-out);
+}
+
+.home-path--journal {
+  margin-top: clamp(2rem, 8vw, 6rem);
+}
+
+.home-path:hover {
+  border-color: var(--color-teal);
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-0.45rem);
+}
+
+.home-path-media {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  background: var(--color-teal-soft);
+}
+
+.home-path-visual,
+.home-path-visual .quiz-visual-image {
+  width: 100%;
+}
+
+.home-path-visual .quiz-visual-image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.55s var(--ease-out);
+}
+
+.home-path:hover .quiz-visual-image {
+  transform: scale(1.035);
+}
+
+/* One chip per card: the card's only label sits in the top-left corner of the
+ * image, over the column its body copy starts in. */
+.home-path-media-label {
+  position: absolute;
+  z-index: 2;
+  top: 0.8rem;
+  left: 0.8rem;
+  display: inline-flex;
+  min-height: 1.8rem;
+  align-items: center;
+  border-radius: 0.25rem;
+  background: var(--paper);
+  padding: 0.3rem 0.5rem;
+  color: var(--ink);
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.home-path-body {
+  display: flex;
+  min-height: 11.5rem;
+  flex-direction: column;
+  padding: clamp(1.1rem, 2.2vw, 1.8rem);
+}
+
+.home-path-body h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.home-path-body p {
+  max-width: 31rem;
+  margin-top: 0.8rem;
+  color: color-mix(in oklab, var(--ink) 62%, transparent);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.home-path-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  color: var(--color-teal);
+  font-size: 0.73rem;
+  font-weight: 800;
+}
+
+.home-path-action svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform var(--duration-short) var(--ease-out);
+}
+
+.home-path:hover .home-path-action svg {
+  transform: translate(0.15rem, -0.15rem);
+}
+
+.home-continue-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  padding-block: 1rem;
+}
+
+.home-continue-label,
+.home-continue-strip nav,
+.home-continue-strip nav a {
+  display: flex;
+  align-items: center;
+}
+
+.home-continue-label {
+  gap: 0.55rem;
+  color: var(--color-accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.home-continue-label svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.home-continue-strip nav {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem 1.25rem;
+}
+
+.home-continue-strip nav a {
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  color: color-mix(in oklab, var(--ink) 67%, transparent);
+  font-size: 0.72rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.home-continue-strip nav a:hover {
+  color: var(--color-teal);
+}
+
+.home-continue-strip nav svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.home-principles {
+  display: grid;
+  gap: 2rem;
+  padding-top: clamp(3.5rem, 8vw, 7rem);
+}
+
+.home-principles-intro h2 {
+  max-width: 35rem;
+  font-size: 2rem;
+  font-weight: 780;
+  line-height: 0.98;
+}
+
+.home-principle-list {
+  border-top: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+.home-principle-list > div {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 1rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  padding-block: 1.1rem;
+}
+
+.home-principle-list span {
+  color: var(--color-accent);
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.home-principle-list p {
+  max-width: 42rem;
+  color: color-mix(in oklab, var(--ink) 70%, transparent);
+  font-size: 0.9rem;
+}
+
+.home-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: min(100%, var(--layout-max));
+  margin: 0 auto;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  padding: 1.2rem clamp(1.25rem, 4vw, 3.5rem) 2rem;
+  color: color-mix(in oklab, var(--ink) 58%, transparent);
+  font-size: 0.68rem;
+}
+
+.home-footer > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.home-footer > div span:first-child {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.home-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  /* The 0.68rem footer type gives this link an 18px line box. Pad it out so it
+   * is still a comfortable target on a phone. */
+  min-height: 2.75rem;
+  padding-inline: 0.25rem;
+  color: var(--color-teal);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.home-footer a svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+/* Assessment index */
+.assessment-catalog-page .atlas-page-container {
+  padding-top: 0;
+}
+
+.assessment-catalog-intro {
+  display: grid;
+  gap: 1.6rem;
+  margin-inline: calc(clamp(1.25rem, 4vw, 3.5rem) * -1);
+  padding: clamp(2.5rem, 6vw, 5.5rem) clamp(1.25rem, 4vw, 3.5rem) clamp(2.5rem, 5vw, 4.5rem);
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+}
+
+.assessment-catalog-intro .atlas-section-kicker {
+  color: var(--color-signal);
+}
+
+.assessment-catalog-intro h1 {
+  max-width: 52rem;
+  margin-top: 1rem;
+  color: var(--paper);
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 0.96;
+}
+
+.assessment-catalog-intro-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-width: 35rem;
+  color: color-mix(in oklab, var(--surface-contrast-ink) 72%, transparent);
+  font-size: 0.92rem;
+}
+
+.assessment-catalog-intro-copy > p {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 72%, transparent);
+}
+
+.assessment-catalog-intro-copy nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.assessment-catalog-intro-copy nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  color: var(--color-signal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.assessment-catalog-intro-copy nav a:hover {
+  color: var(--paper);
+}
+
+.assessment-catalog-intro-copy nav svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.assessment-catalog-boundary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  padding-bottom: 1.1rem;
+  color: color-mix(in oklab, var(--ink) 58%, transparent);
+  font-size: 0.71rem;
+}
+
+.assessment-catalog-boundary svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  color: var(--color-teal);
+}
+
+.assessment-return {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  border: 1px solid color-mix(in oklab, var(--color-accent) 40%, transparent);
+  border-radius: 0.55rem;
+  background: var(--color-accent-soft);
+  padding: 1rem 1.1rem;
+}
+
+.assessment-return > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.assessment-return p,
+.assessment-return span {
+  color: color-mix(in oklab, var(--ink) 62%, transparent);
+  font-size: 0.68rem;
+}
+
+.assessment-return strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.84rem;
+}
+
+.assessment-return > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-warm-ink);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.assessment-return > a svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.assessment-catalog-library {
+  padding-top: clamp(3rem, 7vw, 6rem);
+}
+
+.catalog-explorer-heading {
+  display: grid;
+  gap: 1.5rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  padding-bottom: 1.3rem;
+}
+
+.catalog-explorer-heading h2 {
+  margin-top: 0.65rem;
+  font-size: 1.8rem;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.catalog-search {
+  border-bottom-color: color-mix(in oklab, var(--ink) 34%, transparent);
+}
+
+.catalog-search input {
+  font-size: 0.88rem;
+}
+
+.catalog-filter-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 16%, transparent);
+  padding-block: 1rem;
+}
+
+.catalog-topic-filter {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.catalog-topic-filter > svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  margin-top: 0.45rem;
+  color: var(--color-accent);
+}
+
+.catalog-topic-filter [role="group"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.atlas-filter {
+  min-height: 2.35rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  border-radius: 999px;
+  padding: 0.45rem 0.72rem;
+  color: color-mix(in oklab, var(--ink) 64%, transparent);
+  font-size: 0.68rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.atlas-filter:hover,
+.atlas-filter-active {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+  color: var(--color-teal);
+}
+
+.catalog-length-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+}
+
+.catalog-length-filter label {
+  color: color-mix(in oklab, var(--ink) 48%, transparent);
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.catalog-length-filter select {
+  min-height: 2.35rem;
+  max-width: 9rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  border-radius: 0.3rem;
+  background: var(--paper-strong);
+  padding: 0.4rem 0.55rem;
+  color: var(--ink);
+  font-size: 0.68rem;
+}
+
+.catalog-result-status {
+  padding-block: 1rem 0.75rem;
+  color: color-mix(in oklab, var(--ink) 48%, transparent);
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.atlas-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+/* Assessment cards */
+.atlas-test-card {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  border-radius: 0.55rem;
+  background: var(--paper-strong);
+  box-shadow: none;
+  animation: none;
+  transition: transform var(--duration-medium) var(--ease-out), border-color var(--duration-medium) var(--ease-out), box-shadow var(--duration-medium) var(--ease-out);
+}
+
+.atlas-test-card:hover {
+  border-color: var(--color-teal);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-0.3rem);
+}
+
+.atlas-test-card-link {
+  min-width: 0;
+}
+
+.atlas-test-card-visual {
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 16%, transparent);
+  background: var(--color-teal-soft);
+}
+
+.atlas-test-card-visual .quiz-visual-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.atlas-test-card:hover .atlas-test-card-visual .quiz-visual-image {
+  transform: scale(1.025);
+}
+
+.atlas-test-card-body {
+  gap: 1.1rem;
+  padding: 1.15rem;
+}
+
+.atlas-category-mark {
+  border-radius: 0.35rem !important;
+  border-color: color-mix(in oklab, var(--color-accent) 35%, transparent) !important;
+  background: var(--color-accent-soft);
+  color: var(--color-accent) !important;
+}
+
+.atlas-card-category {
+  color: var(--color-teal);
+  font-family: var(--font-code);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.atlas-card-trust {
+  color: color-mix(in oklab, var(--ink) 52%, transparent);
+  font-size: 0.62rem;
+}
+
+.atlas-test-card-body h3 {
+  font-size: 1.1rem;
+  font-weight: 780;
+  line-height: 1.08;
+}
+
+.atlas-test-card-body p {
+  color: color-mix(in oklab, var(--ink) 62%, transparent);
+  font-size: 0.76rem;
+  line-height: 1.65;
+}
+
+.atlas-test-card-body > div:last-child {
+  border-top-color: color-mix(in oklab, var(--ink) 17%, transparent);
+  padding-top: 0.85rem;
+}
+
+/* When the card gets narrow, let the meta row stack instead of breaking short
+ * labels like `12-21 分钟` or the `先了解` call to action across two lines. */
+.atlas-test-card-foot {
+  flex-wrap: wrap;
+}
+
+.atlas-test-card-meta,
+.atlas-test-card-cta {
+  white-space: nowrap;
+}
+
+.atlas-test-card-meta > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.atlas-card-save {
+  top: 0.65rem;
+  right: 0.65rem;
+  min-width: 2.45rem;
+  min-height: 2.45rem;
+  border: 1px solid color-mix(in oklab, var(--paper) 55%, var(--ink));
+  background: color-mix(in oklab, var(--paper-strong) 86%, transparent);
+  color: var(--color-teal);
+}
+
+.atlas-card-save:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.atlas-index,
+.atlas-progress-count,
+.atlas-question-index {
+  color: var(--color-accent);
+  font-family: var(--font-code);
+  font-size: 0.63rem;
+  font-weight: 700;
+}
+
+.atlas-empty-state {
+  min-height: 16rem;
+  border: 1px dashed color-mix(in oklab, var(--ink) 26%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in oklab, var(--paper-strong) 62%, transparent);
+}
+
+/* Detail, quiz, and result surfaces */
+.assessment-detail-enter,
+.quiz-main,
+.journal-reading-container,
+.community-page {
+  animation: atlas-enter 0.45s var(--ease-out) both;
+}
+
+.assessment-detail-enter > .grid {
+  gap: clamp(2rem, 6vw, 6rem);
+}
+
+.assessment-detail-enter h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 0.98;
+}
+
+.atlas-detail-panel {
+  border: 0;
+  border-radius: 0.65rem;
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.atlas-detail-panel .atlas-section-kicker,
+.atlas-detail-panel .atlas-question-index {
+  color: var(--color-signal);
+}
+
+.atlas-detail-panel p,
+.atlas-detail-panel .text-muted-foreground {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 72%, transparent);
+}
+
+.atlas-detail-panel .border-t,
+.atlas-detail-panel .border-ink\/16 {
+  border-color: color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
+}
+
+.atlas-assessment-brief {
+  border-top: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  padding-block: 1.6rem;
+}
+
+.atlas-assessment-brief-heading h2 {
+  margin-top: 0.55rem;
+  font-size: 1.6rem;
+  font-weight: 780;
+}
+
+.atlas-assessment-brief-grid {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
+.atlas-assessment-brief-item {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
+  gap: 0.65rem;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  padding-top: 0.85rem;
+}
+
+.atlas-assessment-brief-item > svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-accent);
+}
+
+.atlas-assessment-brief-item strong {
+  font-size: 0.78rem;
+}
+
+.atlas-assessment-brief-item p {
+  margin-top: 0.25rem;
+  color: color-mix(in oklab, var(--ink) 58%, transparent);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.quiz-main {
+  max-width: 54rem;
+  padding-top: clamp(2rem, 5vw, 4.5rem);
+}
+
+.quiz-heading-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  padding-bottom: 1rem;
+}
+
+.quiz-main-title {
+  max-width: 44rem;
+  font-size: 1.6rem;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.quiz-progress-block {
+  margin-top: 1rem;
+}
+
+.atlas-progress-route {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+.atlas-progress-route span {
+  background: var(--color-accent);
+}
+
+.quiz-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.55rem;
+  color: color-mix(in oklab, var(--ink) 48%, transparent);
+  font-size: 0.68rem;
+}
+
+.quiz-draft-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  color: var(--color-teal);
+  font-size: 0.66rem;
+}
+
+.quiz-draft-status-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.quiz-draft-status--warning {
+  color: var(--color-accent);
+}
+
+.quiz-question-area {
+  min-height: 30rem;
+  padding-block: clamp(2.5rem, 7vw, 5.5rem) 2.5rem;
+}
+
+.quiz-question-stage {
+  max-width: 48rem;
+}
+
+.quiz-question-title {
+  margin-top: 1rem;
+  font-size: 2.1rem;
+  font-weight: 780;
+  line-height: 0.98;
+}
+
+.quiz-answer-group {
+  margin-top: 2.25rem;
+}
+
+.quiz-answer-prompt {
+  color: color-mix(in oklab, var(--ink) 52%, transparent);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.quiz-answer-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.8rem;
+}
+
+.atlas-answer-option {
+  min-height: 4.25rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: 0.45rem;
+  background: var(--paper-strong);
+  color: var(--ink);
+  padding: 0.9rem 1rem;
+  transition: transform var(--duration-short) var(--ease-out), border-color var(--duration-short) var(--ease-out), background-color var(--duration-short) var(--ease-out);
+}
+
+.atlas-answer-option:hover {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+  transform: translateX(0.25rem);
+}
+
+.atlas-answer-selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--ink);
+}
+
+.atlas-answer-key {
+  width: 2rem;
+  height: 2rem;
+  border-color: color-mix(in oklab, var(--ink) 28%, transparent);
+  border-radius: 0.3rem;
+  background: color-mix(in oklab, var(--paper) 58%, transparent);
+  color: var(--color-teal);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.quiz-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  padding-top: 1rem;
+}
+
+.quiz-actions > * {
+  min-width: 0;
+}
+
+.atlas-resume-panel {
+  border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: 0.65rem;
+  background: var(--paper-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.atlas-resume-symbol {
+  border: 0;
+  border-radius: 0.3rem;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.atlas-result-panel,
+.atlas-result-intro-block {
+  border-color: color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+.atlas-result-intro-block {
+  border: 0;
+  border-radius: 0.65rem;
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.atlas-result-question {
+  color: var(--color-signal);
+}
+
+.atlas-result-identity {
+  border: 1px solid color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in oklab, var(--surface-contrast-ink) 8%, transparent);
+  color: var(--surface-contrast-ink);
+}
+
+.atlas-result-identity-label,
+.atlas-result-identity-description,
+.atlas-result-identity-note,
+.atlas-result-summary-item span {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 72%, transparent);
+}
+
+.atlas-result-identity-title {
+  color: var(--surface-contrast-ink);
+}
+
+.atlas-result-summary,
+.atlas-result-summary-item + .atlas-result-summary-item {
+  border-color: color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
+}
+
+.atlas-result-summary-item strong {
+  color: var(--color-signal);
+}
+
+.atlas-result-identity-note {
+  border-top-color: color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
+}
+
+.atlas-result-intro-block .quiz-visual-feedback {
+  border-top-color: color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
+}
+
+.atlas-result-intro-block .quiz-visual-feedback legend,
+.atlas-result-intro-block .quiz-visual-feedback button {
+  color: var(--surface-contrast-ink);
+}
+
+.atlas-result-intro-block .quiz-visual-feedback button {
+  border-color: color-mix(in oklab, var(--surface-contrast-ink) 28%, transparent);
+}
+
+.atlas-result-intro-block .quiz-visual-feedback button:hover,
+.atlas-result-intro-block .quiz-visual-feedback button[aria-pressed="true"] {
+  border-color: var(--color-signal);
+  background: color-mix(in oklab, var(--color-signal) 18%, transparent);
+  color: var(--color-signal);
+}
+
+.atlas-result-intro-block .quiz-visual-feedback > p {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 64%, transparent);
+}
+
+.atlas-result-panel {
+  border-radius: 0.55rem;
+  background: var(--paper-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.atlas-score-readout {
+  border-bottom-color: color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+/* Journal and community surfaces */
+.journal-library-page .atlas-page-container,
+.community-page,
+.journal-reading-container {
+  padding-top: clamp(2rem, 5vw, 4rem);
+}
+
+.journal-library-header h1,
+.community-intro h1 {
+  max-width: 26rem;
+  font-size: 2.7rem;
+  font-weight: 800;
+  line-height: 0.98;
+}
+
+/* CJK display tier: han glyphs fill the em box edge to edge, so Latin display
+ * leading reads as touching lines. Loosen the display sizes, and let breaks
+ * follow kinsoku rules rather than the global `anywhere`. */
+html[lang="zh-CN"] .home-hero-copy h1,
+html[lang="zh-CN"] .home-principles-intro h2,
+html[lang="zh-CN"] .assessment-catalog-intro h1,
+html[lang="zh-CN"] .assessment-detail-enter h1,
+html[lang="zh-CN"] .atlas-section-title,
+html[lang="zh-CN"] .quiz-question-title,
+html[lang="zh-CN"] .journal-library-header h1,
+html[lang="zh-CN"] .community-intro h1 {
+  line-height: 1.12;
+}
+
+/* CJK mid and card tier: smaller sizes need more leading, not less */
+html[lang="zh-CN"] .home-path-body h2,
+html[lang="zh-CN"] .catalog-explorer-heading h2,
+html[lang="zh-CN"] .atlas-assessment-brief-heading h2,
+html[lang="zh-CN"] .quiz-main-title,
+html[lang="zh-CN"] .atlas-test-card-body h3,
+html[lang="zh-CN"] .journal-library-copy h2 {
+  line-height: 1.2;
+}
+
+html[lang="zh-CN"] h1,
+html[lang="zh-CN"] h2,
+html[lang="zh-CN"] h3,
+html[lang="zh-CN"] h4 {
+  overflow-wrap: break-word;
+  line-break: strict;
+  /* Longer headings stranded their final glyph — 数据、保留期限与删除方 / 式 on the
+   * policy page, MBTI人格测 / 试 on a detail page. `pretty` pulls the break
+   * earlier, and unlike `balance` it does not cut a two-character compound in
+   * half (balance gave MBTI人 / 格测试). Browsers without it keep today's break. */
+  text-wrap: pretty;
+}
+
+/* Short CJK headings otherwise strand a single character on the last line */
+html[lang="zh-CN"] .home-path-body h2,
+html[lang="zh-CN"] .atlas-test-card-body h3,
+html[lang="zh-CN"] .journal-library-copy h2,
+html[lang="zh-CN"] .atlas-section-title,
+html[lang="zh-CN"] .journal-library-header h1,
+html[lang="zh-CN"] .community-intro h1 {
+  text-wrap: balance;
+}
+
+/* `ch` is the advance of `0`, roughly half a han glyph, so a ch cap turns a
+ * 14-character Chinese line into three ragged ones. Cap in `em` instead. */
+html[lang="zh-CN"] .journal-library-header h1,
+html[lang="zh-CN"] .community-intro h1 {
+  max-width: 13em;
+}
+
+.journal-library-header {
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  padding-bottom: 1.6rem;
+}
+
+.journal-library-header p,
+.community-intro > div > p {
+  max-width: 38rem;
+  margin-top: 0.9rem;
+  color: color-mix(in oklab, var(--ink) 62%, transparent);
+  font-size: 0.9rem;
+}
+
+.journal-library-toolbar,
+.community-toolbar {
+  border-bottom-color: color-mix(in oklab, var(--ink) 20%, transparent);
+}
+
+.journal-library-toolbar button,
+.community-toolbar button {
+  color: color-mix(in oklab, var(--ink) 55%, transparent);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.journal-library-toolbar button.is-active,
+.community-toolbar button.is-active {
+  color: var(--color-accent);
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+}
+
+.journal-library-grid {
+  gap: 1rem;
+}
+
+.journal-access-state,
+.journal-state,
+.journal-empty-state {
+  min-height: 20rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  border-radius: 0.6rem;
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.atlas-page .journal-access-state,
+.atlas-page .journal-state,
+.atlas-page .journal-empty-state {
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+}
+
+.journal-access-state > svg,
+.journal-state > svg,
+.journal-empty-state > .journal-empty-mark {
+  color: var(--color-signal);
+}
+
+.journal-access-state h1,
+.journal-access-state h2,
+.journal-state h1,
+.journal-state h2,
+.journal-empty-state h2 {
+  color: var(--surface-contrast-ink);
+  font-size: 1.6rem;
+  font-weight: 780;
+}
+
+.atlas-page .journal-access-state h1,
+.atlas-page .journal-access-state h2,
+.atlas-page .journal-state h1,
+.atlas-page .journal-state h2,
+.atlas-page .journal-empty-state h2 {
+  color: var(--surface-contrast-ink);
+}
+
+.journal-access-state p,
+.journal-state p,
+.journal-empty-state p {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 68%, transparent);
+}
+
+.atlas-page .journal-access-state p,
+.atlas-page .journal-state p,
+.atlas-page .journal-empty-state p {
+  color: color-mix(in oklab, var(--surface-contrast-ink) 68%, transparent);
+}
+
+.journal-library-card {
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  border-radius: 0.55rem;
+  background: var(--paper-strong);
+  box-shadow: none;
+}
+
+.journal-library-card:hover {
+  border-color: var(--color-teal);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-0.25rem);
+}
+
+.journal-library-cover {
+  border-bottom-color: color-mix(in oklab, var(--ink) 16%, transparent);
+}
+
+.journal-library-copy {
+  padding: 1.1rem;
+}
+
+.journal-library-copy h2 {
+  font-size: 1.25rem;
+  font-weight: 780;
+  line-height: 1.05;
+}
+
+.journal-library-copy p {
+  color: color-mix(in oklab, var(--ink) 62%, transparent);
+  font-size: 0.78rem;
+}
+
+.community-intro {
+  border-bottom-color: color-mix(in oklab, var(--ink) 20%, transparent);
+}
+
+.community-intro aside {
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.community-post,
+.community-state,
+.community-composer {
+  border-color: color-mix(in oklab, var(--ink) 20%, transparent);
+  border-radius: 0.55rem;
+  background: var(--paper-strong);
+}
+
+.community-post {
+  box-shadow: none;
+}
+
+.community-post:hover {
+  border-color: color-mix(in oklab, var(--color-teal) 62%, transparent);
+}
+
+.community-assessment a,
+.community-post-actions button.is-active {
+  color: var(--color-accent);
+}
+
+.community-dimensions div {
+  border-color: color-mix(in oklab, var(--ink) 15%, transparent);
+}
+
+/* Settings, account, history and long-form pages */
+.atlas-settings-section {
+  border-top-color: color-mix(in oklab, var(--ink) 20%, transparent);
+}
+
+.atlas-history-row {
+  border-bottom-color: color-mix(in oklab, var(--ink) 17%, transparent);
+  padding-block: 1.15rem;
+}
+
+/* The import row pairs a two-line label with a tall control stack (two mode
+ * buttons above a 7rem dropzone), and the shared row rule centres its children,
+ * so the label floated a third of the way down the row with nothing beside it.
+ * Top-align only the row that carries the dropzone. */
+.atlas-data-row:has(.atlas-dropzone) {
+  align-items: flex-start;
+}
+
+/* Storage figures arrive as "101 B"; the three-up snapshot is narrow enough at
+ * 320px to split the number from its unit. */
+.atlas-data-summary strong {
+  font-size: clamp(1.15rem, 5.5vw, 1.5rem);
+  white-space: nowrap;
+}
+
+.profile-panel,
+.profile-form {
+  border-color: color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+/* The profile panel already closes with a rule, so the section that follows it
+ * would otherwise open with a second hairline 2.5rem below the first. */
+.profile-panel + .atlas-settings-section {
+  border-top: 0;
+}
+
+.wellness-footer {
+  border-top-color: color-mix(in oklab, var(--ink) 20%, transparent);
+  background: var(--surface-contrast);
+  color: color-mix(in oklab, var(--surface-contrast-ink) 65%, transparent);
+}
+
+.wellness-footer a,
+.wellness-footer span {
+  color: inherit;
+}
+
+/* Dark mode uses the same hierarchy, not a second visual language */
+.dark .atlas-page,
+.dark .atlas-page-container,
+.dark .home-path,
+.dark .atlas-test-card,
+.dark .atlas-result-panel,
+.dark .atlas-resume-panel,
+.dark .journal-library-card,
+.dark .community-post,
+.dark .community-state,
+.dark .community-composer,
+.dark .atlas-empty-state,
+.dark .atlas-account-input,
+.dark .journal-editor-section input,
+.dark .journal-editor-section textarea,
+.dark .journal-image-fields textarea,
+.dark .journal-publish-rail select,
+.dark .journal-report-dialog select,
+.dark .journal-report-dialog textarea,
+.dark .journal-comment-form textarea,
+.dark .community-comment-form textarea {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.dark .atlas-header,
+.dark .atlas-mobile-nav,
+.dark .assessment-catalog-intro,
+.dark .atlas-detail-panel,
+.dark .wellness-footer {
+  background: var(--surface-contrast);
+  color: var(--surface-contrast-ink);
+}
+
+.dark .home-hero-copy h1,
+.dark .home-path-body h2,
+.dark .atlas-test-card-body h3,
+.dark .atlas-section-title,
+.dark .quiz-main-title,
+.dark .quiz-question-title,
+.dark .journal-library-header h1,
+.dark .community-intro h1 {
+  color: var(--ink);
+}
+
+.dark .home-hero-copy h1 span,
+.dark .atlas-card-category {
+  color: var(--color-teal);
+}
+
+.dark .home-hero-lede,
+.dark .home-path-body p,
+.dark .atlas-test-card-body p,
+.dark .journal-library-header p,
+.dark .community-intro > div > p {
+  color: color-mix(in oklab, var(--ink) 66%, transparent);
+}
+
+.dark .atlas-secondary-action {
+  border-color: color-mix(in oklab, var(--ink) 28%, transparent);
+  color: var(--ink);
+}
+
+.dark .atlas-answer-option {
+  background: var(--paper-strong);
+  color: var(--ink);
+}
+
+.dark .home-footer,
+.dark .home-continue-strip,
+.dark .home-principle-list > div,
+.dark .catalog-explorer-heading,
+.dark .catalog-filter-bar,
+.dark .atlas-assessment-brief,
+.dark .quiz-heading-row,
+.dark .quiz-actions,
+.dark .journal-library-header,
+.dark .community-intro {
+  border-color: color-mix(in oklab, var(--ink) 22%, transparent);
+}
+
+@keyframes atlas-enter {
+  from { opacity: 0; transform: translateY(0.6rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 800px) {
+  .atlas-section-title {
+    font-size: 4.5rem;
+  }
+
+  .atlas-desktop-nav {
+    display: flex;
+  }
+
+  .atlas-mobile-nav {
+    display: none;
+  }
+
+  .home-hero {
+    grid-template-columns: minmax(17rem, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .home-hero-copy h1 {
+    font-size: 6rem;
+  }
+
+  .home-hero-lede {
+    font-size: 1.15rem;
+  }
+
+  .home-path-body h2 {
+    font-size: 2rem;
+  }
+
+  /* The second path card is the narrow one: 203-217px of text width across the
+   * desktop range. A seven-character Chinese heading needs 224px at 2rem, so it
+   * wrapped 4+3 and split the compound 图像 down the middle. Hold the CJK size
+   * to what the narrow card can fit on one line. */
+  html[lang="zh-CN"] .home-path-body h2 {
+    font-size: 1.75rem;
+  }
+
+  .home-principles {
+    grid-template-columns: minmax(15rem, 0.72fr) minmax(0, 1.28fr);
+    align-items: start;
+    /* The section stops widening at 80rem, so a 7vw gutter keeps eating into the
+     * intro column past that point: its text width fell from 347px at 1280 to
+     * 328px at 1920, which pushed the heading to three lines on the widest
+     * screens. Cap the gutter where the container caps. */
+    gap: clamp(2rem, 7vw, 5.5rem);
+  }
+
+  .home-principles-intro h2 {
+    font-size: 3.5rem;
+  }
+
+  .assessment-catalog-intro {
+    grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+    align-items: end;
+  }
+
+  .assessment-catalog-intro h1 {
+    font-size: 4.75rem;
+  }
+
+  .catalog-explorer-heading {
+    grid-template-columns: minmax(0, 0.8fr) minmax(18rem, 1.2fr);
+    align-items: end;
+  }
+
+  .catalog-explorer-heading h2 {
+    font-size: 3.2rem;
+  }
+
+  .atlas-test-card-body h3 {
+    font-size: 1.45rem;
+  }
+
+  .assessment-detail-enter h1 {
+    font-size: 5rem;
+  }
+
+  .atlas-assessment-brief-heading h2 {
+    font-size: 2.25rem;
+  }
+
+  .quiz-main-title {
+    font-size: 3rem;
+  }
+
+  .quiz-question-title {
+    font-size: 4rem;
+  }
+
+  .journal-library-header h1,
+  .community-intro h1 {
+    font-size: 4.5rem;
+  }
+
+  /* These headings sit in the narrower column of a two-column intro. A
+   * 14-character Chinese line needs roughly 500px at 4.5rem, which the column
+   * does not have, so the Latin size lands as three ragged lines. Cap the CJK
+   * size to what the column can hold in two balanced lines. */
+  html[lang="zh-CN"] .journal-library-header h1,
+  html[lang="zh-CN"] .community-intro h1 {
+    font-size: 3.4rem;
+  }
+
+  .journal-access-state h1,
+  .journal-access-state h2,
+  .journal-state h1,
+  .journal-state h2,
+  .journal-empty-state h2 {
+    font-size: 2.25rem;
+  }
+}
+
+@media (max-width: 960px) {
+  .atlas-catalog-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 800px) and (max-width: 960px) {
+  .home-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .atlas-section-title {
+    font-size: 3.5rem;
+  }
+
+  .home-hero-copy h1 {
+    font-size: 4.5rem;
+  }
+
+  .home-hero-lede {
+    font-size: 1.05rem;
+  }
+
+  .home-path-body h2 {
+    font-size: 1.75rem;
+  }
+
+  .home-principles-intro h2 {
+    font-size: 2.5rem;
+  }
+
+  .assessment-catalog-intro h1 {
+    font-size: 3.5rem;
+  }
+
+  .catalog-explorer-heading h2 {
+    font-size: 2.5rem;
+  }
+
+  .atlas-test-card-body h3 {
+    font-size: 1.15rem;
+  }
+
+  .assessment-detail-enter h1 {
+    font-size: 3.5rem;
+  }
+
+  .atlas-assessment-brief-heading h2 {
+    font-size: 2rem;
+  }
+
+  .quiz-main-title {
+    font-size: 2.25rem;
+  }
+
+  .quiz-question-title {
+    font-size: 3rem;
+  }
+
+  .journal-library-header h1,
+  .community-intro h1 {
+    font-size: 3.5rem;
+  }
+
+  .journal-access-state h1,
+  .journal-access-state h2,
+  .journal-state h1,
+  .journal-state h2,
+  .journal-empty-state h2 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 799px) {
+  .atlas-page-container {
+    padding-inline: 1.25rem;
+  }
+
+  .home-paths,
+  .atlas-catalog-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-path--journal {
+    margin-top: 0;
+  }
+
+  .assessment-catalog-intro {
+    margin-inline: -1.25rem;
+    padding-inline: 1.25rem;
+  }
+
+  .catalog-filter-bar {
+    flex-direction: column;
+  }
+
+  .catalog-length-filter {
+    width: 100%;
+  }
+
+  .catalog-length-filter select {
+    max-width: none;
+    flex: 1;
+  }
+
+  .community-intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .atlas-header-inner {
+    gap: 0.5rem;
+    padding-inline: 1rem;
+  }
+
+  .atlas-header-section {
+    display: none;
+  }
+
+  .atlas-header-actions {
+    gap: 0.2rem;
+  }
+
+  .atlas-preference-control {
+    min-width: 2.4rem;
+    padding-inline: 0.55rem;
+  }
+
+  .home-hero-copy h1 {
+    font-size: 5rem;
+  }
+
+  .home-continue-strip,
+  .home-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-continue-strip nav {
+    justify-content: flex-start;
+  }
+
+  .home-footer {
+    padding-bottom: 6rem;
+  }
+
+  .assessment-return {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .assessment-return > a {
+    align-self: flex-start;
+  }
+
+  .quiz-actions {
+    flex-direction: column-reverse;
+  }
+
+  .quiz-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .atlas-mobile-nav-link {
+    font-size: 0.55rem;
+  }
+
+  .home-hero-copy h1 {
+    font-size: 4.2rem;
+  }
+
+  .assessment-catalog-intro h1 {
+    font-size: 2.45rem;
+  }
+}
+
+/* Latin display tier for the home hero. The copy column is sized for han glyphs
+ * (认识 / 你自己 need ~290px at 96px), so "Yourself" — 4.125x its font size, the
+ * longest unbreakable word on the site — does not fit the same column and the
+ * global `overflow-wrap: anywhere` silently split it as "Yours / elf". Sizes
+ * below are the measured fits: 264px of text width at 320px, 305px at 361px,
+ * and 278-325px across the two-column range from 961px up. */
+@media (max-width: 520px) {
+  html[lang="en"] .home-hero-copy h1 {
+    font-size: 4.25rem;
+  }
+}
+
+@media (max-width: 360px) {
+  html[lang="en"] .home-hero-copy h1 {
+    font-size: 3.7rem;
+  }
+}
+
+/* The two-column hero opens at 961px with only 278px of copy width, where even
+ * the han display overflows its line: 你自己 needs 288px at 6rem and broke to
+ * 你自 / 己, stranding a glyph through the compound 自己. Both scripts step down
+ * for that band and step back up at 1100px, where the column reaches 319px. */
+@media (min-width: 961px) and (max-width: 1099px) {
+  html[lang="en"] .home-hero-copy h1 {
+    font-size: 4rem;
+  }
+
+  html[lang="zh-CN"] .home-hero-copy h1 {
+    font-size: 5.5rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  html[lang="en"] .home-hero-copy h1 {
+    font-size: 4.5rem;
+  }
+}
+
+/* The principles heading shares the hero's problem one section down: the intro
+ * column is 294px wide when the two-column layout opens and only reaches 352px
+ * at 1160px. 慢一点，也可以看见更多。 is twelve han glyphs, so two lines need six
+ * of them per line -- 336px at 3.5rem -- and the band between fell one glyph
+ * short, stranding 多。 on a third line. Hold 3rem until the column can carry
+ * the larger size. */
+@media (min-width: 961px) and (max-width: 1159px) {
+  .home-principles-intro h2 {
+    font-size: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .assessment-detail-enter,
+  .quiz-main,
+  .journal-reading-container,
+  .community-page {
+    animation: none;
+  }
+
+  .atlas-wordmark,
+  .home-path,
+  .home-path-visual .quiz-visual-image,
+  .home-path-action svg,
+  .atlas-test-card,
+  .atlas-test-card-visual .quiz-visual-image,
+  .atlas-answer-option {
+    transition: none;
+  }
+
+  .atlas-wordmark:hover,
+  .home-path:hover,
+  .home-path:hover .quiz-visual-image,
+  .home-path:hover .home-path-action svg,
+  .atlas-test-card:hover,
+  .atlas-test-card:hover .atlas-test-card-visual .quiz-visual-image,
+  .atlas-answer-option:hover {
+    transform: none;
+  }
+}

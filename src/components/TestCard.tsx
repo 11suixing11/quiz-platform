@@ -65,9 +65,9 @@ export function TestCard({ test, index = 0, lang = "zh", variant = "card" }: { t
             <h3 className="text-lg font-semibold text-ink transition group-hover:text-accent dark:text-white">{title}</h3>
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{description}</p>
           </div>
-          <div className="flex items-center justify-between gap-3 border-t border-ink/14 pt-4 text-xs text-muted-foreground dark:border-white/16">
-            <span className="inline-flex min-w-0 items-center gap-2"><span className="atlas-index">{String(index + 1).padStart(2, "0")}</span><span className="inline-flex items-center gap-1.5"><Clock3 className="size-3.5" />{test.questions} {lang === "zh" ? "题" : "questions"} · {duration} {lang === "zh" ? "分钟" : "min"}</span></span>
-            <span className="inline-flex items-center gap-1 font-semibold text-ink/70 transition group-hover:text-accent dark:text-white/70"><span>{lang === "zh" ? "先了解" : "Explore"}</span><ArrowRight className="size-3.5 transition group-hover:translate-x-0.5" aria-hidden="true" /></span>
+          <div className="atlas-test-card-foot flex items-center justify-between gap-3 border-t border-ink/14 pt-4 text-xs text-muted-foreground dark:border-white/16">
+            <span className="atlas-test-card-meta inline-flex min-w-0 items-center gap-2"><span className="atlas-index">{String(index + 1).padStart(2, "0")}</span><span className="inline-flex items-center gap-1.5"><Clock3 className="size-3.5" />{test.questions} {lang === "zh" ? "题" : "questions"} · {duration} {lang === "zh" ? "分钟" : "min"}</span></span>
+            <span className="atlas-test-card-cta inline-flex items-center gap-1 font-semibold text-ink/70 transition group-hover:text-accent dark:text-white/70"><span>{lang === "zh" ? "先了解" : "Explore"}</span><ArrowRight className="size-3.5 transition group-hover:translate-x-0.5" aria-hidden="true" /></span>
           </div>
         </div>
       </Link>

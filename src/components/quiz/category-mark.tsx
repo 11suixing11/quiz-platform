@@ -28,7 +28,7 @@ const icons = {
 export function CategoryMark({ category, className }: { category: string; className?: string }) {
   const Icon = icons[category as keyof typeof icons] ?? Brain;
   return (
-    <span className={cn("inline-flex size-10 items-center justify-center rounded-full border border-current/15", className)}>
+    <span className={cn("atlas-category-mark inline-flex size-10 items-center justify-center rounded-full border border-current/15", className)}>
       <Icon className="size-4" strokeWidth={1.7} />
     </span>
   );

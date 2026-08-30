@@ -8,5 +8,15 @@
     "vibe": "quiet bilingual reflection workspace",
     "enrichment": "local assessment and journal imagery",
     "brief": "Rebuild the product shell, home, catalogue, and shared visual system without changing business logic"
+  },
+  {
+    "date": "2026-08-30",
+    "scope": "app",
+    "macrostructure": "Index-First / Workbench / Split Studio",
+    "theme": "custom",
+    "theme_axes": "ink / warm-paper / coral / deep-teal",
+    "vibe": "lucid editorial reflection workspace",
+    "enrichment": "local assessment and journal imagery",
+    "brief": "Rebuild the full frontend surface while preserving routes, authentication, sync, assessment, result, journal, and community behavior"
   }
 ]

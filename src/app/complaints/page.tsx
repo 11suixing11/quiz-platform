@@ -59,8 +59,8 @@ export default function ComplaintsPage() {
         <fieldset>
           <legend className="text-sm font-semibold">{zh ? "投诉类型" : "Complaint type"}</legend>
           <div className="mt-3 inline-grid grid-cols-2 rounded-lg border border-ink/12 p-1 dark:border-white/12">
-            <button type="button" aria-pressed={kind === "privacy"} onClick={() => setKind("privacy")} className={`min-h-10 rounded-md px-4 text-sm font-semibold ${kind === "privacy" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55"}`}>{zh ? "隐私" : "Privacy"}</button>
-            <button type="button" aria-pressed={kind === "copyright"} onClick={() => setKind("copyright")} className={`min-h-10 rounded-md px-4 text-sm font-semibold ${kind === "copyright" ? "bg-ink text-paper dark:bg-white dark:text-night" : "text-ink/55 dark:text-white/55"}`}>{zh ? "版权" : "Copyright"}</button>
+            <button type="button" aria-pressed={kind === "privacy"} onClick={() => setKind("privacy")} className={`min-h-10 rounded-md px-4 text-sm font-semibold ${kind === "privacy" ? "bg-ink text-paper" : "text-ink/55 dark:text-white/55"}`}>{zh ? "隐私" : "Privacy"}</button>
+            <button type="button" aria-pressed={kind === "copyright"} onClick={() => setKind("copyright")} className={`min-h-10 rounded-md px-4 text-sm font-semibold ${kind === "copyright" ? "bg-ink text-paper" : "text-ink/55 dark:text-white/55"}`}>{zh ? "版权" : "Copyright"}</button>
           </div>
         </fieldset>
 

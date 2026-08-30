@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Bookmark, History, Images, ListChecks, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Bookmark, History, Sparkles } from "lucide-react";
 import type { QuizVisual } from "@/core/quiz";
 import { QuizVisualFrame } from "@/components/quiz/quiz-visual";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
@@ -28,51 +28,59 @@ export default function ReflectionHomePage() {
   const { language } = useLanguage();
 
   return (
-    <div className="atlas-page wellness-page reflection-home">
+    <div className="atlas-page wellness-page reflection-home-page">
       <AppHeader />
       <PageContainer className="reflection-home-shell">
-        <section className="reflection-home-stage">
-          <header className="reflection-home-intro">
-            <p className="reflection-home-kicker">{localized(language, "一个安静的反思空间", "A quiet place to reflect")}</p>
-            <h1><span>{localized(language, "认识你自己", "Know Yourself")}</span><small>{language === "zh" ? "Know Yourself" : "认识你自己"}</small></h1>
-            <p>{localized(language, "做一次测评，或用图像留住难以说清的感受。两条路径，都只为帮你看清一点。", "Take an assessment, or hold a difficult feeling in images. Both paths help you see a little more clearly.")}</p>
-            <div className="reflection-home-boundary"><ShieldCheck aria-hidden="true" />{localized(language, "以自我观察为目的，不替你下结论。", "For self-observation, never a verdict about who you are.")}</div>
+        <section className="home-hero">
+          <header className="home-hero-copy">
+            <h1>{language === "zh" ? <>认识<br /><span>你自己</span></> : <>Know<br /><span>Yourself</span></>}</h1>
+            <p className="home-hero-lede">{localized(language, "做一次测评，或用图像留住难以说清的感受。", "Take an assessment, or hold a difficult feeling in images.")}</p>
           </header>
 
-          <section className="reflection-paths" aria-label={localized(language, "选择反思方式", "Choose a way to reflect")}>
-            <Link href="/assessments/" className="reflection-path group">
-              <div className="reflection-path-visual-wrap">
-                {assessmentVisual && <QuizVisualFrame visual={assessmentVisual} lang={language} sizes="(max-width: 799px) 42vw, 22vw" className="reflection-path-visual" preload />}
-                <span className="reflection-path-index">01</span>
+          <section className="home-paths" aria-label={localized(language, "选择反思方式", "Choose a way to reflect")}>
+            <Link href="/assessments/" className="home-path home-path--assessment group">
+              <div className="home-path-media">
+                {assessmentVisual && <QuizVisualFrame visual={assessmentVisual} lang={language} sizes="(max-width: 799px) 92vw, 39vw" className="home-path-visual" preload />}
+                <span className="home-path-media-label">{localized(language, "结构化路径", "Structured")}</span>
               </div>
-              <div className="reflection-path-copy">
-                <ListChecks aria-hidden="true" />
+              <div className="home-path-body">
                 <h2>{localized(language, "做一次测评", "Take an assessment")}</h2>
                 <p>{localized(language, "沿着一组问题，观察性格、情绪、关系与生活中的倾向。", "Follow a set of questions to notice patterns across personality, emotions, relationships, and daily life.")}</p>
-                <span>{localized(language, "浏览测评", "Browse assessments")}<ArrowRight aria-hidden="true" /></span>
+                <span className="home-path-action">{localized(language, "浏览测评", "Browse assessments")}<ArrowUpRight aria-hidden="true" /></span>
               </div>
             </Link>
 
-            <Link href="/journal/" className="reflection-path group">
-              <div className="reflection-path-visual-wrap">
-                <QuizVisualFrame visual={journalVisual} lang={language} sizes="(max-width: 799px) 42vw, 22vw" className="reflection-path-visual" preload />
-                <span className="reflection-path-index">02</span>
+            <Link href="/journal/" className="home-path home-path--journal group">
+              <div className="home-path-media">
+                <QuizVisualFrame visual={journalVisual} lang={language} sizes="(max-width: 799px) 92vw, 33vw" className="home-path-visual" preload />
+                <span className="home-path-media-label">{localized(language, "开放式路径", "Open-ended")}</span>
               </div>
-              <div className="reflection-path-copy">
-                <Images aria-hidden="true" />
+              <div className="home-path-body">
                 <h2>{localized(language, "写一篇图像札记", "Create an image journal")}</h2>
                 <p>{localized(language, "把图像、片段和说明排成一篇默认私密的个人观察。", "Arrange images, fragments, and captions into a private reflection of your own.")}</p>
-                <span>{localized(language, "进入札记", "Open journal")}<ArrowRight aria-hidden="true" /></span>
+                <span className="home-path-action">{localized(language, "进入札记", "Open journal")}<ArrowUpRight aria-hidden="true" /></span>
               </div>
             </Link>
           </section>
         </section>
 
-        <nav className="reflection-home-secondary" aria-label={localized(language, "继续已有内容", "Continue existing reflections")}>
-          <Link href="/history/"><History aria-hidden="true" />{localized(language, "回看测评记录", "Review assessment history")}</Link>
-          <Link href="/bookmarks/"><Bookmark aria-hidden="true" />{localized(language, "查看收藏", "View saved assessments")}</Link>
-        </nav>
+        <section className="home-continue-strip" aria-label={localized(language, "继续已有内容", "Continue existing reflections")}>
+          <div className="home-continue-label"><Sparkles aria-hidden="true" /><span>{localized(language, "继续上次的线索", "Pick up a thread")}</span></div>
+          <nav>
+            <Link href="/history/"><History aria-hidden="true" />{localized(language, "回看测评记录", "Review history")}<ArrowUpRight aria-hidden="true" /></Link>
+            <Link href="/bookmarks/"><Bookmark aria-hidden="true" />{localized(language, "查看收藏", "View saved")}<ArrowUpRight aria-hidden="true" /></Link>
+          </nav>
+        </section>
+
+        <section className="home-principles" aria-labelledby="home-principles-title">
+          <div className="home-principles-intro"><h2 id="home-principles-title">{localized(language, "慢一点，也可以看见更多。", "A slower look can reveal more.")}</h2></div>
+          <div className="home-principle-list">
+            <div><span>01</span><p>{localized(language, "没有标准答案，只有更接近此刻的回答。", "There are no right answers, only responses closer to this moment.")}</p></div>
+            <div><span>02</span><p>{localized(language, "默认从本机开始，何时同步或公开由你决定。", "Start on your device by default. You choose when to sync or publish.")}</p></div>
+          </div>
+        </section>
       </PageContainer>
+      <footer className="home-footer"><div><span>认识你自己 / Know Yourself</span></div><Link href="/privacy/">{localized(language, "隐私说明", "Privacy notes")}<ArrowUpRight aria-hidden="true" /></Link></footer>
     </div>
   );
 }

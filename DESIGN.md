@@ -2,23 +2,29 @@
 name: "认识你自己 | Know Yourself"
 description: "A quiet bilingual reflection room for structured assessments and open-ended image journals."
 colors:
-  paper: "#FAF0E5"
-  paper-strong: "#FFF8F0"
-  ink: "#2D3530"
-  night-paper: "#17201E"
-  night-ink: "#F1EEE7"
-  accent: "#4F705F"
-  night-accent: "#A8C7B5"
-  muted-text: "#716A62"
-  warm-wash: "#F2D7C5"
-  warm-surface: "#FFF1E3"
-  warm-ink: "#936451"
-  line: "rgba(45, 53, 48, .14)"
-  soft-line: "rgba(45, 53, 48, .09)"
-  emotion: "#B77770"
-  relationship: "#B38A54"
-  life: "#7A856B"
-  danger: "#A53F3F"
+  paper: "oklch(96.2% 0.019 82)"
+  paper-strong: "oklch(99.1% 0.009 84)"
+  ink: "oklch(24% 0.028 165)"
+  night-paper: "oklch(18% 0.028 165)"
+  night-ink: "oklch(95% 0.014 82)"
+  accent: "oklch(55% 0.16 35)"
+  night-accent: "oklch(73% 0.14 35)"
+  accent-soft: "oklch(91% 0.045 35)"
+  teal: "oklch(48% 0.085 170)"
+  teal-soft: "oklch(89% 0.035 170)"
+  signal: "oklch(77% 0.13 86)"
+  signal-ink: "oklch(26% 0.04 90)"
+  sky: "oklch(78% 0.065 220)"
+  muted-text: "oklch(46% 0.025 150)"
+  warm-wash: "oklch(90% 0.06 48)"
+  warm-surface: "oklch(97% 0.026 65)"
+  warm-ink: "oklch(45% 0.105 38)"
+  line: "color-mix(in oklab, var(--ink) 18%, transparent)"
+  soft-line: "color-mix(in oklab, var(--ink) 11%, transparent)"
+  emotion: "oklch(61% 0.16 35)"
+  relationship: "oklch(69% 0.12 78)"
+  life: "oklch(55% 0.07 125)"
+  danger: "oklch(52% 0.16 25)"
 typography:
   display:
     fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
@@ -46,10 +52,10 @@ typography:
     lineHeight: 1.4
     letterSpacing: "0"
 rounded:
-  control: "1rem"
-  answer: "0.9rem"
-  panel: "1rem"
-  feature: "1.5rem"
+  control: "0.4rem"
+  answer: "0.45rem"
+  panel: "0.65rem"
+  feature: "0.65rem"
   pill: "999px"
 spacing:
   section: "clamp(4.5rem, 9vw, 7rem)"
@@ -77,15 +83,20 @@ components:
 
 # Design System: 认识你自己 | Know Yourself
 
+> Current Hallmark redesign (2026-08-30): the interface is intentionally more
+> directional and editorial than the previous quiet-paper treatment. The
+> product keeps its local-first, bilingual promise while using a dark masthead,
+> coral action color, deep teal secondary signal, and index-like page rhythm.
+
 ## Direction
 
-**Creative North Star: The quiet reflection room.**
+**Creative North Star: The clear desk at dusk.**
 
 ### Hallmark implementation profile
 
 - **Genre:** modern-minimal editorial reflection workspace.
-- **Marketing family:** Split Studio, with the two reflection paths kept equal in area and hierarchy.
-- **App family:** Workbench for journal, account, settings, community, and moderation surfaces.
+- **Marketing family:** Split Studio / Index-First, with two reflection paths and a visible continuation rail.
+- **App family:** Workbench with index-led headers, compact utility chrome, and strong content surfaces.
 - **Content family:** Long Document for assessment details, quiz, results, privacy, and public journal reading.
 - **Tokens:** `tokens.css` is the drop-in implementation source for color, type, spacing, radius, and motion values. Page CSS may compose those tokens but must not introduce a parallel palette.
 - **Motion:** transform and opacity only for interface movement; focused tasks remain readable before motion runs.
@@ -94,7 +105,7 @@ This is a bilingual reflection product for people arriving with a small, human q
 
 The homepage presents two equal paths in the first viewport: take an assessment or create an image journal. The assessment catalog then groups the reviewed routes; a detail page explains what a person will answer; the quiz keeps attention on one question at a time. Results are framed as observations from this attempt. Image journals begin in a private library, move through editing and preview, and become public only through an explicit publishing action.
 
-The visual language is sun-warmed paper, deep botanical green, soft peach reflection surfaces, quiet rules, and a small amount of muted subject color. Wordless metaphor scenes are reserved for assessment covers and results; user images carry the journal narrative. Warmth comes from calm surfaces and humane spacing rather than decorative clutter. There is no decorative gradient, glass stack, mesh background, remote font, or ornamental stock imagery.
+The visual language is warm paper, deep ink, coral action cues, teal navigation signals, and restrained yellow notes. Wordless metaphor scenes are reserved for assessment covers and results; user images carry the journal narrative. Contrast and directional hierarchy do the expressive work. There is no decorative gradient, glass stack, mesh background, remote font, or ornamental stock imagery.
 
 ## Users and voice
 
@@ -106,13 +117,14 @@ The visual language is sun-warmed paper, deep botanical green, soft peach reflec
 
 ## Colors
 
-- **Paper** (`#FAF0E5`) is the default light canvas and gives the product a warmer ambient temperature.
-- **Paper strong** (`#FFF8F0`) separates focused panels and answer surfaces without a floating-card effect.
-- **Ink** (`#2D3530`) is the primary text and rule color.
-- **Accent** (`#4F705F`) is the single product action color for links, focus, progress, and primary actions.
-- **Warm surface / warm wash** (`#FFF1E3` / `#F2D7C5`) belong to reflective prompts, gentle process explanations, and supportive moments. They never replace the action color.
-- **Night paper / night ink** (`#17201E` / `#F1EEE7`) form the dark theme. `#A8C7B5` is the dark-theme accent.
-- Subject colors are local signals only: emotion `#B77770`, relationship `#B38A54`, life `#7A856B`. They never replace the global accent.
+- **Paper** (`oklch(96.2% 0.019 82)`) is the default light canvas and gives the product a warm ambient temperature.
+- **Paper strong** (`oklch(99.1% 0.009 84)`) separates focused panels and answer surfaces without a floating-card effect.
+- **Ink** (`oklch(24% 0.028 165)`) is the primary text and rule color.
+- **Coral accent** (`oklch(55% 0.16 35)`) is the action color for links, focus, progress, and primary actions; the darker light-theme value keeps small text readable.
+- **Deep teal** (`oklch(48% 0.085 170)`) is the secondary navigation and informational signal, with `oklch(89% 0.035 170)` as its soft wash.
+- **Signal yellow** (`oklch(77% 0.13 86)`) is reserved for compact notes and result highlights. **Warm surface / wash** (`oklch(97% 0.026 65)` / `oklch(90% 0.06 48)`) support reflective prompts.
+- **Night paper / night ink** (`oklch(18% 0.028 165)` / `oklch(95% 0.014 82)`) form the dark theme; the dark accent is `oklch(73% 0.14 35)`.
+- Subject colors are local signals only: emotion `oklch(61% 0.16 35)`, relationship `oklch(69% 0.12 78)`, life `oklch(55% 0.07 125)`. They never replace the global accent.
 - Danger red is reserved for data deletion and error feedback.
 
 **Color consistency rule:** use one global accent across a page. Subject colors may identify a catalog group, not a CTA or a separate theme.
@@ -122,6 +134,10 @@ The visual language is sun-warmed paper, deep botanical green, soft peach reflec
 System Chinese and Latin fallbacks are intentional for fast first paint and bilingual parity. Headings use decisive but stable sizes, not a decorative display face. Letter spacing is always `0`. Responsive type changes only at explicit breakpoints and never scales continuously with viewport width. Body copy stays around a readable 65 to 75 character measure. Monospace is limited to counts, question indices, progress counts, and storage summaries.
 
 Avoid all-caps marketing eyebrows as a visual identity. Small labels are functional metadata only. Do not use gradient text, emoji as icons, or monospace as decorative body copy.
+
+Display sizes are set per script, not shared. Han glyphs are square and fill the em box, so a column sized for 认识 / 你自己 is far too narrow for `Yourself`, whose advance is 4.1x its font size; the home hero therefore steps Latin down at 360px, 520px, and 961px, and steps both scripts down in the 961 to 1099px band where the two-column hero leaves only 278px of copy width. Chinese headings wrap with `line-break: strict` and `text-wrap: pretty` so a trailing glyph is never stranded alone, and `balance` is reserved for the short headings where it does not cut a two-character compound in half.
+
+A Chinese heading in a narrow column is sized by the count of glyphs that must share a line, because every han glyph takes exactly one em. 慢一点，也可以看见更多。 is twelve glyphs, so two lines need six of them -- six ems -- per line, and the homepage principles heading therefore steps 2rem, 2.5rem, 3rem, 3.5rem as its column widens rather than holding one desktop size; below the fit, the wrap strands a single glyph and its period on a third line. When a heading is measured this way, its column must also stop narrowing: a `vw`-based gutter inside a container that has reached its max width keeps taking space from the column as the viewport grows, which is how the same heading broke correctly at 1280px and incorrectly at 1920px. Cap gutters where the container caps.
 
 ## Layout
 
@@ -155,6 +171,8 @@ Wordmark, optional back context, language, theme, community, and account control
 ### Reflection home
 
 Use two image-led actions with equivalent area, hierarchy, and command clarity. The assessment path leads to `/assessments/`; the journal path leads to `/journal/`. Supporting history and bookmark links remain secondary.
+
+One label per thing. A card carries a single piece of metadata -- its category -- and then its heading; a section carries its heading alone. Stacking a number, a category chip, and an icon eyebrow above a card title makes four labels compete for the reading order the title already owns, and a second `01 / 02` sequence at section level collides with the one on the cards. State each idea once per page: the hero names the two paths, the cards describe them, and the closing principles say what the product will not do -- none of the three repeats another.
 
 ### Assessment catalog
 
@@ -207,6 +225,7 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
 - Do not use AI-purple gradients, glassmorphism, mesh backgrounds, decorative blur, or a fake data dashboard.
 - Do not use map, atlas, coordinate, contour, or route language in new user-facing copy.
 - Do not turn a result into a diagnosis or permanent label.
+- Do not restate a heading in a decorative kicker above it, and do not repeat the same reassurance in more than one place on a page.
 - Do not embed labels, scores, or explanatory text in assessment artwork.
 - Do not add remote stock images, web fonts, third-party analytics, or runtime AI image generation for visual polish.
 - Do not make image ordering drag-only, publish private edits automatically, or present unpublish as deletion.
@@ -220,13 +239,17 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
 
 ```css
 :root {
-  --color-paper: oklch(95.7% 0.025 75);
-  --color-paper-strong: oklch(98.2% 0.015 75);
-  --color-ink: oklch(31% 0.025 150);
-  --color-accent: oklch(50% 0.08 155);
-  --color-accent-ink: oklch(97% 0.018 80);
-  --color-muted-text: oklch(48% 0.02 70);
-  --color-danger: oklch(50% 0.16 25);
+  --color-paper: oklch(96.2% 0.019 82);
+  --color-paper-strong: oklch(99.1% 0.009 84);
+  --color-ink: oklch(24% 0.028 165);
+  --color-accent: oklch(55% 0.16 35);
+  --color-accent-ink: oklch(98% 0.012 84);
+  --color-accent-soft: oklch(91% 0.045 35);
+  --color-teal: oklch(48% 0.085 170);
+  --color-teal-soft: oklch(89% 0.035 170);
+  --color-signal: oklch(77% 0.13 86);
+  --color-muted-text: oklch(46% 0.025 150);
+  --color-danger: oklch(52% 0.16 25);
   --font-display: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-body: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-code: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
@@ -236,7 +259,7 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
   --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem;
   --text-lg: 1.25rem; --text-xl: 1.75rem; --text-2xl: 2.5rem;
   --text-display: 4rem;
-  --radius-control: 0.5rem; --radius-panel: 0.5rem; --radius-pill: 999px;
+  --radius-control: 0.4rem; --radius-panel: 0.65rem; --radius-media: 0.3rem; --radius-pill: 999px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-short: 180ms; --duration-medium: 280ms;
 }
@@ -246,10 +269,14 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
 
 ```css
 @theme {
-  --color-paper: oklch(95.7% 0.025 75);
-  --color-ink: oklch(31% 0.025 150);
-  --color-accent: oklch(50% 0.08 155);
-  --color-muted-foreground: oklch(48% 0.02 70);
+  --color-paper: oklch(96.2% 0.019 82);
+  --color-ink: oklch(24% 0.028 165);
+  --color-accent: oklch(55% 0.16 35);
+  --color-accent-soft: oklch(91% 0.045 35);
+  --color-teal: oklch(48% 0.085 170);
+  --color-teal-soft: oklch(89% 0.035 170);
+  --color-signal: oklch(77% 0.13 86);
+  --color-muted-foreground: oklch(46% 0.025 150);
   --font-display: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-body: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
@@ -257,7 +284,7 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
   --spacing-lg: 2rem; --spacing-xl: 3rem; --spacing-2xl: 4.5rem;
   --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem;
   --text-lg: 1.25rem; --text-xl: 1.75rem; --text-2xl: 2.5rem;
-  --radius-lg: 0.5rem;
+  --radius-lg: 0.65rem;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 ```
@@ -268,10 +295,13 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
 {
   "$schema": "https://design-tokens.github.io/community-group/format/",
   "color": {
-    "paper": { "$value": "oklch(95.7% 0.025 75)", "$type": "color" },
-    "ink": { "$value": "oklch(31% 0.025 150)", "$type": "color" },
-    "accent": { "$value": "oklch(50% 0.08 155)", "$type": "color" },
-    "danger": { "$value": "oklch(50% 0.16 25)", "$type": "color" }
+    "paper": { "$value": "oklch(96.2% 0.019 82)", "$type": "color" },
+    "paper-strong": { "$value": "oklch(99.1% 0.009 84)", "$type": "color" },
+    "ink": { "$value": "oklch(24% 0.028 165)", "$type": "color" },
+    "accent": { "$value": "oklch(55% 0.16 35)", "$type": "color" },
+    "teal": { "$value": "oklch(48% 0.085 170)", "$type": "color" },
+    "signal": { "$value": "oklch(77% 0.13 86)", "$type": "color" },
+    "danger": { "$value": "oklch(52% 0.16 25)", "$type": "color" }
   },
   "font": {
     "display": { "$value": "Segoe UI, PingFang SC, Microsoft YaHei, sans-serif", "$type": "fontFamily" },
@@ -290,18 +320,18 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
 
 ```css
 :root {
-  --background: 95.7% 0.025 75;
-  --foreground: 31% 0.025 150;
-  --card: 98.2% 0.015 75;
-  --card-foreground: 31% 0.025 150;
-  --primary: 50% 0.08 155;
-  --primary-foreground: 97% 0.018 80;
-  --muted: 91% 0.025 150;
-  --muted-foreground: 48% 0.02 70;
-  --destructive: 50% 0.16 25;
-  --border: 86% 0.02 150;
-  --input: 86% 0.02 150;
-  --ring: 50% 0.08 155;
-  --radius: 0.5rem;
+  --background: 96.2% 0.019 82;
+  --foreground: 24% 0.028 165;
+  --card: 99.1% 0.009 84;
+  --card-foreground: 24% 0.028 165;
+  --primary: 55% 0.16 35;
+  --primary-foreground: 98% 0.012 84;
+  --muted: 91% 0.021 165;
+  --muted-foreground: 46% 0.025 150;
+  --destructive: 52% 0.16 25;
+  --border: 89% 0.021 165;
+  --input: 89% 0.021 165;
+  --ring: 55% 0.16 35;
+  --radius: 0.65rem;
 }
 ```

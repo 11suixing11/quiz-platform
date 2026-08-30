@@ -11,8 +11,10 @@ import { cn } from "@/lib/utils";
 
 type Theme = "system" | "light" | "dark";
 
-function initials(name: string) {
-  return Array.from(name.trim()).slice(0, 2).join("").toUpperCase() || "ME";
+// The compact avatar is a 1.25rem circle in the mobile nav. Two Han glyphs are
+// wider than that at any legible size, so it gets a single initial.
+function initials(name: string, count: number) {
+  return Array.from(name.trim()).slice(0, count).join("").toUpperCase() || "ME";
 }
 
 function AccountAvatar({ displayName, avatar, compact = false }: { displayName: string; avatar?: string; compact?: boolean }) {
@@ -20,7 +22,7 @@ function AccountAvatar({ displayName, avatar, compact = false }: { displayName: 
     <span className={cn("atlas-account-avatar", compact && "atlas-account-avatar-compact")} aria-hidden="true">
       {avatar
         ? <Image src={avatar} alt="" width={64} height={64} unoptimized />
-        : <span>{initials(displayName)}</span>}
+        : <span>{initials(displayName, compact ? 1 : 2)}</span>}
     </span>
   );
 }
@@ -103,8 +105,8 @@ export function AppHeader({ backHref, backLabel, section, narrow = false }: { ba
     <header className="atlas-header">
       <div className={cn("atlas-header-inner mx-auto flex w-full items-center gap-4 px-5 sm:px-8", narrow ? "max-w-3xl" : "max-w-6xl")}>
         <div className="flex min-w-0 items-center gap-4">
-          {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true" /><span className="sm:hidden">认识你自己</span><span className="hidden sm:inline">认识你自己 <span className="text-muted-foreground">/</span> Know Yourself</span></Link>}
-          {section && <span className="hidden truncate text-xs font-medium text-muted-foreground sm:inline">{section}</span>}
+          {backHref ? <Link href={backHref} className="atlas-back-link"><ArrowLeft className="size-3.5" aria-hidden="true" /><span>{backLabel ?? (language === "zh" ? "返回" : "Back")}</span></Link> : <Link href="/" className="atlas-wordmark"><span className="atlas-wordmark-mark" aria-hidden="true"><span /></span><span className="atlas-wordmark-copy"><strong>认识你自己</strong><small>Know Yourself</small></span></Link>}
+          {section && <span className="atlas-header-section hidden truncate sm:inline">{section}</span>}
         </div>
         {!narrow && (
           <nav className="atlas-desktop-nav" aria-label={language === "zh" ? "主导航" : "Primary navigation"}>
