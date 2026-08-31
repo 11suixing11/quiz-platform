@@ -27,9 +27,9 @@ body {
 
 .atlas-page-container {
   width: min(100%, var(--layout-max));
-  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
-  padding-top: clamp(2rem, 4vw, 3.5rem);
-  padding-bottom: clamp(6.5rem, 10vw, 8rem);
+  padding-inline: clamp(var(--space-sm), 4vw, var(--space-xl));
+  padding-top: clamp(var(--space-lg), 4vw, var(--space-xl));
+  padding-bottom: var(--space-3xl);
 }
 
 h1,
@@ -84,21 +84,23 @@ textarea {
 
 .atlas-wordmark {
   min-height: 2.75rem;
-  gap: 0.7rem;
+  gap: var(--space-xs);
   color: var(--surface-contrast-ink);
   transition: color var(--duration-short) var(--ease-out), transform var(--duration-short) var(--ease-out);
 }
 
-.atlas-wordmark:hover {
-  color: var(--color-accent-soft);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .atlas-wordmark:hover {
+    color: var(--color-accent-soft);
+    transform: translateY(-1px);
+  }
 }
 
 .atlas-wordmark-mark {
   width: 2rem;
   height: 2rem;
   border: 1px solid color-mix(in oklab, var(--surface-contrast-ink) 45%, transparent);
-  border-radius: 0.35rem;
+  border-radius: var(--radius-media);
   background: var(--color-accent);
   color: var(--color-accent-ink);
 }
@@ -121,7 +123,7 @@ textarea {
 .atlas-wordmark-copy {
   display: inline-flex;
   flex-direction: column;
-  gap: 0.05rem;
+  gap: 0;
   line-height: 1.15;
 }
 
@@ -141,7 +143,7 @@ textarea {
 .atlas-header-section {
   max-width: 16rem;
   border-left: 1px solid color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
-  padding-left: 0.85rem;
+  padding-left: var(--space-xs);
   color: color-mix(in oklab, var(--surface-contrast-ink) 62%, transparent);
   font-size: 0.7rem;
   font-weight: 700;
@@ -153,8 +155,10 @@ textarea {
   font-weight: 750;
 }
 
-.atlas-back-link:hover {
-  color: var(--color-accent-soft);
+@media (hover: hover) {
+  .atlas-back-link:hover {
+    color: var(--color-accent-soft);
+  }
 }
 
 .atlas-desktop-nav {
@@ -165,18 +169,24 @@ textarea {
 
 .atlas-desktop-nav a {
   min-height: 2.6rem;
-  border-radius: 0.3rem;
-  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius-media);
+  padding: var(--space-2xs) var(--space-xs);
   color: color-mix(in oklab, var(--surface-contrast-ink) 62%, transparent);
   font-size: 0.72rem;
   font-weight: 750;
   transition: background-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out);
 }
 
-.atlas-desktop-nav a:hover,
 .atlas-desktop-nav a[aria-current="page"] {
   background: color-mix(in oklab, var(--surface-contrast-ink) 12%, transparent);
   color: var(--surface-contrast-ink);
+}
+
+@media (hover: hover) {
+  .atlas-desktop-nav a:hover {
+    background: color-mix(in oklab, var(--surface-contrast-ink) 12%, transparent);
+    color: var(--surface-contrast-ink);
+  }
 }
 
 .atlas-desktop-nav a[aria-current="page"] {
@@ -188,24 +198,26 @@ textarea {
   color: color-mix(in oklab, var(--surface-contrast-ink) 78%, transparent);
 }
 
-.atlas-header-actions .atlas-icon-link:hover,
-.atlas-header-actions .atlas-preference-control:hover {
-  background: color-mix(in oklab, var(--surface-contrast-ink) 12%, transparent);
-  color: var(--surface-contrast-ink);
+@media (hover: hover) {
+  .atlas-header-actions .atlas-icon-link:hover,
+  .atlas-header-actions .atlas-preference-control:hover {
+    background: color-mix(in oklab, var(--surface-contrast-ink) 12%, transparent);
+    color: var(--surface-contrast-ink);
+  }
 }
 
 .atlas-preference-control {
   min-height: 2.6rem;
   border-color: color-mix(in oklab, var(--surface-contrast-ink) 18%, transparent);
-  border-radius: 0.3rem;
-  padding-inline: 0.7rem;
+  border-radius: var(--radius-media);
+  padding-inline: var(--space-xs);
   font-size: 0.68rem;
 }
 
 .atlas-icon-link {
   min-width: 2.6rem;
   min-height: 2.6rem;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-media);
 }
 
 .atlas-mobile-nav {
@@ -216,14 +228,16 @@ textarea {
 
 .atlas-mobile-nav-link {
   min-height: 3.35rem;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-media);
   color: color-mix(in oklab, var(--surface-contrast-ink) 63%, transparent);
   font-size: 0.62rem;
 }
 
-.atlas-mobile-nav-link:hover {
-  background: color-mix(in oklab, var(--surface-contrast-ink) 10%, transparent);
-  color: var(--surface-contrast-ink);
+@media (hover: hover) {
+  .atlas-mobile-nav-link:hover {
+    background: color-mix(in oklab, var(--surface-contrast-ink) 10%, transparent);
+    color: var(--surface-contrast-ink);
+  }
 }
 
 .atlas-mobile-nav-link[aria-current="page"] {
@@ -231,29 +245,66 @@ textarea {
   color: var(--color-accent-ink);
 }
 
-/* Controls */
+/* Controls. Five states each -- default, hover, focus-visible, active, disabled
+ * -- and the hit target never falls under 44px. The 2px transparent outline is
+ * a reserved slot: the focus ring paints into space the box already allowed for,
+ * so nothing moves when you tab through. */
 .atlas-primary-action,
 .atlas-secondary-action,
 .atlas-danger-action {
-  min-height: 2.85rem;
-  border-radius: 0.35rem;
-  padding: 0.72rem 1rem;
+  min-height: 3rem;
+  border-radius: var(--radius-control);
+  padding: var(--space-xs) var(--space-sm);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0;
   white-space: nowrap;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.atlas-primary-action:focus-visible,
+.atlas-secondary-action:focus-visible,
+.atlas-danger-action:focus-visible,
+.atlas-text-link:focus-visible,
+.atlas-inline-action:focus-visible,
+.atlas-text-button:focus-visible {
+  outline-color: var(--color-accent);
 }
 
 .atlas-primary-action {
   background: var(--color-accent);
   color: var(--color-accent-ink);
-  box-shadow: 0 0.35rem 0 color-mix(in oklab, var(--color-accent) 38%, transparent);
+  box-shadow: 0 var(--space-3xs) 0 color-mix(in oklab, var(--color-accent) 38%, transparent);
 }
 
-.atlas-primary-action:hover {
-  background: color-mix(in oklab, var(--color-accent) 88%, var(--ink));
-  color: var(--color-accent-ink);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .atlas-primary-action:hover {
+    background: color-mix(in oklab, var(--color-accent) 88%, var(--ink));
+    color: var(--color-accent-ink);
+    transform: translateY(-2px);
+  }
+}
+
+/* Pressed: the button sits down onto its own offset shadow instead of sliding. */
+.atlas-primary-action:active {
+  background: color-mix(in oklab, var(--color-accent) 78%, var(--ink));
+  box-shadow: 0 0 0 color-mix(in oklab, var(--color-accent) 38%, transparent);
+  transform: translateY(2px);
+}
+
+/* Disabled. A 35% wash over the accent fill left the label at nearly the same
+ * value as the paint under it, with the offset shadow still floating below the
+ * dead button. Flatten it: no fill, no shadow, ink dropped to a readable
+ * secondary weight, and the inset rule keeps the box the same size. */
+.atlas-primary-action:disabled,
+.atlas-primary-action[aria-disabled="true"] {
+  background: color-mix(in oklab, var(--ink) 6%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 16%, transparent);
+  color: color-mix(in oklab, var(--ink) 50%, transparent);
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .atlas-secondary-action {
@@ -262,11 +313,20 @@ textarea {
   color: var(--ink);
 }
 
-.atlas-secondary-action:hover {
+@media (hover: hover) {
+  .atlas-secondary-action:hover {
+    border-color: var(--color-teal);
+    background: var(--color-teal-soft);
+    color: var(--color-teal);
+    transform: translateY(-2px);
+  }
+}
+
+.atlas-secondary-action:active {
   border-color: var(--color-teal);
-  background: var(--color-teal-soft);
+  background: color-mix(in oklab, var(--color-teal-soft) 82%, var(--ink) 8%);
   color: var(--color-teal);
-  transform: translateY(-2px);
+  transform: translateY(1px);
 }
 
 .atlas-danger-action {
@@ -274,24 +334,113 @@ textarea {
   color: var(--danger);
 }
 
-.atlas-danger-action:hover {
-  background: color-mix(in oklab, var(--danger) 10%, transparent);
+@media (hover: hover) {
+  .atlas-danger-action:hover {
+    background: color-mix(in oklab, var(--danger) 10%, transparent);
+  }
+}
+
+.atlas-danger-action:active {
+  background: color-mix(in oklab, var(--danger) 18%, transparent);
+  transform: translateY(1px);
+}
+
+.atlas-secondary-action:disabled,
+.atlas-secondary-action[aria-disabled="true"],
+.atlas-danger-action:disabled,
+.atlas-danger-action[aria-disabled="true"],
+.atlas-text-link:disabled,
+.atlas-inline-action:disabled,
+.atlas-text-button:disabled,
+.atlas-filter:disabled,
+.atlas-card-save:disabled {
+  background: transparent;
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .atlas-text-link,
 .atlas-inline-action,
 .atlas-text-button {
-  min-height: 2.6rem;
+  min-height: 2.75rem;
   color: var(--color-teal);
   font-size: 0.74rem;
   font-weight: 800;
   white-space: nowrap;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
-.atlas-text-link:hover,
-.atlas-inline-action:hover,
-.atlas-text-button:hover {
-  color: var(--color-accent);
+.atlas-text-link:active,
+.atlas-inline-action:active,
+.atlas-text-button:active {
+  color: color-mix(in oklab, var(--color-accent) 82%, var(--ink));
+}
+
+/* The rest of the interactive surface -- cards, nav items, filters, icon
+ * buttons -- gets the same reserved ring slot and a pressed state, so the
+ * keyboard path through a page reads as one path and a tap has a bottom to it. */
+.atlas-wordmark,
+.atlas-back-link,
+.atlas-desktop-nav a,
+.atlas-header-actions .atlas-icon-link,
+.atlas-header-actions .atlas-preference-control,
+.atlas-mobile-nav-link,
+.home-path,
+.home-continue-strip nav a,
+.assessment-catalog-intro-copy nav a,
+.atlas-filter,
+.atlas-test-card,
+.atlas-card-save,
+.journal-library-card {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.atlas-wordmark:focus-visible,
+.atlas-back-link:focus-visible,
+.atlas-desktop-nav a:focus-visible,
+.atlas-header-actions .atlas-icon-link:focus-visible,
+.atlas-header-actions .atlas-preference-control:focus-visible,
+.atlas-mobile-nav-link:focus-visible,
+.home-path:focus-visible,
+.home-continue-strip nav a:focus-visible,
+.assessment-catalog-intro-copy nav a:focus-visible,
+.atlas-filter:focus-visible,
+.atlas-test-card:focus-visible,
+.atlas-card-save:focus-visible,
+.journal-library-card:focus-visible {
+  outline-color: var(--color-accent);
+}
+
+.atlas-back-link:active,
+.atlas-desktop-nav a:active,
+.atlas-header-actions .atlas-icon-link:active,
+.atlas-header-actions .atlas-preference-control:active,
+.atlas-mobile-nav-link:active,
+.home-path:active,
+.home-continue-strip nav a:active,
+.assessment-catalog-intro-copy nav a:active,
+.atlas-filter:active,
+.atlas-test-card:active,
+.atlas-card-save:active,
+.journal-library-card:active {
+  transform: translateY(1px);
+}
+
+/* 44px is the floor for anything a thumb has to hit. */
+.atlas-desktop-nav a,
+.atlas-back-link {
+  min-height: 2.75rem;
+}
+
+@media (hover: hover) {
+  .atlas-text-link:hover,
+  .atlas-inline-action:hover,
+  .atlas-text-button:hover {
+    color: var(--color-accent);
+  }
 }
 
 .atlas-section-kicker {
@@ -305,16 +454,16 @@ textarea {
 
 .atlas-section-title {
   max-width: 50rem;
-  font-size: 2.6rem;
+  font-size: clamp(1.75rem, 1.15rem + 2vw, 2.75rem);
   font-weight: 780;
-  line-height: 0.98;
+  line-height: 1.05;
 }
 
 .atlas-meta-chip {
   border: 1px solid color-mix(in oklab, var(--ink) 17%, transparent);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: color-mix(in oklab, var(--paper-strong) 70%, transparent);
-  padding: 0.38rem 0.65rem;
+  padding: var(--space-2xs) var(--space-xs);
   color: color-mix(in oklab, var(--ink) 68%, transparent);
   font-size: 0.68rem;
   font-weight: 700;
@@ -330,7 +479,7 @@ textarea {
 .journal-comment-form textarea,
 .community-comment-form textarea {
   border: 1px solid color-mix(in oklab, var(--ink) 24%, transparent);
-  border-radius: 0.35rem;
+  border-radius: var(--radius-media);
   background: var(--paper-strong);
   color: var(--ink);
 }
@@ -357,8 +506,8 @@ textarea {
 .home-hero {
   display: grid;
   align-items: end;
-  gap: clamp(2.5rem, 6vw, 6rem);
-  padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  gap: clamp(var(--space-lg), 6vw, var(--space-2xl));
+  padding-bottom: clamp(var(--space-lg), 5vw, var(--space-2xl));
 }
 
 .home-hero-copy {
@@ -400,7 +549,7 @@ textarea {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   align-items: start;
-  gap: clamp(0.8rem, 2vw, 1.5rem);
+  gap: clamp(var(--space-xs), 2vw, var(--space-md));
 }
 
 .home-path {
@@ -409,7 +558,7 @@ textarea {
   flex-direction: column;
   overflow: hidden;
   border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
-  border-radius: 0.65rem;
+  border-radius: var(--radius-panel);
   background: var(--paper-strong);
   color: var(--ink);
   box-shadow: var(--shadow-soft);
@@ -417,13 +566,15 @@ textarea {
 }
 
 .home-path--journal {
-  margin-top: clamp(2rem, 8vw, 6rem);
+  margin-top: clamp(var(--space-lg), 8vw, var(--space-2xl));
 }
 
-.home-path:hover {
-  border-color: var(--color-teal);
-  box-shadow: var(--shadow-lift);
-  transform: translateY(-0.45rem);
+@media (hover: hover) {
+  .home-path:hover {
+    border-color: var(--color-teal);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-0.45rem);
+  }
 }
 
 .home-path-media {
@@ -445,8 +596,10 @@ textarea {
   transition: transform 0.55s var(--ease-out);
 }
 
-.home-path:hover .quiz-visual-image {
-  transform: scale(1.035);
+@media (hover: hover) {
+  .home-path:hover .quiz-visual-image {
+    transform: scale(1.035);
+  }
 }
 
 /* One chip per card: the card's only label sits in the top-left corner of the
@@ -454,14 +607,14 @@ textarea {
 .home-path-media-label {
   position: absolute;
   z-index: 2;
-  top: 0.8rem;
-  left: 0.8rem;
+  top: var(--space-xs);
+  left: var(--space-xs);
   display: inline-flex;
   min-height: 1.8rem;
   align-items: center;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-media);
   background: var(--paper);
-  padding: 0.3rem 0.5rem;
+  padding: var(--space-3xs) var(--space-2xs);
   color: var(--ink);
   font-family: var(--font-code);
   font-size: 0.62rem;
@@ -472,7 +625,7 @@ textarea {
   display: flex;
   min-height: 11.5rem;
   flex-direction: column;
-  padding: clamp(1.1rem, 2.2vw, 1.8rem);
+  padding: clamp(var(--space-sm), 2.2vw, var(--space-lg));
 }
 
 .home-path-body h2 {
@@ -483,7 +636,7 @@ textarea {
 
 .home-path-body p {
   max-width: 31rem;
-  margin-top: 0.8rem;
+  margin-top: var(--space-xs);
   color: color-mix(in oklab, var(--ink) 62%, transparent);
   font-size: 0.82rem;
   line-height: 1.7;
@@ -492,7 +645,7 @@ textarea {
 .home-path-action {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--space-2xs);
   margin-top: auto;
   padding-top: 1.5rem;
   color: var(--color-teal);
@@ -506,8 +659,10 @@ textarea {
   transition: transform var(--duration-short) var(--ease-out);
 }
 
-.home-path:hover .home-path-action svg {
-  transform: translate(0.15rem, -0.15rem);
+@media (hover: hover) {
+  .home-path:hover .home-path-action svg {
+    transform: translate(0.15rem, -0.15rem);
+  }
 }
 
 .home-continue-strip {
@@ -528,7 +683,7 @@ textarea {
 }
 
 .home-continue-label {
-  gap: 0.55rem;
+  gap: var(--space-2xs);
   color: var(--color-accent);
   font-size: 0.7rem;
   font-weight: 800;
@@ -542,11 +697,11 @@ textarea {
 .home-continue-strip nav {
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0.35rem 1.25rem;
+  gap: var(--space-3xs) var(--space-sm);
 }
 
 .home-continue-strip nav a {
-  gap: 0.4rem;
+  gap: var(--space-2xs);
   min-height: 2.5rem;
   color: color-mix(in oklab, var(--ink) 67%, transparent);
   font-size: 0.72rem;
@@ -554,8 +709,10 @@ textarea {
   white-space: nowrap;
 }
 
-.home-continue-strip nav a:hover {
-  color: var(--color-teal);
+@media (hover: hover) {
+  .home-continue-strip nav a:hover {
+    color: var(--color-teal);
+  }
 }
 
 .home-continue-strip nav svg {
@@ -566,7 +723,7 @@ textarea {
 .home-principles {
   display: grid;
   gap: 2rem;
-  padding-top: clamp(3.5rem, 8vw, 7rem);
+  padding-top: clamp(var(--space-xl), 8vw, var(--space-3xl));
 }
 
 .home-principles-intro h2 {
@@ -585,7 +742,7 @@ textarea {
   grid-template-columns: 3rem minmax(0, 1fr);
   gap: 1rem;
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
-  padding-block: 1.1rem;
+  padding-block: var(--space-sm);
 }
 
 .home-principle-list span {
@@ -609,7 +766,7 @@ textarea {
   width: min(100%, var(--layout-max));
   margin: 0 auto;
   border-top: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
-  padding: 1.2rem clamp(1.25rem, 4vw, 3.5rem) 2rem;
+  padding: var(--space-sm) clamp(var(--space-sm), 4vw, var(--space-xl)) var(--space-lg);
   color: color-mix(in oklab, var(--ink) 58%, transparent);
   font-size: 0.68rem;
 }
@@ -617,7 +774,7 @@ textarea {
 .home-footer > div {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: var(--space-3xs);
 }
 
 .home-footer > div span:first-child {
@@ -628,7 +785,7 @@ textarea {
 .home-footer a {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-3xs);
   /* The 0.68rem footer type gives this link an 18px line box. Pad it out so it
    * is still a comfortable target on a phone. */
   min-height: 2.75rem;
@@ -650,9 +807,9 @@ textarea {
 
 .assessment-catalog-intro {
   display: grid;
-  gap: 1.6rem;
-  margin-inline: calc(clamp(1.25rem, 4vw, 3.5rem) * -1);
-  padding: clamp(2.5rem, 6vw, 5.5rem) clamp(1.25rem, 4vw, 3.5rem) clamp(2.5rem, 5vw, 4.5rem);
+  gap: var(--space-md);
+  margin-inline: calc(clamp(var(--space-sm), 4vw, var(--space-xl)) * -1);
+  padding: clamp(var(--space-lg), 5vw, var(--space-xl)) clamp(var(--space-sm), 4vw, var(--space-xl)) clamp(var(--space-xl), 6vw, var(--space-2xl));
   background: var(--surface-contrast);
   color: var(--surface-contrast-ink);
 }
@@ -673,7 +830,7 @@ textarea {
 .assessment-catalog-intro-copy {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: var(--space-sm);
   max-width: 35rem;
   color: color-mix(in oklab, var(--surface-contrast-ink) 72%, transparent);
   font-size: 0.92rem;
@@ -686,13 +843,13 @@ textarea {
 .assessment-catalog-intro-copy nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
+  gap: var(--space-2xs) var(--space-sm);
 }
 
 .assessment-catalog-intro-copy nav a {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-3xs);
   min-height: 2.5rem;
   color: var(--color-signal);
   font-size: 0.72rem;
@@ -700,8 +857,10 @@ textarea {
   white-space: nowrap;
 }
 
-.assessment-catalog-intro-copy nav a:hover {
-  color: var(--paper);
+@media (hover: hover) {
+  .assessment-catalog-intro-copy nav a:hover {
+    color: var(--paper);
+  }
 }
 
 .assessment-catalog-intro-copy nav svg {
@@ -712,10 +871,10 @@ textarea {
 .assessment-catalog-boundary {
   display: flex;
   align-items: flex-start;
-  gap: 0.7rem;
+  gap: var(--space-xs);
   margin-top: 1.5rem;
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
-  padding-bottom: 1.1rem;
+  padding-bottom: var(--space-sm);
   color: color-mix(in oklab, var(--ink) 58%, transparent);
   font-size: 0.71rem;
 }
@@ -732,17 +891,17 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 1.4rem;
+  margin-top: var(--space-md);
   border: 1px solid color-mix(in oklab, var(--color-accent) 40%, transparent);
-  border-radius: 0.55rem;
+  border-radius: var(--radius-panel);
   background: var(--color-accent-soft);
-  padding: 1rem 1.1rem;
+  padding: var(--space-sm);
 }
 
 .assessment-return > div {
   display: grid;
   min-width: 0;
-  gap: 0.2rem;
+  gap: var(--space-3xs);
 }
 
 .assessment-return p,
@@ -761,7 +920,7 @@ textarea {
 .assessment-return > a {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-3xs);
   color: var(--color-warm-ink);
   font-size: 0.72rem;
   font-weight: 800;
@@ -774,18 +933,18 @@ textarea {
 }
 
 .assessment-catalog-library {
-  padding-top: clamp(3rem, 7vw, 6rem);
+  padding-top: clamp(var(--space-xl), 7vw, var(--space-2xl));
 }
 
 .catalog-explorer-heading {
   display: grid;
   gap: 1.5rem;
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
-  padding-bottom: 1.3rem;
+  padding-bottom: var(--space-md);
 }
 
 .catalog-explorer-heading h2 {
-  margin-top: 0.65rem;
+  margin-top: var(--space-xs);
   font-size: 1.8rem;
   font-weight: 780;
   line-height: 1;
@@ -812,39 +971,46 @@ textarea {
   display: flex;
   min-width: 0;
   align-items: flex-start;
-  gap: 0.6rem;
+  gap: var(--space-2xs);
 }
 
 .catalog-topic-filter > svg {
   width: 1rem;
   height: 1rem;
   flex: none;
-  margin-top: 0.45rem;
+  margin-top: var(--space-2xs);
   color: var(--color-accent);
 }
 
 .catalog-topic-filter [role="group"] {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: var(--space-3xs);
 }
 
 .atlas-filter {
   min-height: 2.35rem;
   border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
-  border-radius: 999px;
-  padding: 0.45rem 0.72rem;
+  border-radius: var(--radius-pill);
+  padding: var(--space-2xs) var(--space-xs);
   color: color-mix(in oklab, var(--ink) 64%, transparent);
   font-size: 0.68rem;
   font-weight: 750;
   white-space: nowrap;
 }
 
-.atlas-filter:hover,
 .atlas-filter-active {
   border-color: var(--color-teal);
   background: var(--color-teal-soft);
   color: var(--color-teal);
+}
+
+@media (hover: hover) {
+  .atlas-filter:hover {
+    border-color: var(--color-teal);
+    background: var(--color-teal-soft);
+    color: var(--color-teal);
+  }
 }
 
 .catalog-length-filter {
@@ -866,9 +1032,9 @@ textarea {
   min-height: 2.35rem;
   max-width: 9rem;
   border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
-  border-radius: 0.3rem;
+  border-radius: var(--radius-media);
   background: var(--paper-strong);
-  padding: 0.4rem 0.55rem;
+  padding: var(--space-2xs);
   color: var(--ink);
   font-size: 0.68rem;
 }
@@ -895,17 +1061,19 @@ textarea {
   min-height: 0;
   overflow: hidden;
   border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
-  border-radius: 0.55rem;
+  border-radius: var(--radius-panel);
   background: var(--paper-strong);
   box-shadow: none;
   animation: none;
   transition: transform var(--duration-medium) var(--ease-out), border-color var(--duration-medium) var(--ease-out), box-shadow var(--duration-medium) var(--ease-out);
 }
 
-.atlas-test-card:hover {
-  border-color: var(--color-teal);
-  box-shadow: var(--shadow-soft);
-  transform: translateY(-0.3rem);
+@media (hover: hover) {
+  .atlas-test-card:hover {
+    border-color: var(--color-teal);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-0.3rem);
+  }
 }
 
 .atlas-test-card-link {
@@ -925,17 +1093,19 @@ textarea {
   transition: transform 0.45s var(--ease-out);
 }
 
-.atlas-test-card:hover .atlas-test-card-visual .quiz-visual-image {
-  transform: scale(1.025);
+@media (hover: hover) {
+  .atlas-test-card:hover .atlas-test-card-visual .quiz-visual-image {
+    transform: scale(1.025);
+  }
 }
 
 .atlas-test-card-body {
-  gap: 1.1rem;
-  padding: 1.15rem;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
 }
 
 .atlas-category-mark {
-  border-radius: 0.35rem !important;
+  border-radius: var(--radius-media) !important;
   border-color: color-mix(in oklab, var(--color-accent) 35%, transparent) !important;
   background: var(--color-accent-soft);
   color: var(--color-accent) !important;
@@ -969,7 +1139,7 @@ textarea {
 
 .atlas-test-card-body > div:last-child {
   border-top-color: color-mix(in oklab, var(--ink) 17%, transparent);
-  padding-top: 0.85rem;
+  padding-top: var(--space-xs);
 }
 
 /* When the card gets narrow, let the meta row stack instead of breaking short
@@ -990,8 +1160,8 @@ textarea {
 }
 
 .atlas-card-save {
-  top: 0.65rem;
-  right: 0.65rem;
+  top: var(--space-xs);
+  right: var(--space-xs);
   min-width: 2.45rem;
   min-height: 2.45rem;
   border: 1px solid color-mix(in oklab, var(--paper) 55%, var(--ink));
@@ -999,9 +1169,11 @@ textarea {
   color: var(--color-teal);
 }
 
-.atlas-card-save:hover {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+@media (hover: hover) {
+  .atlas-card-save:hover {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
 }
 
 .atlas-index,
@@ -1016,7 +1188,7 @@ textarea {
 .atlas-empty-state {
   min-height: 16rem;
   border: 1px dashed color-mix(in oklab, var(--ink) 26%, transparent);
-  border-radius: 0.55rem;
+  border-radius: var(--radius-panel);
   background: color-mix(in oklab, var(--paper-strong) 62%, transparent);
 }
 
@@ -1029,18 +1201,28 @@ textarea {
 }
 
 .assessment-detail-enter > .grid {
-  gap: clamp(2rem, 6vw, 6rem);
+  gap: clamp(var(--space-lg), 6vw, var(--space-2xl));
 }
 
 .assessment-detail-enter h1 {
-  font-size: 3rem;
+  font-size: clamp(2.25rem, 1.5rem + 2.6vw, 3.75rem);
   font-weight: 800;
-  line-height: 0.98;
+  line-height: 1.02;
+}
+
+/* The left column runs several screens long while the panel is about one screen,
+ * which left ~650px of empty column beside the brief. Sticky spends that space:
+ * the sample questions stay next to whatever the reader is reading. */
+@media (min-width: 1024px) {
+  .assessment-detail-enter .atlas-detail-panel {
+    position: sticky;
+    top: var(--space-md);
+  }
 }
 
 .atlas-detail-panel {
   border: 0;
-  border-radius: 0.65rem;
+  border-radius: var(--radius-panel);
   background: var(--surface-contrast);
   color: var(--surface-contrast-ink);
   box-shadow: var(--shadow-soft);
@@ -1064,27 +1246,30 @@ textarea {
 .atlas-assessment-brief {
   border-top: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
-  padding-block: 1.6rem;
+  padding-block: var(--space-md);
 }
 
 .atlas-assessment-brief-heading h2 {
-  margin-top: 0.55rem;
+  margin-top: var(--space-2xs);
   font-size: 1.6rem;
   font-weight: 780;
 }
 
 .atlas-assessment-brief-grid {
   display: grid;
-  gap: 0.8rem;
-  margin-top: 1.4rem;
+  /* Three notes in a two-column grid left the third one alone next to a hole.
+   * Auto-fit lays them out in one row where there is room and reflows when not. */
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-xs) var(--space-md);
+  margin-top: var(--space-md);
 }
 
 .atlas-assessment-brief-item {
   display: grid;
   grid-template-columns: 1.4rem minmax(0, 1fr);
-  gap: 0.65rem;
+  gap: var(--space-xs);
   border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
-  padding-top: 0.85rem;
+  padding-top: var(--space-xs);
 }
 
 .atlas-assessment-brief-item > svg {
@@ -1106,32 +1291,34 @@ textarea {
 
 .quiz-main {
   max-width: 54rem;
-  padding-top: clamp(2rem, 5vw, 4.5rem);
+  padding-top: clamp(var(--space-lg), 5vw, var(--space-2xl));
 }
 
 .quiz-heading-row {
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--space-sm);
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
-  padding-bottom: 1rem;
+  padding-bottom: var(--space-sm);
 }
 
 .quiz-main-title {
   max-width: 44rem;
+  color: var(--ink);
   font-size: 1.6rem;
   font-weight: 780;
+  letter-spacing: 0;
   line-height: 1;
 }
 
 .quiz-progress-block {
-  margin-top: 1rem;
+  margin-top: var(--space-sm);
 }
 
 .atlas-progress-route {
-  height: 0.45rem;
-  border-radius: 999px;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
   background: color-mix(in oklab, var(--ink) 12%, transparent);
 }
 
@@ -1142,8 +1329,8 @@ textarea {
 .quiz-progress-meta {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  margin-top: 0.55rem;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xs);
   color: color-mix(in oklab, var(--ink) 48%, transparent);
   font-size: 0.68rem;
 }
@@ -1152,15 +1339,15 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
-  margin-top: 0.75rem;
+  gap: var(--space-3xs);
+  margin-top: var(--space-xs);
   color: var(--color-teal);
   font-size: 0.66rem;
 }
 
 .quiz-draft-status-dot {
-  width: 0.4rem;
-  height: 0.4rem;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: 50%;
   background: currentColor;
 }
@@ -1169,55 +1356,111 @@ textarea {
   color: var(--color-accent);
 }
 
+/* The question and the choices under it are the whole screen. The stage keeps a
+ * stable floor so the page does not jump between a two-option and a five-option
+ * question, but the floor is the height the choices need -- not a 480px well
+ * with the answers stranded at the top of it. */
 .quiz-question-area {
-  min-height: 30rem;
-  padding-block: clamp(2.5rem, 7vw, 5.5rem) 2.5rem;
+  min-height: 22rem;
+  margin-top: var(--space-lg);
+  border-top: 1px solid color-mix(in oklab, var(--ink) 11%, transparent);
+  padding-block: var(--space-xl) var(--space-lg);
 }
 
 .quiz-question-stage {
   max-width: 48rem;
 }
 
+/* 64px of question over 15px of answer put the decoration above the decision.
+ * The question stays the largest thing on the screen, at a size the choices can
+ * still be read against: 40px against 16px, not 64 against 15. */
 .quiz-question-title {
-  margin-top: 1rem;
-  font-size: 2.1rem;
-  font-weight: 780;
-  line-height: 0.98;
+  max-width: 35rem;
+  color: var(--ink);
+  font-size: clamp(1.75rem, 1.1rem + 2.2vw, 2.5rem);
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+.quiz-question-title--long {
+  font-size: clamp(1.55rem, 1rem + 1.9vw, 2.2rem);
+}
+
+.quiz-question-title--compact {
+  max-width: 40rem;
+  font-size: clamp(1.4rem, 0.95rem + 1.6vw, 1.9rem);
+  line-height: 1.25;
 }
 
 .quiz-answer-group {
-  margin-top: 2.25rem;
+  margin-top: var(--space-lg);
 }
 
-.quiz-answer-prompt {
-  color: color-mix(in oklab, var(--ink) 52%, transparent);
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
+/* Two to five choices, each one a target rather than a full-width band: the
+ * track is as wide as the longest label needs and no wider, so a four-glyph
+ * answer is not stretched across 760px of paper. Long sentence options wrap
+ * inside 36rem, which keeps the measure under 75 characters. */
 .quiz-answer-list {
   display: grid;
-  gap: 0.65rem;
-  margin-top: 0.8rem;
+  grid-template-columns: minmax(min(100%, 18rem), max-content);
+  gap: var(--space-2xs);
+  margin-top: var(--space-xs);
+  max-width: 36rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
-.atlas-answer-option {
-  min-height: 4.25rem;
+.quiz-answer-list .atlas-answer-option {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  gap: var(--space-xs);
   border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
-  border-radius: 0.45rem;
+  border-radius: var(--radius-control);
   background: var(--paper-strong);
+  padding: var(--space-xs) var(--space-sm);
   color: var(--ink);
-  padding: 0.9rem 1rem;
+  font-size: var(--text-md);
+  font-weight: 550;
+  line-height: 1.45;
+  text-align: left;
+  /* Reserved ring slot: the outline is already 2px, so focus paints into space
+   * the box has already allowed for and nothing moves. */
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   transition: transform var(--duration-short) var(--ease-out), border-color var(--duration-short) var(--ease-out), background-color var(--duration-short) var(--ease-out);
 }
 
-.atlas-answer-option:hover {
-  border-color: var(--color-teal);
-  background: var(--color-teal-soft);
-  transform: translateX(0.25rem);
+@media (hover: hover) {
+  .quiz-answer-list .atlas-answer-option:hover {
+    border-color: var(--color-teal);
+    background: var(--color-teal-soft);
+    transform: translateX(0.25rem);
+  }
 }
 
-.atlas-answer-selected {
+.quiz-answer-list .atlas-answer-option:focus-visible {
+  border-color: var(--color-accent);
+  outline-color: var(--color-accent);
+}
+
+.quiz-answer-list .atlas-answer-option:active {
+  border-color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent-soft) 84%, var(--ink) 8%);
+  transform: translateY(1px);
+}
+
+.quiz-answer-list .atlas-answer-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.quiz-answer-list .atlas-answer-option.atlas-answer-selected {
   border-color: var(--color-accent);
   background: var(--color-accent-soft);
   color: var(--ink);
@@ -1226,36 +1469,51 @@ textarea {
 .atlas-answer-key {
   width: 2rem;
   height: 2rem;
-  border-color: color-mix(in oklab, var(--ink) 28%, transparent);
-  border-radius: 0.3rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 28%, transparent);
+  border-radius: var(--radius-media);
+  opacity: 1;
   background: color-mix(in oklab, var(--paper) 58%, transparent);
   color: var(--color-teal);
   font-size: 0.68rem;
   font-weight: 800;
 }
 
+.quiz-answer-list .atlas-answer-selected .atlas-answer-key {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  opacity: 1;
+}
+
 .quiz-actions {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--space-xs);
+  margin-top: var(--space-lg);
   border-top: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
-  padding-top: 1rem;
+  padding-top: var(--space-sm);
 }
 
 .quiz-actions > * {
   min-width: 0;
 }
 
+.quiz-actions .atlas-primary-action,
+.quiz-actions .atlas-secondary-action {
+  min-height: 3rem;
+  border-radius: var(--radius-control);
+}
+
 .atlas-resume-panel {
   border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
-  border-radius: 0.65rem;
+  border-radius: var(--radius-panel);
   background: var(--paper-strong);
   box-shadow: var(--shadow-soft);
 }
 
 .atlas-resume-symbol {
   border: 0;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-media);
   background: var(--color-accent-soft);
   color: var(--color-accent);
 }
@@ -1267,7 +1525,7 @@ textarea {
 
 .atlas-result-intro-block {
   border: 0;
-  border-radius: 0.65rem;
+  border-radius: var(--radius-panel);
   background: var(--surface-contrast);
   color: var(--surface-contrast-ink);
   padding: clamp(1rem, 2vw, 1.5rem);
@@ -1279,7 +1537,7 @@ textarea {
 
 .atlas-result-identity {
   border: 1px solid color-mix(in oklab, var(--surface-contrast-ink) 22%, transparent);
-  border-radius: 0.45rem;
+  border-radius: var(--radius-control);
   background: color-mix(in oklab, var(--surface-contrast-ink) 8%, transparent);
   color: var(--surface-contrast-ink);
 }
@@ -1321,11 +1579,18 @@ textarea {
   border-color: color-mix(in oklab, var(--surface-contrast-ink) 28%, transparent);
 }
 
-.atlas-result-intro-block .quiz-visual-feedback button:hover,
 .atlas-result-intro-block .quiz-visual-feedback button[aria-pressed="true"] {
   border-color: var(--color-signal);
   background: color-mix(in oklab, var(--color-signal) 18%, transparent);
   color: var(--color-signal);
+}
+
+@media (hover: hover) {
+  .atlas-result-intro-block .quiz-visual-feedback button:hover {
+    border-color: var(--color-signal);
+    background: color-mix(in oklab, var(--color-signal) 18%, transparent);
+    color: var(--color-signal);
+  }
 }
 
 .atlas-result-intro-block .quiz-visual-feedback > p {
@@ -1333,7 +1598,7 @@ textarea {
 }
 
 .atlas-result-panel {
-  border-radius: 0.55rem;
+  border-radius: var(--radius-panel);
   background: var(--paper-strong);
   box-shadow: var(--shadow-soft);
 }
@@ -1346,7 +1611,7 @@ textarea {
 .journal-library-page .atlas-page-container,
 .community-page,
 .journal-reading-container {
-  padding-top: clamp(2rem, 5vw, 4rem);
+  padding-top: clamp(var(--space-lg), 5vw, var(--space-xl));
 }
 
 .journal-library-header h1,
@@ -1413,13 +1678,13 @@ html[lang="zh-CN"] .community-intro h1 {
 
 .journal-library-header {
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
-  padding-bottom: 1.6rem;
+  padding-bottom: var(--space-md);
 }
 
 .journal-library-header p,
 .community-intro > div > p {
   max-width: 38rem;
-  margin-top: 0.9rem;
+  margin-top: var(--space-sm);
   color: color-mix(in oklab, var(--ink) 62%, transparent);
   font-size: 0.9rem;
 }
@@ -1451,7 +1716,7 @@ html[lang="zh-CN"] .community-intro h1 {
 .journal-empty-state {
   min-height: 20rem;
   border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
-  border-radius: 0.6rem;
+  border-radius: var(--radius-panel);
   background: var(--surface-contrast);
   color: var(--surface-contrast-ink);
   box-shadow: var(--shadow-soft);
@@ -1503,15 +1768,17 @@ html[lang="zh-CN"] .community-intro h1 {
 .journal-library-card {
   overflow: hidden;
   border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
-  border-radius: 0.55rem;
+  border-radius: var(--radius-panel);
   background: var(--paper-strong);
   box-shadow: none;
 }
 
-.journal-library-card:hover {
-  border-color: var(--color-teal);
-  box-shadow: var(--shadow-soft);
-  transform: translateY(-0.25rem);
+@media (hover: hover) {
+  .journal-library-card:hover {
+    border-color: var(--color-teal);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-0.25rem);
+  }
 }
 
 .journal-library-cover {
@@ -1519,7 +1786,7 @@ html[lang="zh-CN"] .community-intro h1 {
 }
 
 .journal-library-copy {
-  padding: 1.1rem;
+  padding: var(--space-sm);
 }
 
 .journal-library-copy h2 {
@@ -1546,7 +1813,7 @@ html[lang="zh-CN"] .community-intro h1 {
 .community-state,
 .community-composer {
   border-color: color-mix(in oklab, var(--ink) 20%, transparent);
-  border-radius: 0.55rem;
+  border-radius: var(--radius-panel);
   background: var(--paper-strong);
 }
 
@@ -1554,8 +1821,10 @@ html[lang="zh-CN"] .community-intro h1 {
   box-shadow: none;
 }
 
-.community-post:hover {
-  border-color: color-mix(in oklab, var(--color-teal) 62%, transparent);
+@media (hover: hover) {
+  .community-post:hover {
+    border-color: color-mix(in oklab, var(--color-teal) 62%, transparent);
+  }
 }
 
 .community-assessment a,
@@ -1574,7 +1843,7 @@ html[lang="zh-CN"] .community-intro h1 {
 
 .atlas-history-row {
   border-bottom-color: color-mix(in oklab, var(--ink) 17%, transparent);
-  padding-block: 1.15rem;
+  padding-block: var(--space-sm);
 }
 
 /* The import row pairs a two-line label with a tall control stack (two mode
@@ -1614,9 +1883,17 @@ html[lang="zh-CN"] .community-intro h1 {
   color: inherit;
 }
 
-/* Dark mode uses the same hierarchy, not a second visual language */
+/* Dark mode uses the same hierarchy, not a second visual language, and it is
+ * three layers deep. Cards below used to be painted --paper, which in dark mode
+ * *is* the page colour, so a card was a 1px outline around nothing and the cream
+ * illustrations inside it were the brightest thing on the screen. */
 .dark .atlas-page,
-.dark .atlas-page-container,
+.dark .atlas-page-container {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Cards and panels sit one step up from the page. */
 .dark .home-path,
 .dark .atlas-test-card,
 .dark .atlas-result-panel,
@@ -1625,7 +1902,12 @@ html[lang="zh-CN"] .community-intro h1 {
 .dark .community-post,
 .dark .community-state,
 .dark .community-composer,
-.dark .atlas-empty-state,
+.dark .atlas-empty-state {
+  background: var(--paper-strong);
+  color: var(--ink);
+}
+
+/* Fields stay at page level, recessed below the card carrying them. */
 .dark .atlas-account-input,
 .dark .journal-editor-section input,
 .dark .journal-editor-section textarea,
@@ -1637,6 +1919,13 @@ html[lang="zh-CN"] .community-intro h1 {
 .dark .community-comment-form textarea {
   background: var(--paper);
   color: var(--ink);
+}
+
+/* Cream-toned artwork on an 18% page reads as a lightbox: the illustration was
+ * the brightest object on the screen, brighter than any heading. A small step
+ * down keeps it inside the card's value range. */
+.dark .quiz-visual-image {
+  filter: brightness(0.9) saturate(0.96);
 }
 
 .dark .atlas-header,
@@ -1701,10 +1990,6 @@ html[lang="zh-CN"] .community-intro h1 {
 }
 
 @media (min-width: 800px) {
-  .atlas-section-title {
-    font-size: 4.5rem;
-  }
-
   .atlas-desktop-nav {
     display: flex;
   }
@@ -1744,7 +2029,7 @@ html[lang="zh-CN"] .community-intro h1 {
      * intro column past that point: its text width fell from 347px at 1280 to
      * 328px at 1920, which pushed the heading to three lines on the widest
      * screens. Cap the gutter where the container caps. */
-    gap: clamp(2rem, 7vw, 5.5rem);
+    gap: clamp(var(--space-lg), 7vw, var(--space-2xl));
   }
 
   .home-principles-intro h2 {
@@ -1773,10 +2058,6 @@ html[lang="zh-CN"] .community-intro h1 {
     font-size: 1.45rem;
   }
 
-  .assessment-detail-enter h1 {
-    font-size: 5rem;
-  }
-
   .atlas-assessment-brief-heading h2 {
     font-size: 2.25rem;
   }
@@ -1785,9 +2066,6 @@ html[lang="zh-CN"] .community-intro h1 {
     font-size: 3rem;
   }
 
-  .quiz-question-title {
-    font-size: 4rem;
-  }
 
   .journal-library-header h1,
   .community-intro h1 {
@@ -1823,10 +2101,6 @@ html[lang="zh-CN"] .community-intro h1 {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .atlas-section-title {
-    font-size: 3.5rem;
-  }
-
   .home-hero-copy h1 {
     font-size: 4.5rem;
   }
@@ -1855,10 +2129,6 @@ html[lang="zh-CN"] .community-intro h1 {
     font-size: 1.15rem;
   }
 
-  .assessment-detail-enter h1 {
-    font-size: 3.5rem;
-  }
-
   .atlas-assessment-brief-heading h2 {
     font-size: 2rem;
   }
@@ -1867,9 +2137,6 @@ html[lang="zh-CN"] .community-intro h1 {
     font-size: 2.25rem;
   }
 
-  .quiz-question-title {
-    font-size: 3rem;
-  }
 
   .journal-library-header h1,
   .community-intro h1 {
@@ -1887,7 +2154,7 @@ html[lang="zh-CN"] .community-intro h1 {
 
 @media (max-width: 799px) {
   .atlas-page-container {
-    padding-inline: 1.25rem;
+    padding-inline: var(--space-sm);
   }
 
   .home-paths,
@@ -1900,8 +2167,8 @@ html[lang="zh-CN"] .community-intro h1 {
   }
 
   .assessment-catalog-intro {
-    margin-inline: -1.25rem;
-    padding-inline: 1.25rem;
+    margin-inline: calc(var(--space-sm) * -1);
+    padding-inline: var(--space-sm);
   }
 
   .catalog-filter-bar {
@@ -1933,12 +2200,12 @@ html[lang="zh-CN"] .community-intro h1 {
   }
 
   .atlas-header-actions {
-    gap: 0.2rem;
+    gap: var(--space-3xs);
   }
 
   .atlas-preference-control {
     min-width: 2.4rem;
-    padding-inline: 0.55rem;
+    padding-inline: var(--space-2xs);
   }
 
   .home-hero-copy h1 {
@@ -1956,7 +2223,7 @@ html[lang="zh-CN"] .community-intro h1 {
   }
 
   .home-footer {
-    padding-bottom: 6rem;
+    padding-bottom: var(--space-3xl);
   }
 
   .assessment-return {
@@ -2060,7 +2327,7 @@ html[lang="zh-CN"] .community-intro h1 {
   .home-path-action svg,
   .atlas-test-card,
   .atlas-test-card-visual .quiz-visual-image,
-  .atlas-answer-option {
+  .quiz-answer-list .atlas-answer-option {
     transition: none;
   }
 
@@ -2070,7 +2337,22 @@ html[lang="zh-CN"] .community-intro h1 {
   .home-path:hover .home-path-action svg,
   .atlas-test-card:hover,
   .atlas-test-card:hover .atlas-test-card-visual .quiz-visual-image,
-  .atlas-answer-option:hover {
+  .quiz-answer-list .atlas-answer-option:hover,
+  .quiz-answer-list .atlas-answer-option:active {
+    transform: none;
+  }
+
+  .atlas-back-link:active,
+  .atlas-desktop-nav a:active,
+  .atlas-mobile-nav-link:active,
+  .home-path:active,
+  .atlas-filter:active,
+  .atlas-test-card:active,
+  .atlas-card-save:active,
+  .journal-library-card:active,
+  .atlas-primary-action:active,
+  .atlas-secondary-action:active,
+  .atlas-danger-action:active {
     transform: none;
   }
 }

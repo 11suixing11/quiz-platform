@@ -99,7 +99,7 @@
 
 .dark {
   --color-paper: var(--color-night);
-  --color-paper-strong: oklch(23% 0.03 165);
+  --color-paper-strong: oklch(24% 0.03 165);
   --color-ink: var(--color-night-ink);
   --color-accent: oklch(73% 0.14 35);
   --color-accent-ink: oklch(19% 0.028 165);
@@ -116,6 +116,10 @@
   --color-warm-ink: oklch(78% 0.08 48);
   --color-blue-wash: oklch(29% 0.03 225);
   --color-danger: oklch(74% 0.12 25);
-  --surface-contrast: var(--color-night);
+  /* Light mode inverts to ink for its loudest surface. Dark mode has nothing
+   * darker than the page to invert to, so the contrast surface becomes the
+   * lightest layer instead and the elevation ladder stays readable:
+   * page 18% -> cards 24% -> header, footer, panels 28%. */
+  --surface-contrast: oklch(28% 0.03 165);
   --surface-contrast-ink: var(--color-night-ink);
 }

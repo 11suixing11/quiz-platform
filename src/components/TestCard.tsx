@@ -45,13 +45,16 @@ export function TestCard({ test, index = 0, lang = "zh", variant = "card" }: { t
   const category = group?.id ?? fallbackGroup?.id ?? test.category;
   const trust = "trust" in test ? (test as TestCardItem & { trust?: QuizTrustProfile }).trust : undefined;
   const trustLabel = trust?.label[lang];
-  const cover = getQuizCover(test.id);
+  // Art exists for 5 of 16 assessments. In the square grid a single illustrated
+  // card stretched its whole row, so the cover runs only in the browse list, whose
+  // layout already handles both cases side by side.
+  const cover = variant === "catalog" ? getQuizCover(test.id) : undefined;
 
   return (
     <article className={`atlas-test-card${cover ? " atlas-test-card--visual" : ""}${variant === "catalog" ? " atlas-test-card--catalog" : ""}`}>
       <Link href={`/test/${test.id}/`} className="atlas-test-card-link group block h-full">
         {cover && <QuizVisualFrame visual={cover} lang={lang} sizes={variant === "catalog" ? "(max-width: 799px) 38vw, 10rem" : "(max-width: 640px) calc(100vw - 2.5rem), (max-width: 1024px) 45vw, 24rem"} className="atlas-test-card-visual" />}
-        <div className="atlas-test-card-body flex h-full flex-col gap-5 p-5 sm:p-6">
+        <div className="atlas-test-card-body flex h-full flex-col">
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-2.5">
               <CategoryMark category={category} className="text-accent" />
@@ -62,7 +65,7 @@ export function TestCard({ test, index = 0, lang = "zh", variant = "card" }: { t
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-ink transition group-hover:text-accent dark:text-white">{title}</h3>
+            <h3 className="font-semibold text-ink transition group-hover:text-accent dark:text-white">{title}</h3>
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{description}</p>
           </div>
           <div className="atlas-test-card-foot flex items-center justify-between gap-3 border-t border-ink/14 pt-4 text-xs text-muted-foreground dark:border-white/16">

@@ -47,7 +47,7 @@ export default async function TestPage({ params }: TestPageProps) {
   if (!entry) notFound();
   const definition = await loadQuizDefinition(id);
   if (!definition) notFound();
-  const sampleQuestions = definition.questions.slice(0, 3).map(({ id: questionId, prompt }) => ({ id: questionId, prompt }));
+  const sampleQuestions = definition.questions.slice(0, 5).map(({ id: questionId, prompt }) => ({ id: questionId, prompt }));
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Quiz",

@@ -316,17 +316,15 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
         <div className="quiz-heading-row"><h1 id="quiz-title" className="quiz-main-title">{language === "zh" ? definition.title.zh : definition.title.en}</h1><span className="atlas-progress-count">{String(currentQuestion + 1).padStart(2, "0")} <span>/ {String(total).padStart(2, "0")}</span></span></div>
         <div className="quiz-progress-block">
           <div className="atlas-progress-route" role="progressbar" aria-label={language === "zh" ? "答题进度" : "Quiz progress"} aria-valuemin={1} aria-valuemax={total} aria-valuenow={currentQuestion + 1} aria-valuetext={language === "zh" ? `第 ${currentQuestion + 1} 题，共 ${total} 题` : `Question ${currentQuestion + 1} of ${total}`}><span style={{ "--progress": progress / 100 } as React.CSSProperties} /></div>
-          <div className="quiz-progress-meta"><span>{answered} {language === "zh" ? "题已回答" : "answered"}</span><span>{language === "zh" ? "可以随时返回" : "You can go back anytime"}</span></div>
+          <div className="quiz-progress-meta"><span>{answered} {language === "zh" ? "题已回答" : "answered"}</span></div>
           <DraftSaveStatus language={language} savedAt={hasDraft ? draftSavedLabel : null} label={draftStatus.label} warning={draftStatus.warning} />
         </div>
 
         <div {...touchHandlers} className="quiz-question-area">
           <section key={question.id} className={cn("quiz-question-stage", direction > 0 ? "quiz-question-stage--next" : "quiz-question-stage--prev")}>
-            <p className="atlas-question-index">{language === "zh" ? "问题" : "Question"} {currentQuestion + 1}</p>
             <h2 ref={questionHeadingRef} tabIndex={-1} className={cn("quiz-question-title", questionTitleClass(question.prompt[language]))}>{question.prompt[language]}</h2>
             <div className="quiz-answer-group">
-              <p className="quiz-answer-prompt">{language === "zh" ? "选择最接近你的回答" : "Choose the response closest to you"}</p>
-              <div className="quiz-answer-list">
+              <div className="quiz-answer-list" role="group" aria-label={language === "zh" ? "选择最接近你的回答" : "Choose the response closest to you"}>
               {question.options.map((option, index) => {
                 const selected = currentAnswer === index;
                 return <button key={option.id} type="button" onClick={() => selectAnswer(index)} aria-pressed={selected} className={cn("atlas-answer-option", selected && "atlas-answer-selected")}><span className="atlas-answer-key" aria-hidden="true">{String.fromCharCode(65 + index)}</span><span className="flex-1 text-left">{option.label[language]}</span>{selected && <Check className="size-4 shrink-0" aria-hidden="true" />}</button>;
@@ -336,7 +334,7 @@ export default function QuizEngine({ testId }: QuizEngineProps) {
           </section>
         </div>
 
-        <div className="quiz-actions"><button type="button" onClick={() => move(currentQuestion - 1)} disabled={currentQuestion === 0} className="atlas-secondary-action disabled:cursor-not-allowed disabled:opacity-30"><ArrowLeft className="size-4" aria-hidden="true" />{language === "zh" ? "上一题" : "Previous"}</button>{isLast ? <button type="button" onClick={submit} disabled={currentAnswer === null || submitting || answered !== total} className="atlas-primary-action disabled:cursor-not-allowed disabled:opacity-35">{submitting ? (language === "zh" ? "正在整理……" : "Reading…") : (language === "zh" ? "查看结果" : "See result")}<ArrowRight className="size-4" aria-hidden="true" /></button> : <button type="button" onClick={() => move(currentQuestion + 1)} disabled={currentAnswer === null} className="atlas-primary-action disabled:cursor-not-allowed disabled:opacity-35">{language === "zh" ? "下一题" : "Next"}<ArrowRight className="size-4" aria-hidden="true" /></button>}</div>
+        <div className="quiz-actions"><button type="button" onClick={() => move(currentQuestion - 1)} disabled={currentQuestion === 0} className="atlas-secondary-action"><ArrowLeft className="size-4" aria-hidden="true" />{language === "zh" ? "上一题" : "Previous"}</button>{isLast ? <button type="button" onClick={submit} disabled={currentAnswer === null || submitting || answered !== total} className="atlas-primary-action">{submitting ? (language === "zh" ? "正在整理……" : "Reading…") : (language === "zh" ? "查看结果" : "See result")}<ArrowRight className="size-4" aria-hidden="true" /></button> : <button type="button" onClick={() => move(currentQuestion + 1)} disabled={currentAnswer === null} className="atlas-primary-action">{language === "zh" ? "下一题" : "Next"}<ArrowRight className="size-4" aria-hidden="true" /></button>}</div>
         <div className="mt-4 min-h-5 text-center text-xs" role="status" aria-live="polite">{submitError}</div>
         <p className="mt-5 text-center text-[11px] text-ink/35 dark:text-white/35">{language === "zh" ? "提示：使用 1–9 选择，← → 移动" : "Tip: use 1–9 to choose, ← → to move"}</p>
       </main>

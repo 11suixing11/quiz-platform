@@ -1,4 +1,4 @@
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · design-system: DESIGN.md · designed-as-app · rebuilt 2026-08-30 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · design-system: DESIGN.md · designed-as-app · rebuilt 2026-08-30 · revised 2026-08-31 */
 @import "tailwindcss";
 @import "../../tokens.css";
 
@@ -75,7 +75,7 @@
 .atlas-back-link { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .5rem; color: color-mix(in srgb, var(--ink) 60%, transparent); font-size: .75rem; font-weight: 700; }
 .atlas-back-link:hover { color: var(--accent); }
 .atlas-section-kicker { color: color-mix(in srgb, var(--ink) 50%, transparent); font-size: .72rem; font-weight: 750; letter-spacing: 0; }
-.atlas-section-title { max-width: 44rem; font-size: 3.25rem; font-weight: 650; letter-spacing: 0; line-height: 1.02; }
+.atlas-section-title { max-width: 44rem; font-weight: 650; letter-spacing: 0; }
 .atlas-desktop-nav { display: none; align-items: center; gap: .15rem; margin-left: auto; }
 .atlas-desktop-nav a { display: inline-flex; min-height: 2.75rem; align-items: center; border-radius: var(--radius-control); padding: .65rem .75rem; color: var(--muted-text); font-size: .72rem; font-weight: 700; white-space: nowrap; transition: background-color var(--duration-short) var(--ease-out), color var(--duration-short) var(--ease-out); }
 .atlas-desktop-nav a:hover, .atlas-desktop-nav a[aria-current="page"] { background: var(--accent-wash); color: var(--accent); }
@@ -197,7 +197,7 @@
   .atlas-primary-action:hover, .atlas-secondary-action:hover, .atlas-answer-option:hover, .atlas-test-card:hover, .atlas-support-panel:hover { transform: none; }
   .skip-link { transition: none; }
 }
-@media (max-width: 640px) { .atlas-return-strip { align-items: flex-start; flex-direction: column; } .atlas-inline-action { margin-left: 3.1rem; } .atlas-section-title { font-size: 2.7rem; } }
+@media (max-width: 640px) { .atlas-return-strip { align-items: flex-start; flex-direction: column; } .atlas-inline-action { margin-left: 3.1rem; } }
 @media (max-width: 640px) { .profile-summary { gap: 1rem; } .profile-avatar { width: 4.5rem; height: 4.5rem; } .profile-summary .atlas-secondary-action { width: 100%; justify-content: center; margin-top: .9rem; } }
 @media (min-width: 800px) { .atlas-desktop-nav { display: flex; } .atlas-mobile-nav { display: none; } }
 
@@ -337,47 +337,19 @@
   .quiz-question-stage { animation: none; }
 }
 
-/* Focused assessment rhythm: one column, one visual beat, no floating-card pile. */
-.quiz-main { --quiz-rule: color-mix(in srgb, var(--ink) 12%, transparent); }
-.quiz-heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem; }
-.quiz-main-title { color: var(--ink); font-size: 2.35rem; font-weight: 650; letter-spacing: 0; line-height: 1.08; }
-.quiz-progress-block { margin-top: 1.45rem; }
-.quiz-progress-meta { display: flex; justify-content: space-between; gap: 1rem; margin-top: .6rem; color: color-mix(in srgb, var(--ink) 48%, transparent); font-size: .72rem; line-height: 1.4; }
-.quiz-draft-status { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; margin-top: .65rem; color: color-mix(in srgb, var(--ink) 48%, transparent); font-size: .68rem; line-height: 1.5; }
-.quiz-draft-status-dot { width: .38rem; height: .38rem; flex: none; border-radius: 999px; background: var(--accent); }
-.quiz-draft-status--warning { color: var(--danger); }
+/* Focused assessment rhythm: one column, one visual beat, no floating-card pile.
+ * Type sizes, spacing, and the choice list belong to rebuild.css; what stays
+ * here is only what the quiz screen shares with the rest of the atlas layer.
+ * Two files styling the same list is what left the options inside a rounded
+ * frame with square rows and the gap showing through it. */
+.quiz-draft-status-dot { flex: none; }
 .quiz-draft-status--warning .quiz-draft-status-dot { background: var(--danger); }
 .quiz-draft-status-separator { opacity: .55; }
-.quiz-question-area { margin-top: 2.8rem; border-top: 1px solid var(--soft-line); padding-top: 1.35rem; }
-.quiz-question-title { max-width: 35rem; margin-top: .8rem; color: var(--ink); font-size: 3.1rem; font-weight: 650; letter-spacing: 0; line-height: 1.12; text-wrap: balance; }
 /* The heading receives programmatic focus so screen readers announce the next question. It is not an interactive control, so a full focus ring would look like an input border around the copy. */
 .quiz-question-title:focus,
 .quiz-question-title:focus-visible { outline: none; }
-.quiz-question-title--long { font-size: 2.8rem; }
-.quiz-question-title--compact { max-width: 40rem; font-size: 2.55rem; line-height: 1.18; letter-spacing: 0; }
-.quiz-answer-group { margin-top: 2.1rem; }
-.quiz-answer-prompt { display: flex; align-items: center; gap: .75rem; color: color-mix(in srgb, var(--ink) 52%, transparent); font-size: .76rem; font-weight: 700; line-height: 1.5; }
-.quiz-answer-prompt::after { content: ""; flex: 1; height: 1px; background: var(--soft-line); }
-.quiz-answer-list { display: grid; gap: 0; margin-top: .7rem; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: var(--paper-strong); }
-.quiz-answer-list .atlas-answer-option { min-height: 3.9rem; border: 0; border-bottom: 1px solid var(--soft-line); border-radius: 0; background: transparent; padding: .7rem 1rem; }
-.quiz-answer-list .atlas-answer-option:last-child { border-bottom: 0; }
-.quiz-answer-list .atlas-answer-option:hover { transform: none; background: color-mix(in srgb, var(--accent) 5%, transparent); }
-.quiz-answer-list .atlas-answer-option.atlas-answer-selected { background: var(--accent-wash); color: var(--ink); }
-.quiz-answer-list .atlas-answer-selected .atlas-answer-key { border-color: var(--accent); color: var(--accent); opacity: .9; }
-.quiz-actions { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 2.1rem; border-top: 1px solid var(--quiz-rule); padding-top: .9rem; }
-.quiz-actions .atlas-primary-action, .quiz-actions .atlas-secondary-action { min-height: 2.9rem; border-radius: 1rem; }
 @media (max-width: 640px) {
   .atlas-page-container { padding-bottom: calc(7rem + env(safe-area-inset-bottom)); }
-  .quiz-main { padding-top: 1.4rem; }
-  .quiz-main-title { font-size: 1.65rem; }
-  .quiz-progress-block { margin-top: 1.2rem; }
-  .quiz-question-area { margin-top: 2.35rem; padding-top: 1.1rem; }
-  .quiz-question-title { font-size: 2.35rem; line-height: 1.14; }
-  .quiz-question-title--long { font-size: 2.15rem; }
-  .quiz-question-title--compact { font-size: 1.95rem; line-height: 1.2; }
-  .quiz-answer-group { margin-top: 1.75rem; }
-  .quiz-answer-list .atlas-answer-option { min-height: 3.65rem; }
-  .quiz-actions { margin-top: 1.8rem; }
 }
 
 /* Rich assessment imagery */
@@ -390,7 +362,6 @@
 .quiz-visual-fallback span:nth-child(2) { right: 2%; top: 8%; width: 40%; height: 40%; background: color-mix(in srgb, var(--warm-ink) 36%, var(--paper)); }
 .quiz-visual-fallback span:nth-child(3) { left: 36%; top: 8%; width: 12%; height: 74%; background: color-mix(in srgb, var(--ink) 58%, transparent); transform: rotate(31deg); }
 
-.atlas-test-card--visual { min-height: 25rem; }
 .atlas-test-card-visual { border: 0; border-bottom: 1px solid var(--soft-line); border-radius: 0; }
 .atlas-test-card--visual .atlas-card-save { border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); background: color-mix(in srgb, var(--paper-strong) 92%, transparent); color: var(--ink); }
 .atlas-test-card--visual .atlas-card-save:hover { background: var(--paper-strong); color: var(--accent); }
