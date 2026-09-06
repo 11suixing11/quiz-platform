@@ -166,11 +166,11 @@ function ProfileBadgeCollection({ userId, zh }: { userId: string; zh: boolean })
           )}
           <label className="profile-badge-toggle">
             <input
+              aria-label={zh ? "在社区展示佩戴的徽章" : "Show worn badges in the community"}
               type="checkbox"
               checked={state.showBadges}
               disabled={busy}
               onChange={() => void toggleShowBadges()}
-              aria-label={zh ? "在社区展示佩戴的徽章" : "Show worn badges in the community"}
             />
             <span>{zh ? "在社区展示佩戴的徽章（默认关闭；徽章只是此刻的观察，不构成身份定义）" : "Show worn badges in the community (off by default; a badge is an observation, not an identity)"}</span>
           </label>
