@@ -26,7 +26,7 @@
 - **不可变公开修订**：发布会创建独立公开快照；后续编辑先留在私密草稿，只有显式“更新公开版”才替换公开修订；取消公开与永久删除是不同操作
 - **社区双流**：`/community/` 分别展示“图像札记”和“测评分享”，不混合排序；札记 Feed 只展示封面、标题、作者、图片数量和摘要
 - **互动与治理**：公开内容支持共鸣、留言和举报；高危举报首次即自动隐藏，普通举报由 3 名独立举报者触发临时隐藏，管理员可恢复或永久下架
-- **账号与验证**：支持邮箱密码账号、验证邮件、注册及上传 Turnstile、个人资料、改密、自动同步和账号删除
+- **账号与验证**：支持邮箱密码账号、验证邮件、忘记密码邮件找回、注册及上传 Turnstile、个人资料、改密、自动同步和账号删除
 - **本地优先**：游客测评结果默认留在当前浏览器；登录后自动与账号云端数据合并，Storage v3 和既有测评历史协议保持不变
 - **媒体最小化**：只接受静态 JPEG、PNG、WebP；处理后生成 320、960、1600 像素 WebP 变体，清除 EXIF/GPS/设备信息和原文件名，不保留原始上传
 - **自托管发布架构**：standalone 产物包含 Node 应用和媒体 worker；生产需要在自有 VPS 配置 SQLite、持久媒体目录、Caddy 与外部验证/邮件服务
@@ -48,7 +48,7 @@
 | `/history/` | 完成记录；游客保存在本机，登录后自动同步 |
 | `/bookmarks/` | 收藏的测评 |
 | `/settings/` | 语言、主题、本地数据导入导出与清理 |
-| `/account/` | 注册、邮箱验证、登录、自动同步、个人资料与账号管理 |
+| `/account/` | 注册、邮箱验证、登录、忘记密码找回、自动同步、个人资料与账号管理 |
 | `/privacy/` | 数据、媒体、公开索引和备份说明 |
 | `/complaints/` | 无需登录的隐私与版权投诉 |
 | `/admin/moderation/` | 环境配置指定管理员使用的治理后台 |
@@ -61,7 +61,7 @@
 - Tailwind CSS v4 + 原生 CSS tokens
 - Better Auth + better-sqlite3
 - Sharp 媒体处理 + 持久 SQLite 任务队列
-- Nodemailer SMTP 验证邮件 + Cloudflare Turnstile
+- Nodemailer SMTP 验证与重置邮件 + Cloudflare Turnstile
 - 自有 VPS、Node standalone 服务、媒体 worker 与 Caddy HTTPS
 
 ## 目录结构
@@ -78,7 +78,7 @@ src/
 |  |- community/               # 图像札记 / 测评分享双流
 |  |- admin/moderation/        # 单一运营管理员后台
 |  |- complaints/              # 无登录投诉
-|  |- account/                 # 注册、验证、登录与账号管理
+|  |- account/                 # 注册、验证、登录、找回密码与账号管理
 |  `- api/                     # 认证、同步、札记、治理和指标接口
 |- components/
 |  |- journal/                 # 札记编辑、预览、详情与互动
@@ -125,7 +125,7 @@ SMTP_SECURE=false
 JOURNAL_ADMIN_USER_ID=...
 ```
 
-客户端通过运行时 `/api/config/turnstile` 读取 `TURNSTILE_SITE_KEY`；`/api/config/account` 只返回邮箱验证和注册是否可用的布尔值，不返回 SMTP 主机、账号或密钥。注册与重发接口在运行配置缺失时直接返回 `503`，注册成功后再显式发送验证邮件，因此界面不会把失败投递显示为成功。`NEXT_PUBLIC_TURNSTILE_SITE_KEY` 仅作为本地或旧部署兼容项。`SMTP_USER` 和 `SMTP_PASSWORD` 必须同时提供或同时省略；`JOURNAL_ADMIN_USER_ID` 也可使用兼容变量 `ADMIN_USER_ID`，当前生产设计只配置一个管理员用户 ID。生产密钥只放在服务器环境文件中，不提交到仓库。
+客户端通过运行时 `/api/config/turnstile` 读取 `TURNSTILE_SITE_KEY`；`/api/config/account` 只返回邮箱验证、注册与找回密码是否可用的布尔值，不返回 SMTP 主机、账号或密钥。注册、重发与找回密码接口在运行配置缺失时直接返回 `503`，注册成功后再显式发送验证邮件，因此界面不会把失败投递显示为成功。忘记密码请求由 Turnstile 保护并返回统一响应（不区分邮箱是否已注册），重置邮件链接 30 分钟内一次性有效，重置成功后其他设备的登录状态会被吊销。`NEXT_PUBLIC_TURNSTILE_SITE_KEY` 仅作为本地或旧部署兼容项。`SMTP_USER` 和 `SMTP_PASSWORD` 必须同时提供或同时省略；`JOURNAL_ADMIN_USER_ID` 也可使用兼容变量 `ADMIN_USER_ID`，当前生产设计只配置一个管理员用户 ID。生产密钥只放在服务器环境文件中，不提交到仓库。
 
 Turnstile、SMTP、管理员 ID、媒体目录和备份目录都是生产发布的必需运行时配置或验收项。仓库提供相应代码路径，但不能据此推断生产服务器已经填入有效密钥或完成外部服务验证。
 
@@ -150,7 +150,7 @@ npm run build
 npm run package:standalone
 ```
 
-`npm test` 串行覆盖 registry、三类评分、测评视觉选择、Storage v3、云端 revision、社区、札记媒体与治理、Turnstile 运行时配置契约，以及分享输出。`audit:flagship` 只审阅 16 条公开测评路线；`audit:a11y` 检查静态无障碍约束。发布前仍需按 [QA_CHECKLIST.md](./QA_CHECKLIST.md) 完成浏览器、窄屏、媒体、权限、治理和生产 smoke test。
+`npm test` 串行覆盖 registry、三类评分、测评视觉选择、Storage v3、云端 revision、社区、札记媒体与治理、Turnstile 运行时配置契约、忘记密码找回链路，以及分享输出。`audit:flagship` 只审阅 16 条公开测评路线；`audit:a11y` 检查静态无障碍约束。发布前仍需按 [QA_CHECKLIST.md](./QA_CHECKLIST.md) 完成浏览器、窄屏、媒体、权限、治理和生产 smoke test。
 
 生产构建产物位于 `.next/standalone/`。部署时由 Node 服务和媒体 worker 处理应用请求及持久任务，Caddy 负责 HTTPS、公开媒体和反向代理；这些生产条件必须按 [deploy/README.md](./deploy/README.md) 配置并验收。`scripts/serve-static.mjs` 仅用于本地静态预览，不是生产入口。
 
@@ -167,7 +167,7 @@ npm run package:standalone
 ## 产品边界
 
 - 游客仍可完成测评；图像札记要求登录且邮箱已验证
-- SMTP 当前只用于邮箱验证；仍未提供忘记密码邮件找回流程
+- SMTP 仅用于邮箱验证与忘记密码重置邮件；重置令牌 30 分钟内一次性有效，找回请求响应不区分邮箱是否已注册
 - 首版札记不支持 Markdown、HTML、视频、滤镜、贴纸、自由画布、远程图片或运行时 AI 生图
 - 用户内容只记录所选内容语言，不要求中英双份，也不自动翻译
 - 首版不做发布前内容审核或合法敏感内容遮罩；违法内容、未成年人性内容、非自愿私密影像、隐私泄露和明确伤害内容仍可被举报并按治理规则处理

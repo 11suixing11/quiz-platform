@@ -8,7 +8,7 @@ Keep every item unchecked until it has been verified in the named environment. A
 - [ ] Run `npm audit --audit-level=high`.
 - [ ] Run `npm run lint`.
 - [ ] Run `npm run typecheck`.
-- [ ] Run `npm test`, including registry, scoring, quiz-media, Storage v3, cloud revision, community, journal, governance, runtime Turnstile configuration, and share suites.
+- [ ] Run `npm test`, including registry, scoring, quiz-media, Storage v3, cloud revision, community, journal, governance, password reset, runtime Turnstile configuration, and share suites.
 - [ ] Run `npm run audit:flagship` and confirm all 16 public assessments meet the ready threshold.
 - [ ] Run `npm run audit:a11y`.
 - [ ] Run `npm run build` and `npm run package:standalone`.
@@ -21,6 +21,17 @@ Keep every item unchecked until it has been verified in the named environment. A
 - [ ] Windows Edge: both assessment and image-journal flows complete successfully.
 - [ ] Windows Firefox: both assessment and image-journal flows complete successfully.
 - [ ] Light, dark, and system themes remain readable across home, assessments, quiz, result, journal library/editor/detail, community, account, moderation, complaints, settings, and privacy.
+
+## Account recovery
+
+- [ ] The sign-in form links to password recovery, and the recovery and reset pages match the account area's layout, language, and theme behavior in both Simplified Chinese and English.
+- [ ] A recovery request completes Cloudflare Turnstile before submission; without a token the request is blocked client-side and server-side.
+- [ ] The recovery response is identical for registered and unknown addresses, sends at most one email, and never states whether the address exists.
+- [ ] The reset email opens the reset page with a valid token; the link expires in 30 minutes and works only once.
+- [ ] Setting a new password enforces 10 to 128 characters, rejects a mismatched confirmation, and reports success with a sign-in link.
+- [ ] After a reset, the old password is rejected, the new password signs in, and previously signed-in sessions are revoked.
+- [ ] Reusing a consumed token or an expired token shows an invalid-link message and changes no password.
+- [ ] Missing SMTP or Turnstile configuration fails closed with a clear unavailable message instead of exposing the reset form.
 
 ## Homepage, routes, and navigation
 

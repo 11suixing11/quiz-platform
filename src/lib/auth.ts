@@ -4,7 +4,7 @@ import { APIError, betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { captcha } from "better-auth/plugins";
 import { getDatabase } from "@/lib/server/database";
-import { sendAccountVerificationEmail } from "@/lib/server/email";
+import { PASSWORD_RESET_TOKEN_MINUTES, sendAccountVerificationEmail, sendPasswordResetEmail } from "@/lib/server/email";
 import { DEVELOPMENT_ORIGINS, PRODUCTION_HOST, PRODUCTION_ORIGIN, turnstileHostnames } from "@/lib/server/auth-hosts";
 import { prepareJournalUserDeletion, replayJournalUserDeletion } from "@/lib/server/journal";
 
@@ -58,6 +58,17 @@ export const auth = betterAuth({
     maxPasswordLength: 128,
     autoSignIn: false,
     requireEmailVerification: true,
+    // Single-use, time-limited reset tokens; every other session is revoked
+    // once the password is reset through the email link.
+    resetPasswordTokenExpiresIn: PASSWORD_RESET_TOKEN_MINUTES * 60,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ user, url }) => {
+      try {
+        await sendPasswordResetEmail({ email: user.email, displayName: user.name, url });
+      } catch {
+        throw new Error("RESET_PASSWORD_DELIVERY_FAILED");
+      }
+    },
   },
   emailVerification: {
     sendOnSignUp: false,
@@ -106,6 +117,13 @@ export const auth = betterAuth({
       secretKey: process.env.TURNSTILE_SECRET_KEY?.trim() || "",
       endpoints: ["/sign-up/email"],
       expectedAction: "signup",
+      allowedHostnames: turnstileHostnames(),
+    }),
+    captcha({
+      provider: "cloudflare-turnstile",
+      secretKey: process.env.TURNSTILE_SECRET_KEY?.trim() || "",
+      endpoints: ["/request-password-reset"],
+      expectedAction: "password_reset",
       allowedHostnames: turnstileHostnames(),
     }),
     nextCookies(),

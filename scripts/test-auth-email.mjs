@@ -104,17 +104,20 @@ try {
   assert.deepEqual(capabilities.accountCapabilities(), {
     emailVerificationAvailable: true,
     registrationAvailable: false,
+    passwordResetAvailable: false,
     hostAllowed: true,
   }, "Turnstile must gate registration without disabling configured email delivery");
   assert.deepEqual(accountConfigRoute.GET(new Request("https://knowyourself.cc.cd/api/config/account")), {
     emailVerificationAvailable: true,
     registrationAvailable: false,
+    passwordResetAvailable: false,
     hostAllowed: true,
   }, "account capability API must expose capability and host status");
 
   assert.deepEqual(capabilities.accountCapabilities(new Request("https://maintenance.example.test/api/config/account")), {
     emailVerificationAvailable: false,
     registrationAvailable: false,
+    passwordResetAvailable: false,
     hostAllowed: false,
   }, "unsupported hosts must not advertise account email or registration services");
   assert.equal(capabilities.turnstileAvailableForRequest(new Request("https://maintenance.example.test/api/config/turnstile")), false);
@@ -124,6 +127,7 @@ try {
   assert.deepEqual(capabilities.accountCapabilities(), {
     emailVerificationAvailable: false,
     registrationAvailable: false,
+    passwordResetAvailable: false,
     hostAllowed: true,
   }, "Turnstile alone must not advertise registration when SMTP is absent");
 
@@ -136,6 +140,7 @@ try {
   assert.deepEqual(capabilities.accountCapabilities(), {
     emailVerificationAvailable: true,
     registrationAvailable: true,
+    passwordResetAvailable: true,
     hostAllowed: true,
   });
 

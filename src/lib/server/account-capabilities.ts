@@ -14,9 +14,13 @@ export function turnstileRegistrationConfigured() {
 export function accountCapabilities(request?: Request) {
   const hostAllowed = !request || isAllowedAuthHostname(requestHostname(request));
   const emailVerificationAvailable = hostAllowed && emailDeliveryConfigured();
+  // Registration and password recovery share the same delivery plus human
+  // verification requirements; both must fail closed on a partial setup.
+  const actionAvailable = emailVerificationAvailable && turnstileRegistrationConfigured();
   return {
     emailVerificationAvailable,
-    registrationAvailable: emailVerificationAvailable && turnstileRegistrationConfigured(),
+    registrationAvailable: actionAvailable,
+    passwordResetAvailable: actionAvailable,
     hostAllowed,
   };
 }

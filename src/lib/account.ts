@@ -47,6 +47,7 @@ export interface ChangePasswordResponse {
 export interface AccountCapabilities {
   emailVerificationAvailable: boolean;
   registrationAvailable: boolean;
+  passwordResetAvailable: boolean;
   hostAllowed: boolean;
 }
 
@@ -148,6 +149,33 @@ export async function sendVerificationEmail(email: string) {
     credentials: "include",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ email, callbackURL: "/account/" }),
+  }));
+}
+
+/**
+ * Request a password-reset email. The response is intentionally identical
+ * for unknown addresses so the flow never reveals which emails exist.
+ */
+export async function requestPasswordReset(input: { email: string; captchaToken: string; redirectTo: string }) {
+  return responseJson<{ status: boolean }>(await fetch("/api/auth/request-password-reset", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-Captcha-Response": input.captchaToken,
+    },
+    body: JSON.stringify({ email: input.email, redirectTo: input.redirectTo }),
+  }));
+}
+
+/** Set a new password with the single-use, time-limited reset token. */
+export async function resetPassword(input: { token: string; newPassword: string }) {
+  return responseJson<{ status: boolean }>(await fetch("/api/auth/reset-password", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ token: input.token, newPassword: input.newPassword }),
   }));
 }
 

@@ -1,6 +1,6 @@
 # 认识你自己 | Know Yourself 项目摘要
 
-**更新：2026 年 8 月 29 日**
+**更新：2026 年 9 月 6 日**
 
 ## 产品定位
 
@@ -16,7 +16,7 @@
 - 不可变公开修订、显式更新公开版、取消公开和永久删除
 - 社区“图像札记 / 测评分享”两个独立 Feed
 - 共鸣、留言、举报、自动隐藏、管理员治理和无登录隐私/版权投诉
-- 邮箱密码账号、验证邮件、Turnstile、个人资料、改密、自动同步和账号删除
+- 邮箱密码账号、验证邮件、忘记密码邮件找回、Turnstile、个人资料、改密、自动同步和账号删除
 
 不再生成 analytics、dashboard、stats、trends、compare、compat 等旧 secondary routes，也不兼容旧 URL。
 
@@ -46,7 +46,7 @@
 
 Storage v3 继续保存浏览器 preferences、attempts、bookmarks 和 sessions，不迁移旧 v1/v2 命名空间。登录后，本机测评数据与账号云端数据自动合并。已完成测评的原始答案不保存在云端。
 
-图像札记要求登录且邮箱已验证。注册使用 Cloudflare Turnstile，验证邮件通过 SMTP 发送；上传批次使用独立的 `journal_upload` Turnstile action。删除账号会删除结构化数据，并通过持久墓碑清理私密与公开媒体。
+图像札记要求登录且邮箱已验证。注册与找回密码使用 Cloudflare Turnstile，验证与重置邮件通过 SMTP 发送；忘记密码请求返回统一响应（不区分邮箱是否已注册），重置令牌 30 分钟内一次性有效，重置成功后其他会话退出登录；上传批次使用独立的 `journal_upload` Turnstile action。删除账号会删除结构化数据，并通过持久墓碑清理私密与公开媒体。
 
 ## 部署方式
 
@@ -62,6 +62,7 @@ Next.js 生成 standalone 运行时；生产部署架构由自有 VPS 上的 Nod
 - storage/cloud：Storage v3、历史、收藏、会话、导入导出、云端 revision
 - journal：权限、1/3/6 图、媒体验证、任务恢复、配额、不可变修订、取消公开、删除和墓碑
 - governance：自动隐藏、管理员恢复/下架、账号限制、审计和无登录投诉
+- password reset：fail-closed 网关、令牌一次性/过期拒绝、邮箱枚举防护与成功路径
 - standalone：Node 应用、媒体 worker、静态资源及 Linux x64 原生模块
 
 ## 当前维护入口
