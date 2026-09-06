@@ -35,9 +35,11 @@ Keep every item unchecked until it has been verified in the named environment. A
 
 ## Homepage, routes, and navigation
 
-- [ ] The first viewport presents “Take an assessment” and “Create an image journal” with equivalent hierarchy.
-- [ ] The full reviewed catalog is available at `/assessments/` and is not duplicated as a mixed homepage feed.
-- [ ] Header and mobile navigation link to Home, Assessments, Journal, Community, History, and Account with correct current-page state.
+- [ ] `/` renders the unified community feed as the first viewport: shared assessment results, text posts, and image posts with type filters and latest/most-resonant sort.
+- [ ] The full reviewed catalog is available at `/assessments/`; the homepage feed surfaces shared content, not a catalog listing.
+- [ ] Header and mobile navigation link to Home, Assessments, History, and Account with correct current-page state; `/` and the `/community/` compatibility route both mark Home as current.
+- [ ] Guests see a sign-in invitation in the create actions; signed-in verified users see the text composer and a link to their image-post library.
+- [ ] Empty feed states guide to assessments, history, or the image-post editor according to the active filter.
 - [ ] `/community/` has one mixed feed with assessment, text, and image filters; switching filters never leaks another item type or changes the selected sort.
 - [ ] Private routes and `/admin/moderation/` use noindex metadata; public journals are indexable only while published and visible.
 

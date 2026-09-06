@@ -1,8 +1,8 @@
 # 认识你自己 · Know Yourself
 
-> **一个安静的中英双语自我反思空间。** 做一次测评，或在社区分享文字与图像，把此刻的观察留给可能懂你的人。
+> **一个安静的中英双语社区。** 分享文字、测评或图像，把此刻的观察留给可能懂你的人；测评结果是这里看见自己的特色方式。
 >
-> **A calm, bilingual space for self-reflection. See patterns, not labels.** Take an assessment, or share words and images with the community when you choose.
+> **A calm, bilingual community.** Share words, assessment results, or images with people who may understand; assessments are this community's distinctive way of seeing yourself.
 
 [在线体验 / Live demo](https://knowyourself.cc.cd/) · [浏览测评](https://knowyourself.cc.cd/assessments/) · [了解隐私边界](https://knowyourself.cc.cd/privacy/)
 
@@ -19,12 +19,12 @@
 
 ## 当前版本
 
-- **双入口首页**：从“做一次测评”或“在社区发一篇图文”开始，完整测评目录位于 `/assessments/`
+- **首页即社区**：打开即是统一 Feed——测评、文字与图像三类分享混合呈现，支持类型筛选与排序；完整测评目录位于 `/assessments/`，测评结果是社区的特色内容引擎
 - **16 条公开测评路线**：覆盖 type、dimensions、score 三类评分；193 个内部模块继续按质量逐批审阅
 - **四条结果图像试点**：动物人格、情绪调节、依恋风格和生活满意度使用无内嵌文字的隐喻场景；类型、主导维度或稳定 score-band 决定结果图，缺失或并列结果回退到封面
 - **图像札记**：邮箱已验证的登录用户可以创作包含 1 至 6 张有序图片的私密草稿，设置每图说明、替代文字或装饰标记，并使用自动保存、中断恢复、上传进度、网络中断重传、处理失败替换和键盘排序
 - **不可变公开修订**：发布会创建独立公开快照；后续编辑先留在私密草稿，只有显式“更新公开版”才替换公开修订；取消公开与永久删除是不同操作
-- **统一社区 Feed**：`/community/` 混合展示测评、文字和图像帖子，并提供类型筛选；旧图像札记通过兼容适配进入图像流，文字帖默认不公开头像
+- **统一社区 Feed**：首页与 `/community/` 同源渲染，混合展示测评、文字和图像帖子，并提供类型筛选与排序；旧图像札记通过兼容适配进入图像流，文字帖默认不公开头像
 - **互动与治理**：公开内容支持共鸣、留言和举报；高危举报首次即自动隐藏，普通举报由 3 名独立举报者触发临时隐藏，管理员可恢复或永久下架
 - **账号与验证**：支持邮箱密码账号、验证邮件、忘记密码邮件找回、注册及上传 Turnstile、个人资料、改密、自动同步和账号删除
 - **本地优先**：游客测评结果默认留在当前浏览器；登录后自动与账号云端数据合并，Storage v3 和既有测评历史协议保持不变
@@ -35,7 +35,7 @@
 
 | 页面 | 作用 |
 | --- | --- |
-| `/` | 在结构化测评与社区图文分享之间选择 |
+| `/` | 社区统一 Feed：浏览与发布测评、文字、图像分享 |
 | `/assessments/` | 浏览、搜索和筛选 16 条公开测评路线 |
 | `/test/[id]/` | 测评详情、题量、时长、示例问题、收藏和试点视觉 |
 | `/quiz/[type]/` | 答题、进度、键盘操作、未完成会话恢复 |
@@ -69,7 +69,7 @@
 ```text
 src/
 |- app/
-|  |- page.tsx                 # 双入口首页
+|  |- page.tsx                 # 首页 = 社区统一 Feed
 |  |- assessments/             # 完整测评目录
 |  |- test/[id]/               # 测评详情
 |  |- quiz/[type]/             # 答题

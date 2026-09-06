@@ -109,7 +109,7 @@ components:
 
 This is a bilingual reflection product for people arriving with a small, human question. The interface should feel like a clear desk, a notebook, and a calm guide. It supports both structured assessments and open-ended image journals. It is not a game board, clinical dashboard, productivity cockpit, or AI showcase.
 
-The homepage presents two equal paths in the first viewport: take an assessment or create an image journal. The assessment catalog then groups the reviewed routes; a detail page explains what a person will answer; the quiz keeps attention on one question at a time. Results are framed as observations from this attempt. Image journals begin in a private library, move through editing and preview, and become public only through an explicit publishing action.
+The homepage is the unified community feed: assessment shares, text posts, and image posts arrive as one stream with explicit type filters, so a visitor lands inside the community rather than in front of a menu. Create actions sit above the first post. The assessment catalog remains the community's distinctive engine at `/assessments/`; a detail page explains what a person will answer; the quiz keeps attention on one question at a time. Results are framed as observations from this attempt and feed the community through explicit sharing. Image journals begin in a private library, move through editing and preview, and become public only through an explicit publishing action.
 
 The visual language is mineral paper, prussian ink, a single blue action colour, and brass reserved for a reading on a meter. Wordless metaphor scenes are reserved for assessment covers and results and are drawn as monochrome blue exposures, so an illustration never competes with a number; user images carry the journal narrative. Contrast and directional hierarchy do the expressive work. There is no decorative gradient, glass stack, mesh background, or ornamental stock imagery, and no font is fetched at runtime from a third party.
 
@@ -155,8 +155,8 @@ A Chinese heading in a narrow column is sized by the count of glyphs that must s
 ## Layout
 
 - The app shell is a centered 72rem container with 1.25rem mobile gutters and 2rem desktop gutters.
-- The homepage is a two-path composition on wide screens and a single-column sequence on narrow screens. Neither path is visually subordinate.
-- The full assessment catalog lives at `/assessments/`; it is not duplicated below the homepage paths. The first view uses local images and self-hosted fonts only.
+- The homepage is the community feed itself at every width: one stream, filters before content, create actions above the first post. No path hierarchy is needed because there is no menu of paths.
+- The full assessment catalog lives at `/assessments/`; it is not duplicated inside the homepage feed. The first view uses local images and self-hosted fonts only.
 - Detail, quiz, and result pages narrow to a focused reading column. Quiz and result routes hide the mobile primary navigation so the task has the full viewport.
 - The journal editor uses a writing workspace plus a publishing rail on wide screens, then one ordered column on narrow screens. Image controls, fields, and progress overlays must stay within a stable media frame.
 - Public journal details use a vertical image-and-text reading rhythm. Community uses one mixed feed with explicit type filters; image cards keep their own visual treatment while sharing the same ranking and navigation.

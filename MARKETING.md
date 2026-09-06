@@ -35,10 +35,10 @@ Choose the form of reflection that fits the moment: a reviewed assessment or a p
 ```markdown
 # 我把一个测试网站重做成了双路径自我反思空间
 
-「认识你自己 | Know Yourself」不再追求把尽可能多的测试堆到首页，而是提供两条清楚、平等的路径：
+「认识你自己 | Know Yourself」不再追求把尽可能多的测试堆到首页，而是把首页直接做成一个安静的社区 Feed：
 
-- 做一次测评：从 16 条经过审阅的中英双语路线中，观察人格、情绪、关系、工作与生活中的倾向
-- 写一篇图像札记：用 1 至 6 张图片、说明和文字，保存一篇默认私密的个人观察
+- 分享测评结果：从 16 条经过审阅的中英双语路线里做一次观察，把结果留给可能懂你的人
+- 写一段文字或一篇图像帖：用文字、1 至 6 张图片与说明，把此刻的观察分享到同一个社区流里
 
 游客的测评记录默认留在当前浏览器。可选账号用于跨设备同步与札记创作；公开札记采用不可变快照，后续编辑不会悄悄改掉已发布版本。上传图片只保留处理后的 WebP 变体，EXIF、GPS、设备信息、原文件名和原始文件都会被移除。
 
@@ -53,12 +53,12 @@ Choose the form of reflection that fits the moment: a reviewed assessment or a p
 ### English
 
 ```markdown
-# I rebuilt a quiz site into a two-path space for self-reflection
+# I rebuilt a quiz site into a community-first space for self-reflection
 
-Know Yourself does not try to win by putting the largest possible quiz catalog on the homepage. It gives equal weight to two clear paths:
+Know Yourself does not try to win by putting the largest possible quiz catalog on the homepage. The homepage is now a calm community feed:
 
-- Take an assessment: choose from 16 reviewed bilingual routes across personality, emotion, relationships, work, and daily life
-- Create a visual journal: arrange 1-6 images, captions, and optional prose into a private-by-default observation
+- Share an assessment result: take one of 16 reviewed bilingual routes and leave the observation for people who may understand
+- Write a text post or an image post: bring words, or 1-6 images with captions, into the same shared stream
 
 Guest assessment history stays in the current browser. Optional accounts add cross-device sync and journal creation. Public journals use immutable snapshots, so later private edits do not silently rewrite what was published. Uploaded images are converted to processed WebP variants while EXIF, GPS, device data, original filenames, and original uploads are discarded.
 

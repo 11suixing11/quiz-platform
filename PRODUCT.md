@@ -33,7 +33,7 @@ The product is a local-first reflection companion with optional accounts and clo
 
 ## Capabilities and Constraints
 
-- The homepage presents two primary actions: browse assessments at `/assessments/`, or create a community image post through the compatible `/journal/new/` editor.
+- The homepage is the unified community feed: shared assessment results, text posts, and image posts arrive as one stream with type filters and latest/most-resonant sorting. The reviewed assessment catalog at `/assessments/` remains the community's distinctive content engine and stays reachable from the feed's empty states and share flows.
 - 16 public assessments span type, dimensions, and score models. 193 internal modules remain available for staged content review but are not public routes by default.
 - Animal Personality, Emotion Regulation, Attachment Style, and Life Satisfaction form the first result-image pilot. Their wordless metaphor scenes appear consistently on catalog cards, detail pages, and results. Text remains the complete information and accessibility source.
 - Optional result-image feedback is stored only as a first-party daily aggregate keyed by assessment, visual key, and helpful/not-helpful response.
