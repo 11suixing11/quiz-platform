@@ -8,8 +8,8 @@ import type { Metadata } from "next";
  */
 export const SITE_URL = "https://knowyourself.cc.cd";
 export const SITE_NAME = "认识你自己 | Know Yourself";
-export const SITE_DESCRIPTION = "通过结构化测评，或在社区分享文字与图像，记录对性格、情绪、关系与日常生活的观察。";
-export const SITE_DESCRIPTION_EN = "Reflect through structured assessments, then share words or images with the community when you choose.";
+export const SITE_DESCRIPTION = "一个安静的中英双语社区：分享文字、测评或图像，把此刻的观察留给可能懂你的人。";
+export const SITE_DESCRIPTION_EN = "A calm, bilingual community for words, assessment results, and image posts, shared with people who may understand you.";
 export const OG_IMAGE_PATH = "/og-image.png";
 export const OG_IMAGE_URL = `${SITE_URL}${OG_IMAGE_PATH}`;
 

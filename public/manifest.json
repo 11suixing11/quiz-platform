@@ -1,7 +1,7 @@
 ﻿{
   "name": "认识你自己 | Know Yourself",
   "short_name": "Know Yourself",
-  "description": "A bilingual, local-first self-reflection platform with 16 curated assessments.",
+  "description": "A calm, bilingual community for words, assessment results, and image posts.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
