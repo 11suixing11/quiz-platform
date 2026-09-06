@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { ArrowRight, CircleHelp, Footprints, Waves } from "lucide-react";
@@ -126,8 +126,14 @@ export function ReflectionGuide({
         {blocks.map(({ icon: Icon, title, text, nextStep }) => (
           <div key={title} className={`atlas-reflection-block grid gap-3 border-b border-border/50 px-5 py-5 last:border-b-0 sm:grid-cols-[2.25rem_1fr] sm:px-7${nextStep ? " atlas-reflection-next-step" : ""}`}>
             <div
-              className="flex size-9 items-center justify-center rounded-xl"
-              style={{ backgroundColor: `${accentColor}14`, color: accentColor }}
+              className="flex size-9 items-center justify-center"
+              style={{
+                borderRadius: "var(--radius-media)",
+                // `color-mix`, not a hex plus an alpha suffix: the accent is a
+                // token reference now, and "var(--topic-self)14" is not a colour.
+                backgroundColor: `color-mix(in oklab, ${accentColor} 12%, transparent)`,
+                color: accentColor,
+              }}
             >
               <Icon className="size-4" strokeWidth={1.8} />
             </div>
@@ -140,7 +146,7 @@ export function ReflectionGuide({
       </div>
 
       {recommendations.length > 0 && (
-        <div className="border-t border-border/60 bg-[var(--warm-surface)] px-5 py-5 dark:bg-white/[0.035] sm:px-7">
+        <div className="border-t border-border/60 bg-[var(--sheet-surface)] px-5 py-5 dark:bg-white/[0.035] sm:px-7">
           <p className="text-xs font-medium text-muted-foreground">
             {lang === "zh" ? "想从另一个角度继续" : "Continue from another angle"}
           </p>

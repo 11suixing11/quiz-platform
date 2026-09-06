@@ -59,7 +59,6 @@ const definition = defineQuiz({
   id: "work-style",
   kind: "type",
   category: "career",
-  accent: legacy.color ?? "#607D8B",
   duration: "3-6",
   title: { zh: "工作风格测试", en: "Work Style Test" },
   description: {

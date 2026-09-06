@@ -74,7 +74,6 @@ const definition = defineQuiz({
   id: "boundaries",
   kind: "score",
   category: "lifestyle",
-  accent: legacy.color ?? "#FF9800",
   duration: "3-6",
   title: { zh: "边界感测试", en: "Boundaries Test" },
   description: {

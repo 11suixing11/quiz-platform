@@ -38,7 +38,7 @@ Keep every item unchecked until it has been verified in the named environment. A
 - [ ] The first viewport presents “Take an assessment” and “Create an image journal” with equivalent hierarchy.
 - [ ] The full reviewed catalog is available at `/assessments/` and is not duplicated as a mixed homepage feed.
 - [ ] Header and mobile navigation link to Home, Assessments, Journal, Community, History, and Account with correct current-page state.
-- [ ] `/community/` has separate Image Journals and Assessment Shares tabs; switching tabs never mixes ranking or item types.
+- [ ] `/community/` has one mixed feed with assessment, text, and image filters; switching filters never leaks another item type or changes the selected sort.
 - [ ] Private routes and `/admin/moderation/` use noindex metadata; public journals are indexable only while published and visible.
 
 ## Assessment result imagery
@@ -91,7 +91,7 @@ Keep every item unchecked until it has been verified in the named environment. A
 ## Community and interactions
 
 - [ ] Image-journal Feed cards show only cover, title, author display name, image count, date, and excerpt; full images and interactions appear only on detail.
-- [ ] Assessment Share cards remain in their independent tab and never expose raw answers.
+- [ ] Assessment cards appear under the `assessment` filter and never expose raw answers.
 - [ ] Resonance add/remove, comment creation, one-level reply, owner deletion, and closed-comments behavior work for both supported content types.
 - [ ] Read-only, suspended, and banned accounts cannot create community writes; upload-blocked accounts can still perform allowed non-upload writes.
 - [ ] Report dialogs have a name, initial focus, Escape behavior, focus containment, focus return, and recoverable submission feedback.
@@ -108,7 +108,7 @@ Keep every item unchecked until it has been verified in the named environment. A
 
 ## Narrow viewports and zoom
 
-- [ ] At 360px, 390px, and 412px widths, home, assessment catalog, editor, vertical journal detail, both community tabs, report dialog, and account verification have no horizontal scroll, clipped text, or overlapping controls.
+- [ ] At 360px, 390px, and 412px widths, home, assessment catalog, editor, vertical journal detail, all community filters, report dialog, and account verification have no horizontal scroll, clipped text, or overlapping controls.
 - [ ] At those widths, image previews keep stable aspect ratios and processing overlays do not resize surrounding layout.
 - [ ] At those widths, all primary actions and icon controls remain at least 44 by 44 CSS pixels.
 - [ ] Mobile navigation identifies the current page and does not cover final content or editor actions.

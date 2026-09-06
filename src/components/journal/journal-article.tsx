@@ -23,12 +23,14 @@ export function JournalArticle({
   language,
   preview,
   showOwnerActions = false,
+  ownerEditHref,
   onReport,
 }: {
   entry: JournalEntry;
   language: "zh" | "en";
   preview?: "private" | "public";
   showOwnerActions?: boolean;
+  ownerEditHref?: string;
   onReport?: () => void;
 }) {
   const publicView = preview === "public" || (!preview && entry.status === "published");
@@ -55,7 +57,7 @@ export function JournalArticle({
         {entry.body && <p className="journal-article-lead">{entry.body}</p>}
         {(showOwnerActions || onReport) && (
           <div className="journal-article-actions">
-            {showOwnerActions && <Link href={`/journal/${entry.id}/edit/`} className="atlas-secondary-action"><Pencil aria-hidden="true" />{language === "zh" ? "编辑札记" : "Edit journal"}</Link>}
+            {showOwnerActions && <Link href={ownerEditHref ?? `/journal/${entry.id}/edit/`} className="atlas-secondary-action"><Pencil aria-hidden="true" />{language === "zh" ? "编辑札记" : "Edit journal"}</Link>}
             {onReport && <button type="button" className="atlas-text-button" onClick={onReport}><ShieldAlert aria-hidden="true" />{language === "zh" ? "举报" : "Report"}</button>}
           </div>
         )}

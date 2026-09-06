@@ -60,7 +60,6 @@ const definition = defineQuiz({
   id: "emotion-regulation",
   kind: "dimensions",
   category: "emotion",
-  accent: legacy.color ?? "#FF9800",
   duration: "4-7",
   title: { zh: "情绪调节测试", en: "Emotion Regulation Test" },
   description: {

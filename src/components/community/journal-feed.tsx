@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, Images, NotebookPen } from "lucide-react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity } from "@/components/account-provider";
 import { journalImageSource, type JournalImage } from "@/lib/journal";
 import type { Lang } from "@/core/quiz";
 
@@ -33,7 +33,7 @@ function excerpt(value: string, limit = 120) {
 }
 
 export function JournalCommunityFeed({ language }: { language: Lang }) {
-  const { user } = useAccount();
+  const { user } = useAccountIdentity();
   const [entries, setEntries] = useState<PublicJournalSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

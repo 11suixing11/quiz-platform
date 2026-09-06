@@ -26,7 +26,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity, useAccountSync } from "@/components/account-provider";
 import { JournalArticle } from "@/components/journal/journal-article";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { TurnstileWidget } from "@/components/turnstile-widget";
@@ -201,10 +201,13 @@ function SaveIndicator({ state, language }: { state: SaveState; language: "zh" |
   return <span className={`journal-save-indicator is-${state}`}>{icon}{text}</span>;
 }
 
-export function JournalEditor({ entryId, createOnMount = false }: { entryId?: string; createOnMount?: boolean }) {
+export function JournalEditor({ entryId, createOnMount = false, returnTo }: { entryId?: string; createOnMount?: boolean; returnTo?: string }) {
   const router = useRouter();
   const { language } = useLanguage();
-  const { user, syncState } = useAccount();
+  const { user } = useAccountIdentity();
+  const { syncState } = useAccountSync();
+  const communityMode = returnTo === "/community/";
+  const libraryHref = returnTo ?? "/journal/";
   const [entry, setEntry] = useState<JournalEntry | null>(null);
   const [viewer, setViewer] = useState<JournalViewer | null>(null);
   const [form, setForm] = useState<EditorForm>(EMPTY_FORM);
@@ -284,7 +287,7 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
         createStartedRef.current = true;
         const created = await createJournalDraft(user.id, { contentLanguage: language, allowComments: true });
         initializeEntry(created.entry);
-        router.replace(`/journal/${created.entry.id}/edit/`);
+        router.replace(`/journal/${created.entry.id}/edit/${communityMode ? "?from=community" : ""}`);
       } else if (entryId) {
         const loaded = await getJournalEntry(entryId, user.id, "draft");
         if (!loaded.entry.isOwner) throw new Error(language === "zh" ? "你没有编辑这篇札记的权限。" : "You cannot edit this journal.");
@@ -296,7 +299,7 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
     } finally {
       setLoading(false);
     }
-  }, [createOnMount, entryId, initializeEntry, language, router, user]);
+  }, [communityMode, createOnMount, entryId, initializeEntry, language, router, user]);
 
   useEffect(() => {
     if (syncState === "loading") return;
@@ -535,13 +538,12 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
   };
 
   const validationError = useMemo(() => {
-    if (!form.title.trim()) return language === "zh" ? "请填写标题。" : "Add a title.";
     if (!entry || entry.images.length < 1) return language === "zh" ? "至少需要 1 张图片。" : "Add at least 1 image.";
     if (entry.images.some((image) => image.status !== "ready")) return language === "zh" ? "请等待所有图片处理完成。" : "Wait for every image to finish processing.";
     if (entry.images.some((image) => !image.decorative && !image.alt.trim())) return language === "zh" ? "请为非装饰图片填写替代文字。" : "Add alt text for every non-decorative image.";
     if (pendingUploads.length > 0) return language === "zh" ? "请等待上传完成。" : "Wait for uploads to finish.";
     return "";
-  }, [entry, form.title, language, pendingUploads.length]);
+  }, [entry, language, pendingUploads.length]);
 
   const publish = async () => {
     const current = entryRef.current;
@@ -555,7 +557,11 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
         : await publishJournalEntry(user.id, current.id);
       initializeEntry(response.entry);
       setMode("public");
-      router.refresh();
+      if (communityMode && current.publicRevision === 0) {
+        router.push("/community/");
+      } else {
+        router.refresh();
+      }
     } catch (cause) {
       setActionError(cause instanceof Error ? cause.message : (language === "zh" ? "札记未能发布" : "The journal could not be published"));
     } finally {
@@ -590,7 +596,7 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
     try {
       await deleteJournalEntry(user.id, current.id);
       clearRecovery(current.id);
-      router.replace("/journal/");
+      router.replace(libraryHref);
     } catch (cause) {
       setActionError(cause instanceof Error ? cause.message : (language === "zh" ? "札记删除失败" : "The journal could not be deleted"));
       setActionBusy("");
@@ -605,24 +611,24 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
   } : null;
 
   if (syncState === "loading" || loading) {
-    return <div className="atlas-page"><AppHeader backHref="/journal/" /><PageContainer><div className="journal-state" role="status"><span className="journal-state-pulse" />{language === "zh" ? "正在打开编辑器…" : "Opening editor…"}</div></PageContainer></div>;
+    return <div className="atlas-page"><AppHeader backHref={libraryHref} /><PageContainer><div className="journal-state" role="status"><span className="journal-state-pulse" />{language === "zh" ? "正在打开编辑器…" : "Opening editor…"}</div></PageContainer></div>;
   }
 
   if (!user) {
-    return <div className="atlas-page"><AppHeader backHref="/journal/" /><PageContainer><div className="journal-access-state"><LockKeyhole aria-hidden="true" /><h1>{language === "zh" ? "登录后继续创作" : "Sign in to continue"}</h1><p>{language === "zh" ? "札记草稿只保存在你的账号中。" : "Journal drafts are stored only in your account."}</p><Link href="/account/" className="atlas-primary-action">{language === "zh" ? "登录或注册" : "Sign in or register"}</Link></div></PageContainer></div>;
+    return <div className="atlas-page"><AppHeader backHref={libraryHref} /><PageContainer><div className="journal-access-state"><LockKeyhole aria-hidden="true" /><h1>{language === "zh" ? "登录后继续创作" : "Sign in to continue"}</h1><p>{language === "zh" ? "草稿只保存在你的账号中。" : "Drafts are stored only in your account."}</p><Link href="/account/" className="atlas-primary-action">{language === "zh" ? "登录或注册" : "Sign in or register"}</Link></div></PageContainer></div>;
   }
 
   if (viewer && !viewer.emailVerified) {
-    return <div className="atlas-page"><AppHeader backHref="/journal/" /><PageContainer><div className="journal-access-state"><LockKeyhole aria-hidden="true" /><h1>{language === "zh" ? "验证邮箱后继续" : "Verify your email to continue"}</h1><p>{language === "zh" ? "完成验证后即可保存草稿和上传图片。" : "After verification, you can save drafts and upload images."}</p><Link href="/account/" className="atlas-primary-action">{language === "zh" ? "前往账号" : "Open account"}</Link></div></PageContainer></div>;
+    return <div className="atlas-page"><AppHeader backHref={libraryHref} /><PageContainer><div className="journal-access-state"><LockKeyhole aria-hidden="true" /><h1>{language === "zh" ? "验证邮箱后继续" : "Verify your email to continue"}</h1><p>{language === "zh" ? "完成验证后即可保存草稿和上传图片。" : "After verification, you can save drafts and upload images."}</p><Link href="/account/" className="atlas-primary-action">{language === "zh" ? "前往账号" : "Open account"}</Link></div></PageContainer></div>;
   }
 
   if (loadError || !entry || !previewEntry) {
-    return <div className="atlas-page"><AppHeader backHref="/journal/" /><PageContainer><div className="journal-state journal-state-error"><FileImage aria-hidden="true" /><h1>{language === "zh" ? "编辑器没有打开" : "The editor did not open"}</h1><p>{loadError}</p><div><button type="button" className="atlas-secondary-action" onClick={() => void load()}><RefreshCw aria-hidden="true" />{language === "zh" ? "重新加载" : "Try again"}</button><Link href="/journal/" className="atlas-primary-action"><ArrowLeft aria-hidden="true" />{language === "zh" ? "回到个人库" : "Back to library"}</Link></div></div></PageContainer></div>;
+    return <div className="atlas-page"><AppHeader backHref={libraryHref} /><PageContainer><div className="journal-state journal-state-error"><FileImage aria-hidden="true" /><h1>{language === "zh" ? "编辑器没有打开" : "The editor did not open"}</h1><p>{loadError}</p><div><button type="button" className="atlas-secondary-action" onClick={() => void load()}><RefreshCw aria-hidden="true" />{language === "zh" ? "重新加载" : "Try again"}</button><Link href={libraryHref} className="atlas-primary-action"><ArrowLeft aria-hidden="true" />{language === "zh" ? "返回" : "Back"}</Link></div></div></PageContainer></div>;
   }
 
   return (
     <div className="atlas-page journal-editor-page">
-      <AppHeader backHref="/journal/" backLabel={language === "zh" ? "个人库" : "Library"} section={language === "zh" ? "札记编辑" : "Journal editor"} />
+      <AppHeader backHref={libraryHref} backLabel={communityMode ? (language === "zh" ? "社区" : "Community") : (language === "zh" ? "个人库" : "Library")} section={communityMode ? (language === "zh" ? "社区图文" : "Community image post") : (language === "zh" ? "札记编辑" : "Journal editor")} />
       <PageContainer className="journal-editor-container">
         <header className="journal-editor-header">
           <div>
@@ -647,7 +653,7 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
             <div className="journal-editor-workspace">
               <section className="journal-editor-section journal-editor-writing" aria-labelledby="journal-writing-heading">
                 <div className="journal-section-heading"><span>01</span><div><h2 id="journal-writing-heading">{language === "zh" ? "文字" : "Words"}</h2><p>{language === "zh" ? `${Array.from(form.body).length}/5000` : `${Array.from(form.body).length}/5000`}</p></div></div>
-                <label htmlFor="journal-title">{language === "zh" ? "标题" : "Title"}</label>
+                <label htmlFor="journal-title">{language === "zh" ? "标题（可选）" : "Title (optional)"}</label>
                 <input id="journal-title" className="journal-title-input" value={form.title} maxLength={120} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} placeholder={language === "zh" ? "给这一页一个名字" : "Name this page"} />
                 <label htmlFor="journal-body">{language === "zh" ? "正文（可选）" : "Body (optional)"}</label>
                 <textarea id="journal-body" value={form.body} maxLength={5000} rows={8} onChange={(event) => setForm((current) => ({ ...current, body: event.target.value }))} placeholder={language === "zh" ? "此刻，你想和这些图一起留下什么？" : "What would you like to leave beside these images?"} />
@@ -730,7 +736,7 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
               <label className="journal-toggle"><input aria-label={language === "zh" ? "允许留言" : "Allow responses"} type="checkbox" checked={form.allowComments} onChange={(event) => setForm((current) => ({ ...current, allowComments: event.target.checked }))} /><span><strong>{language === "zh" ? "允许留言" : "Allow responses"}</strong><small>{form.allowComments ? (language === "zh" ? "已开启" : "On") : (language === "zh" ? "已关闭" : "Off")}</small></span></label>
 
               <dl className="journal-publish-checks">
-                <div className={form.title.trim() ? "is-ready" : ""}><dt>{language === "zh" ? "标题" : "Title"}</dt><dd>{form.title.trim() ? <Check aria-label={language === "zh" ? "完成" : "Ready"} /> : "—"}</dd></div>
+                <div className="is-ready"><dt>{language === "zh" ? "标题" : "Title"}</dt><dd>{form.title.trim() ? <Check aria-label={language === "zh" ? "完成" : "Ready"} /> : (language === "zh" ? "可选" : "Optional")}</dd></div>
                 <div className={entry.images.length >= 1 ? "is-ready" : ""}><dt>{language === "zh" ? "图片" : "Images"}</dt><dd>{entry.images.length}/{MAX_IMAGES}</dd></div>
                 <div className={!entry.images.some((image) => !image.decorative && !image.alt.trim()) ? "is-ready" : ""}><dt>{language === "zh" ? "无障碍文字" : "Alt text"}</dt><dd>{!entry.images.some((image) => !image.decorative && !image.alt.trim()) ? <Check aria-label={language === "zh" ? "完成" : "Ready"} /> : "—"}</dd></div>
               </dl>
@@ -740,7 +746,7 @@ export function JournalEditor({ entryId, createOnMount = false }: { entryId?: st
 
               <button type="button" className="atlas-primary-action journal-publish-action" disabled={Boolean(validationError) || Boolean(actionBusy) || saveState === "error"} onClick={() => void publish()}>
                 {actionBusy === "publish" ? <LoaderCircle className="is-spinning" aria-hidden="true" /> : <Globe2 aria-hidden="true" />}
-                {entry.publicRevision > 0 ? (language === "zh" ? "更新公开版" : "Update public version") : (language === "zh" ? "发布札记" : "Publish journal")}
+                {entry.publicRevision > 0 ? (language === "zh" ? "更新公开版" : "Update public version") : (communityMode ? (language === "zh" ? "发布图文帖" : "Publish image post") : (language === "zh" ? "发布札记" : "Publish journal"))}
               </button>
               {entry.status === "published" && <button type="button" className="atlas-secondary-action journal-unpublish-action" disabled={Boolean(actionBusy)} onClick={() => void unpublish()}><LockKeyhole aria-hidden="true" />{actionBusy === "unpublish" ? (language === "zh" ? "取消中…" : "Unpublishing…") : (language === "zh" ? "取消公开" : "Unpublish")}</button>}
               <button type="button" className="journal-delete-action" disabled={Boolean(actionBusy)} onClick={() => void removeEntry()}><Trash2 aria-hidden="true" />{actionBusy === "delete" ? (language === "zh" ? "删除中…" : "Deleting…") : (language === "zh" ? "永久删除" : "Delete permanently")}</button>

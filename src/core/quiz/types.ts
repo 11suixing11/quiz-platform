@@ -257,6 +257,28 @@ export interface QuizDefinition {
 
 export type QuizCalculator = (answers: number[]) => QuizResult;
 
+/**
+ * The serializable half of a quiz. `scoring.calculate` is a function, so a
+ * whole `QuizDefinition` can never cross the Server/Client boundary. The paper
+ * can: a Server Component prerenders it and the client renders questions on
+ * first paint, with no loading state.
+ */
+export type QuizPaper = Omit<QuizDefinition, "scoring">;
+
+/**
+ * The narrower slice the answering flow needs. Result copy (`resultContent`)
+ * is by far the largest part of a paper and is useless until the quiz is done,
+ * so it is deliberately absent here.
+ */
+export interface QuizQuestionSet {
+  id: string;
+  kind: QuizKind;
+  accent: string;
+  duration: string;
+  title: LocalizedText;
+  questions: QuizQuestion[];
+}
+
 export interface ScoringAdapter {
   kind: QuizKind;
   calculate: (definition: QuizDefinition, answers: number[]) => QuizResult;

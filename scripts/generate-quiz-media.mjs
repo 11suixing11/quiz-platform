@@ -6,12 +6,18 @@ const WIDTH = 1200;
 const HEIGHT = 900;
 const OUTPUT_ROOT = path.join(process.cwd(), "public", "quiz-media");
 
+/* Cyanotype. A blueprint is a monochrome object, so the four scene families are
+ * four exposures of one blue rather than four different colours: 258 for the
+ * self scenes, 232 for feeling, 205 for relating, 188 for living. Brass never
+ * appears here -- in this product a warm pixel means "this is the number being
+ * reported", and an illustration reports nothing. */
 const palettes = {
-  forest: { paper: "#F7EBDD", sky: "#E9D5BE", light: "#FFF7E8", ground: "#637968", ink: "#293832", accent: "#C77F64", soft: "#AEBDAA" },
-  water: { paper: "#F6EADD", sky: "#D9E4DD", light: "#FFF7E9", ground: "#5D786E", ink: "#263832", accent: "#B96F6A", soft: "#9CB7AD" },
-  bridge: { paper: "#F7EBDD", sky: "#E3DDD0", light: "#FFF9EB", ground: "#526D62", ink: "#2C3833", accent: "#B58A58", soft: "#9FB1A5" },
-  table: { paper: "#F9EDDF", sky: "#E8DCCB", light: "#FFF8EC", ground: "#71806D", ink: "#303A34", accent: "#B97767", soft: "#A8B69E" },
+  forest: { paper: "#EBF1F8", sky: "#CDDAED", light: "#F8FAFE", soft: "#9FB3D0", ground: "#5B77A0", ink: "#14233A", accent: "#2A5695" },
+  water: { paper: "#E9F2F7", sky: "#C6DDEA", light: "#F6FBFD", soft: "#93B7CB", ground: "#477E99", ink: "#042736", accent: "#00608B" },
+  bridge: { paper: "#E7F3F4", sky: "#C3DFE2", light: "#F6FBFC", soft: "#8EBAC0", ground: "#3B828A", ink: "#00292E", accent: "#006775" },
+  table: { paper: "#E8F3F1", sky: "#C4E0DD", light: "#F6FBFB", soft: "#8FBBB7", ground: "#3D847E", ink: "#002A27", accent: "#006A62" },
 };
+
 
 const scenes = [
   ["animal-personality/cover", "forest", "four-paths", 11],

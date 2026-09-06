@@ -51,7 +51,6 @@ const definition = defineQuiz({
   id: "career-values",
   kind: "dimensions",
   category: "career",
-  accent: legacy.color ?? "#3F51B5",
   duration: "3-6",
   title: { zh: "职业价值观测试", en: "Career Values Test" },
   description: {

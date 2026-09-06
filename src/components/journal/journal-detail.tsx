@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { ArrowLeft, FileImage, LogIn, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity, useAccountSync } from "@/components/account-provider";
 import { JournalArticle } from "@/components/journal/journal-article";
 import { JournalInteractions } from "@/components/journal/journal-interactions";
-import { AppHeader, PageContainer } from "@/components/shell/app-shell";
+import { FocusHeader, PageContainer } from "@/components/shell/app-shell";
 import { useLanguage } from "@/hooks/use-local-storage";
 import { getJournalEntry, JournalApiError, type JournalEntry } from "@/lib/journal";
 
@@ -14,19 +14,23 @@ export function JournalDetail({
   id,
   initialEntry,
   initialViewerId,
+  returnTo,
 }: {
   id: string;
   initialEntry: JournalEntry;
   initialViewerId: string | null;
+  returnTo?: "community";
 }) {
   const { language } = useLanguage();
-  const { user, syncState } = useAccount();
+  const { user } = useAccountIdentity();
+  const { syncState } = useAccountSync();
   const userId = user?.id;
   const [entry, setEntry] = useState<JournalEntry | null>(initialEntry);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [errorCode, setErrorCode] = useState("");
   const loadedViewerRef = useRef<string | null | undefined>(initialViewerId);
+  const backHref = returnTo === "community" ? "/community/" : entry?.isOwner ? "/journal/" : "/community/";
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -55,7 +59,7 @@ export function JournalDetail({
 
   return (
     <div className="atlas-page journal-detail-page">
-      <AppHeader backHref={entry?.isOwner ? "/journal/" : "/community/"} backLabel={language === "zh" ? "返回" : "Back"} section={language === "zh" ? "图像札记" : "Image journal"} narrow />
+      <FocusHeader backHref={backHref} backLabel={language === "zh" ? "返回" : "Back"} section={returnTo === "community" ? (language === "zh" ? "社区图文" : "Community image post") : (language === "zh" ? "图像札记" : "Image journal")} />
       <PageContainer className="journal-reading-container max-w-3xl">
         {loading && <div className="journal-state" role="status"><span className="journal-state-pulse" />{language === "zh" ? "正在打开札记…" : "Opening journal…"}</div>}
 
@@ -69,7 +73,7 @@ export function JournalDetail({
             <div>
               <button type="button" className="atlas-secondary-action" onClick={() => void load()}><RefreshCw aria-hidden="true" />{language === "zh" ? "重新加载" : "Try again"}</button>
               {user
-                ? <Link href="/journal/" className="atlas-primary-action"><ArrowLeft aria-hidden="true" />{language === "zh" ? "回到个人库" : "Back to library"}</Link>
+                ? <Link href={backHref} className="atlas-primary-action"><ArrowLeft aria-hidden="true" />{returnTo === "community" ? (language === "zh" ? "回到社区" : "Back to community") : (language === "zh" ? "回到个人库" : "Back to library")}</Link>
                 : <Link href="/account/" className="atlas-primary-action"><LogIn aria-hidden="true" />{language === "zh" ? "登录查看自己的札记" : "Sign in for your journals"}</Link>}
             </div>
           </div>
@@ -81,6 +85,7 @@ export function JournalDetail({
             language={language}
             preview={entry.isOwner && entry.status !== "published" ? "private" : undefined}
             showOwnerActions={entry.isOwner}
+            ownerEditHref={returnTo === "community" ? `/journal/${entry.id}/edit/?from=community` : undefined}
           />
           {entry.status === "published" && <JournalInteractions entry={entry} language={language} onRefresh={() => void load()} />}
         </>}

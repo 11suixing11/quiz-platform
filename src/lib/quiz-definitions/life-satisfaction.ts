@@ -48,7 +48,6 @@ const definition = defineQuiz({
   id: "life-satisfaction",
   kind: "score",
   category: "lifestyle",
-  accent: legacy.color ?? "#FFC107",
   duration: "3-6",
   title: {
     zh: "生活满意度测试",

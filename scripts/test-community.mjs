@@ -71,6 +71,91 @@ const community = compile("src/lib/server/community.ts", {
   },
 });
 
+const feedCalls = { community: [], journal: [] };
+const feedCommunityItems = {
+  assessment: Array.from({ length: 25 }, (_, index) => ({
+    id: `feed-assessment-${index}`,
+    kind: "assessment",
+    title: "",
+    contentLanguage: "zh",
+    testId: "sample-test",
+    testName: "示例测评",
+    testNameEn: "Sample assessment",
+    resultTitle: "安静观察者",
+    resultTitleEn: "Quiet observer",
+    dimensions: [],
+    reflection: `assessment-${index}`,
+    showResultType: true,
+    showDimensions: false,
+    showAvatar: false,
+    allowComments: true,
+    createdAt: 3_000 - index,
+    author: { displayName: "测评用户", avatar: "" },
+    reactionCount: 1,
+    commentCount: 0,
+    reacted: false,
+    isAuthor: false,
+    comments: [],
+  })),
+  text: Array.from({ length: 25 }, (_, index) => ({
+    id: `feed-text-${index}`,
+    kind: "text",
+    title: `文字 ${index}`,
+    contentLanguage: "zh",
+    testId: "",
+    testName: "",
+    testNameEn: "",
+    resultTitle: null,
+    resultTitleEn: null,
+    dimensions: [],
+    reflection: `text-${index}`,
+    showResultType: false,
+    showDimensions: false,
+    showAvatar: false,
+    allowComments: true,
+    createdAt: 2_000 - index,
+    author: { displayName: "文字用户", avatar: "" },
+    reactionCount: 0,
+    commentCount: 0,
+    reacted: false,
+    isAuthor: false,
+    comments: [],
+  })),
+};
+const feedJournalItems = [{
+  id: "feed-journal-high",
+  title: "图像札记",
+  body: "公开内容",
+  contentLanguage: "zh",
+  allowComments: true,
+  isOwner: false,
+  ownerId: "private-owner-id",
+  author: { displayName: "图像作者", id: "private-author-id", avatar: "" },
+  cover: { id: "asset-1", alt: "公开图片", decorative: false, caption: "", variants: { medium: { src: "/media/public/revision/asset-1/960.webp", width: 960, height: 640 } } },
+  imageCount: 1,
+  publishedAt: 4_000,
+  reactionCount: 99,
+  commentCount: 2,
+  reacted: false,
+}];
+const feed = compile("src/lib/server/community-feed.ts", {
+  "server-only": {},
+  "./community": {
+    listCommunityPosts: (_viewerId, sort, kind) => {
+      feedCalls.community.push({ sort, kind });
+      if (kind === "assessment") return feedCommunityItems.assessment;
+      if (kind === "text") return feedCommunityItems.text;
+      return [...feedCommunityItems.assessment, ...feedCommunityItems.text];
+    },
+  },
+  "./journal": {
+    listPublishedJournalEntries: (_viewerId, sort) => {
+      feedCalls.journal.push({ sort });
+      return feedJournalItems;
+    },
+  },
+});
+
 try {
   const sqlite = database.getDatabase();
   const rateRequest = new Request("http://localhost/api/test", { headers: { "x-real-ip": "203.0.113.9" } });
@@ -152,6 +237,70 @@ try {
   assert.equal(community.deleteCommunityComment("user-a", commentId), true, "post owner can moderate a response");
   assert.equal(community.deleteCommunityPost("user-a", postId), true);
   assert.equal(community.listCommunityPosts(null, "latest").length, 0);
+
+  const resultOnlyId = await community.createCommunityPost("user-a", { attemptId: "attempt-1", reflection: "", showResultType: true });
+  const resultOnly = community.listCommunityPosts(null, "latest").find((post) => post.id === resultOnlyId);
+  assert.equal(resultOnly.kind, "assessment");
+  assert.equal(resultOnly.reflection, "", "an assessment result can be shared without a reflection");
+  assert.equal(community.deleteCommunityPost("user-a", resultOnlyId), true);
+
+  const textId = await community.createCommunityPost("user-b", { title: "给今天留一句话", body: "先把想法放在这里。" });
+  const textPost = community.listCommunityPosts(null, "latest").find((post) => post.id === textId);
+  assert.equal(textPost.kind, "text");
+  assert.equal(textPost.title, "给今天留一句话");
+  assert.equal(textPost.reflection, "先把想法放在这里。");
+  assert.equal(textPost.showAvatar, false, "text posts must not expose an avatar unless explicitly selected");
+  assert.equal(community.listCommunityPosts(null, "latest", "assessment").every((post) => post.kind === "assessment"), true);
+  assert.equal(community.listCommunityPosts(null, "latest", "text").every((post) => post.kind === "text"), true);
+  await assert.rejects(() => community.createCommunityPost("user-b", { title: "", body: "" }), (error) => error.code === "EMPTY_POST");
+  assert.equal(community.deleteCommunityPost("user-b", textId), true);
+
+  // Seed alternating kinds so a post-kind query must apply its predicate
+  // before the 20-row page limit rather than filtering a mixed page in JS.
+  const feedSeed = sqlite.prepare(`
+    INSERT INTO community_posts
+      (id, user_id, post_kind, title, content_language, attempt_id, test_id, test_name, test_name_en,
+       result_title, result_title_en, dimensions_json, reflection, show_result_type, show_dimensions,
+       show_avatar, allow_comments, created_at, updated_at)
+    VALUES (?, ?, ?, ?, 'zh', ?, ?, ?, ?, NULL, NULL, '[]', ?, 0, 0, 0, 1, ?, ?)
+  `);
+  const seedBase = Date.now() + 10_000;
+  for (let index = 0; index < 21; index += 1) {
+    feedSeed.run(`feed-smoke-text-${index}`, "user-b", "text", `文字 ${index}`, `post:feed-smoke-text-${index}`, "", "", "", `文字内容 ${index}`, seedBase + index * 2, seedBase + index * 2);
+    feedSeed.run(`feed-smoke-assessment-${index}`, "user-a", "assessment", "", `post:feed-smoke-assessment-${index}`, definition.id, definition.title.zh, definition.title.en, `测评内容 ${index}`, seedBase + index * 2 + 1, seedBase + index * 2 + 1);
+  }
+  const filteredTexts = community.listCommunityPosts(null, "latest", "text");
+  const filteredAssessments = community.listCommunityPosts(null, "latest", "assessment");
+  assert.equal(filteredTexts.length, 20, "text filter must apply before LIMIT");
+  assert.equal(filteredAssessments.length, 20, "assessment filter must apply before LIMIT");
+  assert.equal(filteredTexts.every((post) => post.kind === "text"), true);
+  assert.equal(filteredAssessments.every((post) => post.kind === "assessment"), true);
+  sqlite.prepare("DELETE FROM community_posts WHERE id LIKE 'feed-smoke-%'").run();
+
+  feedCalls.community.length = 0;
+  feedCalls.journal.length = 0;
+  const assessmentFeed = feed.listCommunityFeed(null, "latest", "assessment");
+  assert.equal(assessmentFeed.length, 20, "assessment feed keeps a full page after filtering");
+  assert.equal(assessmentFeed.every((post) => post.source === "community" && post.kind === "assessment"), true);
+  assert.deepEqual(feedCalls.community[0], { sort: "latest", kind: "assessment" });
+  assert.equal(feedCalls.journal.length, 0, "assessment feed must not query journal entries");
+
+  feedCalls.community.length = 0;
+  feedCalls.journal.length = 0;
+  const imageFeed = feed.listCommunityFeed(null, "latest", "image");
+  assert.equal(imageFeed.length, 1);
+  assert.equal(imageFeed[0].source, "journal");
+  assert.match(imageFeed[0].href, /from=community/);
+  assert.equal(feedCalls.community.length, 0, "image feed must not query community posts");
+  assert.deepEqual(feedCalls.journal[0], { sort: "latest" });
+  assert.equal(Object.hasOwn(imageFeed[0], "ownerId"), false, "feed DTO must not expose journal owner ids");
+  assert.equal(JSON.stringify(imageFeed).includes("private-author-id"), false, "feed DTO must not expose private author ids");
+
+  feedCalls.community.length = 0;
+  feedCalls.journal.length = 0;
+  const resonantFeed = feed.listCommunityFeed(null, "resonant", "all");
+  assert.equal(resonantFeed[0].source, "journal", "resonant feed must use journal reaction ordering");
+  assert.deepEqual(feedCalls.journal[0], { sort: "resonant" });
 } finally {
   globalThis.__knowYourselfDatabase?.close();
   globalThis.__knowYourselfDatabase = undefined;

@@ -41,7 +41,6 @@ const definition = defineQuiz({
   id: "self-compassion",
   kind: "dimensions",
   category: "personality",
-  accent: legacy.color ?? "#F44336",
   duration: "2-4",
   title: { zh: "自我关怀测试", en: "Self-Compassion Test" },
   description: {

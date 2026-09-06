@@ -64,7 +64,6 @@ const definition = defineQuiz({
   id: "mbti",
   kind: "type",
   category: "personality",
-  accent: legacy.color ?? "#6C63FF",
   duration: "12-21",
   title: { zh: "MBTI人格测试", en: "MBTI Personality Test" },
   description: {

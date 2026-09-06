@@ -1,3 +1,4 @@
+import { categoryAccent } from "@/lib/constants";
 import type {
   LegacyQuestion,
   LocalizedText,
@@ -41,7 +42,6 @@ export interface QuizDefinitionInput {
   id: string;
   kind: QuizKind;
   category: string;
-  accent: string;
   duration: string;
   title: LocalizedText;
   description: LocalizedText;
@@ -57,7 +57,11 @@ export function defineQuiz(input: QuizDefinitionInput): QuizDefinition {
     kind: input.kind,
     origin: "standard",
     category: input.category,
-    accent: input.accent,
+    // Not `input.accent`: a definition does not get to name its own colour. Each
+    // of these modules was seeded with the Material swatch its legacy source
+    // carried -- #6C63FF for MBTI, #E91E63 for attachment -- and sixteen such
+    // choices are sixteen palettes. The topic decides.
+    accent: categoryAccent(input.category),
     duration: input.duration,
     title: input.title,
     description: input.description,

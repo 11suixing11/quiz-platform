@@ -51,7 +51,6 @@ const definition = defineQuiz({
   id: "emotional-resilience",
   kind: "score",
   category: "emotion",
-  accent: legacy.color ?? "#8BC34A",
   duration: "3-6",
   title: { zh: "情绪韧性测试", en: "Emotional Resilience Test" },
   description: {

@@ -74,7 +74,6 @@ const definition = defineQuiz({
   id: "communication-style",
   kind: "type",
   category: "relationship",
-  accent: legacy.color ?? "#2196F3",
   duration: "4-7",
   title: { zh: "沟通风格测试", en: "Communication Style Test" },
   description: {

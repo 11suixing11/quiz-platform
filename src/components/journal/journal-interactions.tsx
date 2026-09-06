@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Heart, MessageCircle, Reply, ShieldAlert, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity } from "@/components/account-provider";
 import {
   createJournalComment,
   deleteJournalComment,
@@ -43,7 +43,7 @@ function CommentForm({ entryId, parentId, language, onSaved }: {
   language: "zh" | "en";
   onSaved(): void;
 }) {
-  const { user } = useAccount();
+  const { user } = useAccountIdentity();
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -78,7 +78,7 @@ function CommentItem({ comment, entry, language, onRefresh, onReport }: {
   onRefresh(): void;
   onReport(target: ReportTarget): void;
 }) {
-  const { user } = useAccount();
+  const { user } = useAccountIdentity();
   const [replying, setReplying] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const replies = entry.comments.filter((item) => item.parentId === comment.id);
@@ -108,7 +108,7 @@ function ReportDialog({ target, language, onClose, onSubmitted }: {
   onClose(): void;
   onSubmitted(hidden: boolean, duplicate: boolean): void;
 }) {
-  const { user } = useAccount();
+  const { user } = useAccountIdentity();
   const [reason, setReason] = useState<JournalReportReason>("privacy");
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
@@ -178,7 +178,7 @@ function ReportDialog({ target, language, onClose, onSubmitted }: {
 }
 
 export function JournalInteractions({ entry, language, onRefresh }: { entry: JournalEntry; language: "zh" | "en"; onRefresh(): void }) {
-  const { user } = useAccount();
+  const { user } = useAccountIdentity();
   const [reactionBusy, setReactionBusy] = useState(false);
   const [target, setTarget] = useState<ReportTarget | null>(null);
   const [notice, setNotice] = useState("");

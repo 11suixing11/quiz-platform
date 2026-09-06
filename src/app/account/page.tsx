@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   KeyRound,
@@ -12,10 +13,12 @@ import {
   ShieldCheck,
   UserPlus,
 } from "lucide-react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity, useAccountSync, useAccountActions } from "@/components/account-provider";
 import { ProfileEditor } from "@/components/profile-editor";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
-import { TurnstileWidget, type TurnstileConfigurationStatus } from "@/components/turnstile-widget";
+import type { TurnstileConfigurationStatus } from "@/components/turnstile-widget";
+/** Only registration renders a captcha, so only registration pays for it. */
+const TurnstileWidget = dynamic(() => import("@/components/turnstile-widget").then((mod) => mod.TurnstileWidget), { ssr: false });
 import { useLanguage } from "@/hooks/use-local-storage";
 import { AccountApiError, changePassword, deleteAccount, getAccountCapabilities, loginAccount, registerAccount, sendVerificationEmail } from "@/lib/account";
 import { clearSyncBaseline } from "@/lib/account-sync";
@@ -63,15 +66,9 @@ function readableError(error: unknown, language: "zh" | "en") {
 
 export default function AccountPage() {
   const { language } = useLanguage();
-  const {
-    user,
-    syncState,
-    syncError,
-    syncChoice,
-    refreshAccount,
-    syncNow,
-    signOut,
-  } = useAccount();
+  const { user } = useAccountIdentity();
+  const { syncState, syncError, syncChoice } = useAccountSync();
+  const { refreshAccount, syncNow, signOut } = useAccountActions();
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");

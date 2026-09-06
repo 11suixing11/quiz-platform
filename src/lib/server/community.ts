@@ -6,7 +6,9 @@ import { asRow, getDatabase, withTransaction } from "./database";
 import { assertAccountCanWrite, GovernanceError } from "./governance";
 
 export const COMMUNITY_LIMITS = {
+  title: 120,
   reflection: 500,
+  body: 12_000,
   comment: 500,
   pageSize: 20,
   maxCommentsPerPost: 60,
@@ -47,6 +49,9 @@ export interface CommunityComment {
 
 export interface CommunityPost {
   id: string;
+  kind: "assessment" | "text";
+  title: string;
+  contentLanguage: string;
   testId: string;
   testName: string;
   testNameEn: string;
@@ -67,6 +72,8 @@ export interface CommunityPost {
   comments: CommunityComment[];
 }
 
+export type CommunityPostKind = "assessment" | "text";
+
 function id(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${randomBytes(8).toString("hex")}`;
 }
@@ -77,6 +84,11 @@ function text(value: unknown, max: number, required = true) {
   const length = Array.from(normalized).length;
   if ((required && length === 0) || length > max) throw new CommunityValidationError(`内容需要为 1 至 ${max} 个字符`);
   return normalized;
+}
+
+function optionalText(value: unknown, max: number) {
+  if (value === undefined || value === null) return "";
+  return text(value, max, false);
 }
 
 function bool(value: unknown, fallback: boolean) {
@@ -135,26 +147,51 @@ export async function createCommunityPost(userId: string, value: unknown) {
   assertCommunityWrite(userId);
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new CommunityValidationError("请求格式无效");
   const input = value as Record<string, unknown>;
-  const attemptId = text(input.attemptId, 180);
-  if (!/^[a-zA-Z0-9:_-]+$/.test(attemptId)) throw new CommunityValidationError("测评记录无效", "INVALID_ATTEMPT");
-  const reflection = text(input.reflection, COMMUNITY_LIMITS.reflection);
+  const rawAttemptId = input.attemptId;
+  if (rawAttemptId !== undefined && rawAttemptId !== null && typeof rawAttemptId !== "string") {
+    throw new CommunityValidationError("测评记录无效", "INVALID_ATTEMPT");
+  }
+  const attemptId = typeof rawAttemptId === "string" ? rawAttemptId.trim() : "";
+  if (attemptId && !/^[a-zA-Z0-9:_-]+$/.test(attemptId)) throw new CommunityValidationError("测评记录无效", "INVALID_ATTEMPT");
+  const isAssessment = Boolean(attemptId);
+  const title = optionalText(input.title, COMMUNITY_LIMITS.title);
+  const reflection = isAssessment
+    ? optionalText(input.reflection ?? input.body, COMMUNITY_LIMITS.reflection)
+    : optionalText(input.body ?? input.reflection, COMMUNITY_LIMITS.body);
+  if (!isAssessment && !title && !reflection) throw new CommunityValidationError("请至少写下一点内容", "EMPTY_POST");
   const database = getDatabase();
-  const row = asRow(database.prepare(`SELECT test_id, result_json, test_name, test_name_en FROM quiz_attempts WHERE user_id = ? AND id = ?`).get(userId, attemptId));
-  if (!row) throw new CommunityValidationError("没有找到可分享的测评记录", "ATTEMPT_NOT_FOUND");
-  const definition = await loadQuizDefinition(String(row.test_id));
-  if (!definition) throw new CommunityValidationError("这项测评暂时不能公开分享", "QUIZ_NOT_FOUND");
-  let result: QuizResult;
-  try { result = JSON.parse(String(row.result_json)) as QuizResult; } catch { throw new CommunityValidationError("测评结果无效"); }
+  let testId = "";
+  let testName = "";
+  let testNameEn = "";
+  let resultTitleZh: string | null = null;
+  let resultTitleEn: string | null = null;
+  let dimensionJson = "[]";
+  if (isAssessment) {
+    const row = asRow(database.prepare(`SELECT test_id, result_json, test_name, test_name_en FROM quiz_attempts WHERE user_id = ? AND id = ?`).get(userId, attemptId));
+    if (!row) throw new CommunityValidationError("没有找到可分享的测评记录", "ATTEMPT_NOT_FOUND");
+    const definition = await loadQuizDefinition(String(row.test_id));
+    if (!definition) throw new CommunityValidationError("这项测评暂时不能公开分享", "QUIZ_NOT_FOUND");
+    let result: QuizResult;
+    try { result = JSON.parse(String(row.result_json)) as QuizResult; } catch { throw new CommunityValidationError("测评结果无效"); }
+    testId = definition.id;
+    testName = definition.title.zh;
+    testNameEn = definition.title.en;
+    resultTitleZh = resultTitle(definition, result, "zh");
+    resultTitleEn = resultTitle(definition, result, "en");
+    dimensionJson = JSON.stringify(dimensions(definition, result));
+  }
   const now = Date.now();
   const postId = id("post");
+  const storedAttemptId = isAssessment ? attemptId : `post:${postId}`;
   try {
     database.prepare(`
       INSERT INTO community_posts
-        (id, user_id, attempt_id, test_id, test_name, test_name_en, result_title, result_title_en, dimensions_json, reflection, show_result_type, show_dimensions, show_avatar, allow_comments, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(postId, userId, attemptId, definition.id, definition.title.zh, definition.title.en,
-      resultTitle(definition, result, "zh"), resultTitle(definition, result, "en"), JSON.stringify(dimensions(definition, result)), reflection,
-      bool(input.showResultType, true) ? 1 : 0, bool(input.showDimensions, false) ? 1 : 0, bool(input.showAvatar, true) ? 1 : 0,
+        (id, user_id, post_kind, title, content_language, attempt_id, test_id, test_name, test_name_en, result_title, result_title_en, dimensions_json, reflection, show_result_type, show_dimensions, show_avatar, allow_comments, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(postId, userId, isAssessment ? "assessment" : "text", title, typeof input.contentLanguage === "string" && input.contentLanguage.trim() ? input.contentLanguage.trim().slice(0, 16) : "zh", storedAttemptId, testId, testName, testNameEn,
+      resultTitleZh, resultTitleEn, dimensionJson, reflection,
+      bool(input.showResultType, true) ? 1 : 0, bool(input.showDimensions, false) ? 1 : 0,
+      bool(input.showAvatar, isAssessment) ? 1 : 0,
       bool(input.allowComments, true) ? 1 : 0, now, now);
   } catch (cause) {
     if (cause instanceof Error && cause.message.includes("UNIQUE constraint failed")) throw new CommunityValidationError("这次测评已经分享过了", "ALREADY_SHARED");
@@ -163,9 +200,21 @@ export async function createCommunityPost(userId: string, value: unknown) {
   return postId;
 }
 
-export function listCommunityPosts(viewerId: string | null, sort: "latest" | "resonant") {
+/**
+ * List visible community posts. `kind` is intentionally optional so existing
+ * callers that consume the complete community stream keep their behaviour.
+ * When present, the predicate is applied in SQL before the page-size limit so
+ * a busy stream of the other kind cannot starve the requested filter.
+ */
+export function listCommunityPosts(viewerId: string | null, sort: "latest" | "resonant" = "latest", kind?: CommunityPostKind) {
   const database = getDatabase();
-  const order = sort === "resonant" ? "reaction_count DESC, p.created_at DESC" : "p.created_at DESC";
+  const order = sort === "resonant"
+    ? "reaction_count DESC, p.created_at DESC, p.id DESC"
+    : "p.created_at DESC, p.id DESC";
+  const kindFilter = kind === "assessment" || kind === "text" ? " AND p.post_kind = ?" : "";
+  const queryArgs: unknown[] = [viewerId, viewerId];
+  if (kindFilter) queryArgs.push(kind);
+  queryArgs.push(COMMUNITY_LIMITS.pageSize);
   const rows = database.prepare(`
     SELECT p.*, u.name AS display_name, pr.avatar,
       (SELECT COUNT(*) FROM community_reactions r WHERE r.post_id = p.id) AS reaction_count,
@@ -174,10 +223,10 @@ export function listCommunityPosts(viewerId: string | null, sort: "latest" | "re
     FROM community_posts p
     JOIN "user" u ON u.id = p.user_id
     LEFT JOIN profiles pr ON pr.user_id = p.user_id
-    WHERE p.deleted_at IS NULL AND p.moderation_status = 'visible'
+    WHERE p.deleted_at IS NULL AND p.moderation_status = 'visible'${kindFilter}
     ORDER BY ${order}
     LIMIT ?
-  `).all(viewerId, viewerId, COMMUNITY_LIMITS.pageSize) as Array<Record<string, unknown>>;
+  `).all(...queryArgs) as Array<Record<string, unknown>>;
   if (!rows.length) return [];
   const postIds = rows.map((row) => String(row.id));
   const placeholders = postIds.map(() => "?").join(",");
@@ -202,7 +251,9 @@ export function listCommunityPosts(viewerId: string | null, sort: "latest" | "re
     comments.set(postId, list);
   }
   return rows.map((row): CommunityPost => ({
-    id: String(row.id), testId: String(row.test_id), testName: String(row.test_name), testNameEn: String(row.test_name_en),
+    id: String(row.id), kind: String(row.post_kind ?? (row.test_id ? "assessment" : "text")) === "text" ? "text" : "assessment",
+    title: String(row.title ?? ""), contentLanguage: String(row.content_language ?? "zh"),
+    testId: String(row.test_id ?? ""), testName: String(row.test_name ?? ""), testNameEn: String(row.test_name_en ?? ""),
     resultTitle: row.show_result_type ? String(row.result_title || "") || null : null,
     resultTitleEn: row.show_result_type ? String(row.result_title_en || "") || null : null,
     dimensions: row.show_dimensions ? parseDimensions(row.dimensions_json) : [], reflection: String(row.reflection),

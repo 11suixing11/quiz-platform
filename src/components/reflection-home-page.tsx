@@ -40,7 +40,7 @@ export default function ReflectionHomePage() {
           <section className="home-paths" aria-label={localized(language, "选择反思方式", "Choose a way to reflect")}>
             <Link href="/assessments/" className="home-path home-path--assessment group">
               <div className="home-path-media">
-                {assessmentVisual && <QuizVisualFrame visual={assessmentVisual} lang={language} sizes="(max-width: 799px) 92vw, 39vw" className="home-path-visual" preload />}
+                {assessmentVisual && <QuizVisualFrame visual={assessmentVisual} lang={language} sizes="(max-width: 799px) 92vw, 46vw" className="home-path-visual" preload />}
                 <span className="home-path-media-label">{localized(language, "结构化路径", "Structured")}</span>
               </div>
               <div className="home-path-body">
@@ -50,15 +50,15 @@ export default function ReflectionHomePage() {
               </div>
             </Link>
 
-            <Link href="/journal/" className="home-path home-path--journal group">
+            <Link href="/community/" className="home-path home-path--journal group">
               <div className="home-path-media">
-                <QuizVisualFrame visual={journalVisual} lang={language} sizes="(max-width: 799px) 92vw, 33vw" className="home-path-visual" preload />
+                <QuizVisualFrame visual={journalVisual} lang={language} sizes="(max-width: 799px) 92vw, 46vw" className="home-path-visual" preload />
                 <span className="home-path-media-label">{localized(language, "开放式路径", "Open-ended")}</span>
               </div>
               <div className="home-path-body">
-                <h2>{localized(language, "写一篇图像札记", "Create an image journal")}</h2>
-                <p>{localized(language, "把图像、片段和说明排成一篇默认私密的个人观察。", "Arrange images, fragments, and captions into a private reflection of your own.")}</p>
-                <span className="home-path-action">{localized(language, "进入札记", "Open journal")}<ArrowUpRight aria-hidden="true" /></span>
+                <h2>{localized(language, "进入社区分享", "Share with the community")}</h2>
+                <p>{localized(language, "选择文字、测评或图像，把此刻的观察留给可能懂你的人。", "Choose words, an assessment, or images and leave an observation for someone who may understand.")}</p>
+                <span className="home-path-action">{localized(language, "打开社区", "Open community")}<ArrowUpRight aria-hidden="true" /></span>
               </div>
             </Link>
           </section>

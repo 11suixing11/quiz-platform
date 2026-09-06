@@ -68,7 +68,6 @@ const definition = defineQuiz({
   id: "animal-personality",
   kind: "type",
   category: "personality",
-  accent: legacy.color ?? "#795548",
   duration: "3-6",
   title: { zh: "动物人格测试", en: "Animal Personality Test" },
   description: {

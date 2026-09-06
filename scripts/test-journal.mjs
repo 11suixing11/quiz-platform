@@ -191,6 +191,52 @@ try {
   assert.equal(published.status, "published");
   assert.equal(published.publicRevision, 1);
   assert.equal(published.hasUnpublishedChanges, false);
+
+  const imageOnlyDraft = journal.createJournalEntry("reader-3", { contentLanguage: "zh" });
+  const imageOnlyBatch = await batch("reader-3", imageOnlyDraft.id);
+  const imageOnlyQueued = await journal.uploadJournalAsset("reader-3", imageOnlyDraft.id, await jpegFile("image-only.jpg"), { uploadId: imageOnlyBatch.uploadId });
+  const { entry: imageOnlyReady } = await waitForAsset("reader-3", imageOnlyDraft.id, imageOnlyQueued.uploadedAssetId, "ready");
+  journal.updateJournalEntry("reader-3", imageOnlyDraft.id, {
+    baseRevision: imageOnlyReady.revision,
+    images: [{ id: imageOnlyReady.images[0].id, position: 0, caption: "", alt: "只有图片的社区帖子", decorative: false }],
+  });
+  const imageOnlyPublished = journal.publishJournalEntry("reader-3", imageOnlyDraft.id);
+  assert.equal(imageOnlyPublished.title, "", "an image post can be published without a title");
+  assert.equal(imageOnlyPublished.body, "", "an image post can be published without body text");
+  journal.deleteJournalEntry("reader-3", imageOnlyDraft.id);
+
+  // Keep the high-reaction entry outside the latest page. Resonant ordering
+  // must be applied in SQL so it can still surface on the first page.
+  const feedSeedEntries = Array.from({ length: 21 }, (_, index) => ({
+    entryId: `feed-sort-entry-${index}`,
+    revisionId: `feed-sort-revision-${index}`,
+    publishedAt: Date.now() - 2_000_000 + index * 1_000,
+  }));
+  const insertFeedEntry = sqlite.prepare(`
+    INSERT INTO journal_entries
+      (id, user_id, title, body, content_language, allow_comments, status, published_revision_id,
+       created_at, updated_at, published_at)
+    VALUES (?, 'owner', ?, ?, 'zh', 1, 'published', ?, ?, ?, ?)
+  `);
+  const insertFeedRevision = sqlite.prepare(`
+    INSERT INTO journal_revisions
+      (id, entry_id, revision_number, title, body, content_language, allow_comments,
+       draft_revision, author_display_name, created_at)
+    VALUES (?, ?, 1, ?, ?, 'zh', 1, 0, '札记作者', ?)
+  `);
+  for (const item of feedSeedEntries) {
+    insertFeedEntry.run(item.entryId, item.entryId, "排序测试内容", item.revisionId, item.publishedAt, item.publishedAt, item.publishedAt);
+    insertFeedRevision.run(item.revisionId, item.entryId, item.entryId, "排序测试内容", item.publishedAt);
+  }
+  const highReactionEntryId = feedSeedEntries[0].entryId;
+  sqlite.prepare("INSERT INTO journal_reactions (entry_id, user_id, created_at) VALUES (?, 'reader', ?)").run(highReactionEntryId, Date.now());
+  const latestFeedEntries = journal.listPublishedJournalEntries(null, "latest");
+  const resonantFeedEntries = journal.listPublishedJournalEntries(null, "resonant");
+  assert.equal(latestFeedEntries.some((entry) => entry.id === highReactionEntryId), false, "the oldest entry stays outside the latest page");
+  assert.equal(resonantFeedEntries[0].id, highReactionEntryId, "resonant ordering surfaces the high-reaction entry");
+  sqlite.prepare("DELETE FROM journal_reactions WHERE entry_id LIKE 'feed-sort-entry-%'").run();
+  sqlite.prepare("DELETE FROM journal_entries WHERE id LIKE 'feed-sort-entry-%'").run();
+
   const publicV1 = journal.getPublishedJournalEntry(draft.id, "reader");
   assert.equal(publicV1.title, "雨后窗边");
   assert.equal(publicV1.images[0].alt, "雨后透光的绿色窗边");

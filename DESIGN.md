@@ -2,41 +2,44 @@
 name: "认识你自己 | Know Yourself"
 description: "A quiet bilingual reflection room for structured assessments and open-ended image journals."
 colors:
-  paper: "oklch(96.2% 0.019 82)"
-  paper-strong: "oklch(99.1% 0.009 84)"
-  ink: "oklch(24% 0.028 165)"
-  night-paper: "oklch(18% 0.028 165)"
-  night-ink: "oklch(95% 0.014 82)"
-  accent: "oklch(55% 0.16 35)"
-  night-accent: "oklch(73% 0.14 35)"
-  accent-soft: "oklch(91% 0.045 35)"
-  teal: "oklch(48% 0.085 170)"
-  teal-soft: "oklch(89% 0.035 170)"
-  signal: "oklch(77% 0.13 86)"
-  signal-ink: "oklch(26% 0.04 90)"
-  sky: "oklch(78% 0.065 220)"
-  muted-text: "oklch(46% 0.025 150)"
-  warm-wash: "oklch(90% 0.06 48)"
-  warm-surface: "oklch(97% 0.026 65)"
-  warm-ink: "oklch(45% 0.105 38)"
+  paper: "oklch(97% 0.007 250)"
+  paper-strong: "oklch(99.4% 0.003 250)"
+  ink: "oklch(24% 0.042 252)"
+  night-paper: "oklch(18% 0.034 252)"
+  night-ink: "oklch(93.5% 0.012 245)"
+  accent: "oklch(44% 0.132 255)"
+  night-accent: "oklch(72% 0.118 250)"
+  accent-soft: "oklch(90.5% 0.048 255)"
+  teal: "oklch(52% 0.088 205)"
+  teal-soft: "oklch(90% 0.034 205)"
+  signal: "oklch(74% 0.115 78)"
+  signal-ink: "oklch(26% 0.045 75)"
+  sky: "oklch(80% 0.062 235)"
+  muted-text: "oklch(46% 0.024 252)"
+  sheet-wash: "oklch(91.5% 0.03 245)"
+  sheet-surface: "oklch(98.2% 0.011 245)"
+  sheet-ink: "oklch(45% 0.06 250)"
   line: "color-mix(in oklab, var(--ink) 18%, transparent)"
   soft-line: "color-mix(in oklab, var(--ink) 11%, transparent)"
-  emotion: "oklch(61% 0.16 35)"
-  relationship: "oklch(69% 0.12 78)"
-  life: "oklch(55% 0.07 125)"
-  danger: "oklch(52% 0.16 25)"
+  topic-self: "oklch(42% 0.128 258)"
+  topic-emotion: "oklch(47% 0.112 232)"
+  topic-relationship: "oklch(50% 0.092 205)"
+  topic-life: "oklch(46% 0.07 188)"
+  meter-fill: "{colors.accent}"
+  meter-needle: "{colors.signal}"
+  danger: "oklch(52% 0.16 22)"
 typography:
   display:
-    fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
-    fontSize: "3rem"
-    fontWeight: 570
+    fontFamily: 'var(--font-archivo), "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
+    fontSize: "4rem"
+    fontWeight: 820
     lineHeight: 1.02
-    letterSpacing: "0"
+    letterSpacing: "-0.022em"
   headline:
-    fontSize: "2.15rem"
+    fontSize: "2.5rem"
     fontWeight: 620
     lineHeight: 1
-    letterSpacing: "0"
+    letterSpacing: "-0.012em"
   body:
     fontFamily: '"Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
     fontSize: "0.875rem"
@@ -46,16 +49,18 @@ typography:
     fontSize: "0.78rem"
     fontWeight: 750
     lineHeight: 1.4
+    letterSpacing: "0.08em"
   mono:
-    fontFamily: '"Cascadia Code", "SFMono-Regular", Consolas, monospace'
-    fontSize: "0.66rem"
+    fontFamily: 'var(--font-plex-mono), "Cascadia Code", "SFMono-Regular", Consolas, monospace'
+    fontSize: "0.6875rem"
     lineHeight: 1.4
     letterSpacing: "0"
 rounded:
-  control: "0.4rem"
-  answer: "0.45rem"
-  panel: "0.65rem"
-  feature: "0.65rem"
+  control: "0.3rem"
+  answer: "0.3rem"
+  panel: "0.5rem"
+  feature: "0.5rem"
+  media: "0.25rem"
   pill: "999px"
 spacing:
   section: "clamp(4.5rem, 9vw, 7rem)"
@@ -83,16 +88,17 @@ components:
 
 # Design System: 认识你自己 | Know Yourself
 
-> Current Hallmark redesign (2026-08-30): the interface is intentionally more
-> directional and editorial than the previous quiet-paper treatment. The
-> product keeps its local-first, bilingual promise while using a dark masthead,
-> coral action color, deep teal secondary signal, and index-like page rhythm.
+> Current palette, Cyanotype (2026-08-31): the paper is mineral rather than
+> parchment, prussian blue is the one structural colour, and brass marks a value
+> being reported and nothing else. This replaces the Hallmark cream-and-coral
+> treatment of 2026-08-30; the local-first bilingual promise, the index-like page
+> rhythm, and the editorial hierarchy are unchanged.
 
 ## Direction
 
-**Creative North Star: The clear desk at dusk.**
+**Creative North Star: The clear desk in daylight, and one instrument on it.**
 
-### Hallmark implementation profile
+### Implementation profile
 
 - **Genre:** modern-minimal editorial reflection workspace.
 - **Marketing family:** Split Studio / Index-First, with two reflection paths and a visible continuation rail.
@@ -105,7 +111,7 @@ This is a bilingual reflection product for people arriving with a small, human q
 
 The homepage presents two equal paths in the first viewport: take an assessment or create an image journal. The assessment catalog then groups the reviewed routes; a detail page explains what a person will answer; the quiz keeps attention on one question at a time. Results are framed as observations from this attempt. Image journals begin in a private library, move through editing and preview, and become public only through an explicit publishing action.
 
-The visual language is warm paper, deep ink, coral action cues, teal navigation signals, and restrained yellow notes. Wordless metaphor scenes are reserved for assessment covers and results; user images carry the journal narrative. Contrast and directional hierarchy do the expressive work. There is no decorative gradient, glass stack, mesh background, remote font, or ornamental stock imagery.
+The visual language is mineral paper, prussian ink, a single blue action colour, and brass reserved for a reading on a meter. Wordless metaphor scenes are reserved for assessment covers and results and are drawn as monochrome blue exposures, so an illustration never competes with a number; user images carry the journal narrative. Contrast and directional hierarchy do the expressive work. There is no decorative gradient, glass stack, mesh background, or ornamental stock imagery, and no font is fetched at runtime from a third party.
 
 ## Users and voice
 
@@ -117,25 +123,32 @@ The visual language is warm paper, deep ink, coral action cues, teal navigation 
 
 ## Colors
 
-- **Paper** (`oklch(96.2% 0.019 82)`) is the default light canvas and gives the product a warm ambient temperature.
-- **Paper strong** (`oklch(99.1% 0.009 84)`) separates focused panels and answer surfaces without a floating-card effect.
-- **Ink** (`oklch(24% 0.028 165)`) is the primary text and rule color.
-- **Coral accent** (`oklch(55% 0.16 35)`) is the action color for links, focus, progress, and primary actions; the darker light-theme value keeps small text readable.
-- **Deep teal** (`oklch(48% 0.085 170)`) is the secondary navigation and informational signal, with `oklch(89% 0.035 170)` as its soft wash.
-- **Signal yellow** (`oklch(77% 0.13 86)`) is reserved for compact notes and result highlights. **Warm surface / wash** (`oklch(97% 0.026 65)` / `oklch(90% 0.06 48)`) support reflective prompts.
-- **Night paper / night ink** (`oklch(18% 0.028 165)` / `oklch(95% 0.014 82)`) form the dark theme; the dark accent is `oklch(73% 0.14 35)`.
-- Subject colors are local signals only: emotion `oklch(61% 0.16 35)`, relationship `oklch(69% 0.12 78)`, life `oklch(55% 0.07 125)`. They never replace the global accent.
-- Danger red is reserved for data deletion and error feedback.
+- **Paper** (`oklch(97% 0.007 250)`) is the default light canvas. It carries just enough blue to read as cool white beside warm skin and warm rooms.
+- **Paper strong** (`oklch(99.4% 0.003 250)`) separates focused panels and answer surfaces without a floating-card effect.
+- **Ink** (`oklch(24% 0.042 252)`) is the primary text and rule color.
+- **Prussian accent** (`oklch(44% 0.132 255)`) is the action color for links, focus, meters, and primary actions. It is the only structural colour; a page uses it and nothing else for "this is a control".
+- **Cyan support** (`oklch(52% 0.088 205)`) is the secondary navigation and informational signal, with `oklch(90% 0.034 205)` as its soft wash.
+- **Brass** (`oklch(74% 0.115 78)`) is the one warm hue and it is rationed to a single job: the needle at the present value on a meter. A warm pixel anywhere in this interface means "this is the number being reported".
+- **Sheet surface / wash** (`oklch(98.2% 0.011 245)` / `oklch(91.5% 0.03 245)`) raise a card that holds a reading one step off the page and band one reading off the next.
+- **Night paper / night ink** (`oklch(18% 0.034 252)` / `oklch(93.5% 0.012 245)`) form the dark theme; the dark accent is `oklch(72% 0.118 250)`. Dark mode has nothing darker than its page to invert to, so its loudest surface is the lightest layer instead: page 18% -> cards 24% -> header, footer, panels 28%.
+- Topic colours are four exposures of the same blue, not four different hues: self `oklch(42% 0.128 258)`, feeling `oklch(47% 0.112 232)`, relating `oklch(50% 0.092 205)`, living `oklch(46% 0.07 188)`. Chroma falls as the hue turns so none of the four shouts louder than the others, and none of them is warm.
+- Danger red (`oklch(52% 0.16 22)`) is reserved for data deletion and error feedback.
 
-**Color consistency rule:** use one global accent across a page. Subject colors may identify a catalog group, not a CTA or a separate theme.
+**Color consistency rule:** use one global accent across a page. Topic colours may identify a catalog group or carry a result's accent, never a CTA or a separate theme. A quiz does not choose its own colour: the accent comes from the topic it belongs to, which is why `CATEGORY_COLORS` holds `var()` references and both halves of the catalog resolve through `categoryAccent(category)` -- the legacy normalizer and `defineQuiz` alike. `QuizDefinitionInput` has no `accent` field, so a new quiz cannot declare one; the `color` values inherited from the legacy test library are deliberately not read.
+
+**Contrast floor.** Every foreground and background pair in this palette clears 5.4:1, verified by conversion to sRGB rather than by eye. The lowest is danger on paper at 5.49:1; ink on paper is 15.08:1 and the accent on paper is 7.20:1.
 
 ## Typography
 
-System Chinese and Latin fallbacks are intentional for fast first paint and bilingual parity. Headings use decisive but stable sizes, not a decorative display face. Letter spacing is always `0`. Responsive type changes only at explicit breakpoints and never scales continuously with viewport width. Body copy stays around a readable 65 to 75 character measure. Monospace is limited to counts, question indices, progress counts, and storage summaries.
+Two faces are self-hosted through `next/font`: Archivo for the display tier and IBM Plex Mono for every number the product reports. Neither has han glyphs, so Chinese falls through to the system stack behind them and keeps its own metrics, and body copy stays on the system stack in both scripts -- a downloaded body face would buy nothing for the half of this product that is Chinese. Nothing is fetched from a third party at runtime.
+
+Tracking is part of the hierarchy, not decoration. The display tier is set at `-0.022em` because Archivo's Latin is wide at heavy weights, small all-caps labels open to `0.08em` because 11px letters need the air, and body text stays at `0`. Negative tracking is a Latin adjustment only: han glyphs are already drawn on a full em square, so pulling them together closes the gap a reader uses to tell one character from the next, and the whole Chinese display tier is therefore reset to `0` under `html[lang="zh-CN"]`.
+
+Responsive type changes at explicit breakpoints or against the width of its own container; it never scales continuously with the viewport. Body copy stays around a readable 65 to 75 character measure. Monospace is limited to counts, question indices, progress counts, dimension percentages, and storage summaries.
 
 Avoid all-caps marketing eyebrows as a visual identity. Small labels are functional metadata only. Do not use gradient text, emoji as icons, or monospace as decorative body copy.
 
-Display sizes are set per script, not shared. Han glyphs are square and fill the em box, so a column sized for 认识 / 你自己 is far too narrow for `Yourself`, whose advance is 4.1x its font size; the home hero therefore steps Latin down at 360px, 520px, and 961px, and steps both scripts down in the 961 to 1099px band where the two-column hero leaves only 278px of copy width. Chinese headings wrap with `line-break: strict` and `text-wrap: pretty` so a trailing glyph is never stranded alone, and `balance` is reserved for the short headings where it does not cut a two-character compound in half.
+Display sizes are set per script, not shared. Han glyphs are square and fill the em box, so a column sized for 认识 / 你自己 is far too narrow for `Yourself`, whose advance is several times its font size. Hand-measuring that ratio ties the layout to one font file, so the English hero is sized against its own column instead: `.home-hero-copy` is a container and the heading takes `min(4.5rem, 21cqi)`, which holds at every width from 320px up without a breakpoint and survives a change of display face. Chinese still steps down in the 961 to 1099px band, where the two-column hero leaves only 278px of copy width. Chinese headings wrap with `line-break: strict` and `text-wrap: pretty` so a trailing glyph is never stranded alone, and `balance` is reserved for the short headings where it does not cut a two-character compound in half.
 
 A Chinese heading in a narrow column is sized by the count of glyphs that must share a line, because every han glyph takes exactly one em. 慢一点，也可以看见更多。 is twelve glyphs, so two lines need six of them -- six ems -- per line, and the homepage principles heading therefore steps 2rem, 2.5rem, 3rem, 3.5rem as its column widens rather than holding one desktop size; below the fit, the wrap strands a single glyph and its period on a third line. When a heading is measured this way, its column must also stop narrowing: a `vw`-based gutter inside a container that has reached its max width keeps taking space from the column as the viewport grows, which is how the same heading broke correctly at 1280px and incorrectly at 1920px. Cap gutters where the container caps.
 
@@ -143,10 +156,10 @@ A Chinese heading in a narrow column is sized by the count of glyphs that must s
 
 - The app shell is a centered 72rem container with 1.25rem mobile gutters and 2rem desktop gutters.
 - The homepage is a two-path composition on wide screens and a single-column sequence on narrow screens. Neither path is visually subordinate.
-- The full assessment catalog lives at `/assessments/`; it is not duplicated below the homepage paths. The first view uses local images and system fonts only.
+- The full assessment catalog lives at `/assessments/`; it is not duplicated below the homepage paths. The first view uses local images and self-hosted fonts only.
 - Detail, quiz, and result pages narrow to a focused reading column. Quiz and result routes hide the mobile primary navigation so the task has the full viewport.
 - The journal editor uses a writing workspace plus a publishing rail on wide screens, then one ordered column on narrow screens. Image controls, fields, and progress overlays must stay within a stable media frame.
-- Public journal details use a vertical image-and-text reading rhythm. Community keeps Image Journals and Assessment Shares in separate tabs and does not visually merge their card types.
+- Public journal details use a vertical image-and-text reading rhythm. Community uses one mixed feed with explicit type filters; image cards keep their own visual treatment while sharing the same ranking and navigation.
 - The main responsive breakpoints are 800px for the hero and 640px for compact stacks. Touch targets stay at least 44px.
 - Use `min-height: 100dvh`; do not use fixed `h-screen` layouts that break on mobile browser chrome.
 
@@ -183,6 +196,14 @@ Pilot cards use the same local visual language as their detail and result views.
 ### Answer options
 
 Full-width, left-aligned rows are at least 4.2rem tall. Selected state changes border and adds a light accent wash. The answer key is a small circular marker for keyboard discoverability, not a decorative map pin.
+
+### The exposure meter
+
+One instrument, two readings: how far into a quiz you are, and how strongly a dimension came out. Progress and result share it deliberately, so a person meets the same object twice and does not have to learn a second way of being shown a number.
+
+A ruled track, a hard-edged fill, and a brass needle at the present value. The value travels as `--progress` (0 to 1) on the track, not on the fill: the fill scales from it and the needle is positioned from it, because a needle inside a `scaleX` fill would be squeezed to nothing at low values and stretched at high ones. The needle is the only brass in the interface. Reduced motion removes the transition, not the needle.
+
+Every meter is a `role="progressbar"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and an accessible name; the quiz adds `aria-valuetext` so a screen reader hears "question 4 of 20" rather than "4".
 
 ### Results
 
@@ -227,7 +248,7 @@ Maintain visible focus, semantic headings, labels for icon-only controls, suffic
 - Do not turn a result into a diagnosis or permanent label.
 - Do not restate a heading in a decorative kicker above it, and do not repeat the same reassurance in more than one place on a page.
 - Do not embed labels, scores, or explanatory text in assessment artwork.
-- Do not add remote stock images, web fonts, third-party analytics, or runtime AI image generation for visual polish.
+- Do not add remote stock images, runtime third-party font requests, third-party analytics, or runtime AI image generation for visual polish. Fonts ship self-hosted through `next/font` or not at all.
 - Do not make image ordering drag-only, publish private edits automatically, or present unpublish as deletion.
 - Do not animate layout properties or ship a large dependency for a small transition.
 

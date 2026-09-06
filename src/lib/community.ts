@@ -1,8 +1,10 @@
 "use client";
 
+import type { CommunityFeedFilter, CommunityFeedItem } from "@/lib/server/community-feed";
 import type { CommunityPost } from "@/lib/server/community";
 
 export type { CommunityPost, CommunityComment } from "@/lib/server/community";
+export type { CommunityFeedFilter, CommunityFeedItem, CommunityFeedJournalItem } from "@/lib/server/community-feed";
 
 export class CommunityApiError extends Error {
   constructor(message: string, public readonly status: number, public readonly code?: string) {
@@ -25,7 +27,21 @@ export async function getCommunityPosts(sort: "latest" | "resonant") {
   return responseJson<{ posts: CommunityPost[] }>(await fetch(`/api/community/posts?sort=${sort}`, { cache: "no-store", credentials: "include", headers: headers() }));
 }
 
-export async function publishCommunityPost(userId: string, input: { attemptId: string; reflection: string; showResultType: boolean; showDimensions: boolean; showAvatar: boolean; allowComments: boolean }) {
+export async function getCommunityFeed(sort: "latest" | "resonant", filter: CommunityFeedFilter = "all") {
+  return responseJson<{ posts: CommunityFeedItem[] }>(await fetch(`/api/community/feed?sort=${sort}&type=${filter}`, { cache: "no-store", credentials: "include", headers: headers() }));
+}
+
+export async function publishCommunityPost(userId: string, input: {
+  attemptId?: string;
+  title?: string;
+  body?: string;
+  reflection?: string;
+  contentLanguage?: string;
+  showResultType?: boolean;
+  showDimensions?: boolean;
+  showAvatar?: boolean;
+  allowComments?: boolean;
+}) {
   return responseJson<{ id: string }>(await fetch("/api/community/posts", { method: "POST", credentials: "include", headers: headers(userId, true), body: JSON.stringify(input) }));
 }
 

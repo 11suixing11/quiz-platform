@@ -8,14 +8,14 @@ web
 
 ## Users
 
-Chinese- and English-speaking people who want a low-pressure way to reflect on personality, emotions, relationships, work, and daily life. They may prefer a structured assessment, an open-ended visual journal, or move between both.
+Chinese- and English-speaking people who want a low-pressure way to reflect on personality, emotions, relationships, work, and daily life. They may start with a structured assessment or write directly in the community with words, images, or both.
 
 ## Product Purpose
 
-Know Yourself supports two equally visible reflection paths:
+Know Yourself supports a structured reflection path and one shared community for every form of expression:
 
 - Structured reflection through assessments, with result imagery that helps a user understand a type, leading dimension, or score range.
-- Open-ended reflection through image journals, where a user can arrange several images, captions, and optional prose into a private or public narrative.
+- Community expression through text posts, assessment shares, and image posts, where a user can combine images, captions, and prose when useful.
 
 Success means a person can choose the form that fits the moment, understand what will be stored or published, complete the work without friction, and return to it later.
 
@@ -33,15 +33,15 @@ The product is a local-first reflection companion with optional accounts and clo
 
 ## Capabilities and Constraints
 
-- The homepage presents two primary actions: browse assessments at `/assessments/`, or open the image-journal library at `/journal/`.
+- The homepage presents two primary actions: browse assessments at `/assessments/`, or create a community image post through the compatible `/journal/new/` editor.
 - 16 public assessments span type, dimensions, and score models. 193 internal modules remain available for staged content review but are not public routes by default.
 - Animal Personality, Emotion Regulation, Attachment Style, and Life Satisfaction form the first result-image pilot. Their wordless metaphor scenes appear consistently on catalog cards, detail pages, and results. Text remains the complete information and accessibility source.
 - Optional result-image feedback is stored only as a first-party daily aggregate keyed by assessment, visual key, and helpful/not-helpful response.
-- Image journals require a signed-in, email-verified account. A journal has a required title, optional body, one to six ordered images, optional per-image captions, and either alt text or a decorative flag.
+- Image journals require a signed-in, email-verified account. A journal has an optional title and body, one to six ordered images, optional per-image captions, and either alt text or a decorative flag.
 - SMTP delivers account-verification and password-reset mail. A password-recovery request is Turnstile-verified and returns an enumeration-safe response; the reset token is single-use, expires in 30 minutes, and completing a reset revokes every existing session.
 - The editor supports upload progress, retrying an interrupted transfer from the client-held file, selecting a replacement after server-side processing failure, deletion, drag enhancement, explicit move-up/move-down controls, autosave, interrupted-session recovery, private preview, and public preview. The server never retains an original merely to retry processing later.
 - Publication is immediate and indexable. A published revision is immutable; later edits remain private until the owner explicitly updates the public version. Unpublishing and deletion are separate actions.
-- Community uses separate Image Journals and Assessment Shares tabs with no mixed ranking. Journal cards expose only cover, title, display name, image count, and excerpt before opening the detail route.
+- Community uses one mixed feed with filters for assessments, text, and images. Existing journal cards are adapted into the image-post feed while their immutable revisions and media permissions remain intact.
 - Public content supports resonance, comments when enabled by the author, and reports. A high-risk report hides content immediately; three independent ordinary reports trigger temporary hiding.
 - The first release has no pre-publication content review or blur for otherwise lawful sensitive material. Illegal material, sexual content involving minors, non-consensual intimate imagery, privacy exposure, and explicit harm remain prohibited report categories.
 - One environment-configured administrator uses `/admin/moderation/` to review hidden content, restore it, permanently remove it, review privacy/copyright complaints, change account governance status, and inspect append-only audit records.

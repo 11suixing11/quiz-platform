@@ -1,4 +1,4 @@
-﻿import { TestCategory, WorldDefinition } from "./types";
+﻿import { TestCategory } from "./types";
 
 export const TEST_CATEGORIES: TestCategory[] = [
   { id: "personality", zh: "自我认知", en: "Self Identity", icon: "🧬", desc: "你的性格、气质与人格原型", descEn: "Your character, temperament and personality archetype" },
@@ -12,69 +12,30 @@ export const TEST_CATEGORIES: TestCategory[] = [
   { id: "fun", zh: "趣味探索", en: "Playful Discovery", icon: "🎪", desc: "用轻松的方式认识自己", descEn: "Discover yourself through play" },
 ];
 
-export const WORLDS: WorldDefinition[] = [
-  {
-    id: "dreamers",
-    icon: "🌙",
-    categories: ["emotion", "mental"],
-    zh: { title: "梦境感知者", desc: "为那些感受过深、常常在深夜回放一句话的人。", hint: "情绪、共情、敏感度" },
-    en: { title: "Dreamers", desc: "For those who feel too deeply, who replay a single sentence late into the night.", hint: "Emotion, empathy, sensitivity" },
-    color: "#6B5B95",
-    bgLight: "#F3F0F8",
-    bgDark: "#1a1520",
-    borderColor: "#E0DAF0",
-    borderDark: "#2a2535",
-    atmoColor: "#EDE8F5",
-  },
-  {
-    id: "analysts",
-    icon: "🔮",
-    categories: ["personality", "intelligence"],
-    zh: { title: "理性建筑师", desc: "为那些在混乱中寻找结构、习惯把世界拆解成系统的人。", hint: "人格、认知、系统思维" },
-    en: { title: "Analysts", desc: "For those who find structure in chaos, who take the world apart to understand it.", hint: "Personality, cognition, systems" },
-    color: "#4A6FA5",
-    bgLight: "#EEF3F8",
-    bgDark: "#121a24",
-    borderColor: "#D8E2F0",
-    borderDark: "#1a2535",
-    atmoColor: "#E8EFF7",
-  },
-  {
-    id: "connectors",
-    icon: "🌊",
-    categories: ["relationship", "social"],
-    zh: { title: "关系连接者", desc: "为那些总能感到关系里的温度、沉默和拉扯的人。", hint: "依恋、爱语、人际边界" },
-    en: { title: "Connectors", desc: "For those who sense every temperature shift in a relationship — the warmth, the silence, the pull.", hint: "Attachment, love, boundaries" },
-    color: "#4A8B5A",
-    bgLight: "#EEF5EF",
-    bgDark: "#121a15",
-    borderColor: "#D0E8D5",
-    borderDark: "#1a2a1e",
-    atmoColor: "#E8F2EA",
-  },
-  {
-    id: "explorers",
-    icon: "🔥",
-    categories: ["career", "lifestyle", "fun"],
-    zh: { title: "行动探索者", desc: "为那些需要走出去，才知道自己是谁的人。", hint: "职业、生活方式、冒险" },
-    en: { title: "Explorers", desc: "For those who need to walk out into the world to discover who they are.", hint: "Career, lifestyle, adventure" },
-    color: "#C4783C",
-    bgLight: "#FAF3EC",
-    bgDark: "#1a1510",
-    borderColor: "#F0DCC8",
-    borderDark: "#2a2018",
-    atmoColor: "#F8EFE5",
-  },
-];
-
+/**
+ * The accent a quiz carries into its result: its topic's exposure of the
+ * blueprint blue, not a colour of its own. These are `var()` references rather
+ * than hexes so a result flips with the theme -- a fixed mid-tone hex that reads
+ * as "the accent" on paper turns into a smudge on the night page. Categories are
+ * grouped onto the four public topics: self, feeling, relating, living.
+ */
 export const CATEGORY_COLORS: Record<string, string> = {
-  personality: "#88619A",
-  emotion: "#E0607A",
-  mental: "#4A90A4",
-  relationship: "#E8A838",
-  career: "#54965C",
-  intelligence: "#5B7FB5",
-  lifestyle: "#8BAA6B",
-  social: "#D4824A",
-  fun: "#C76B8A",
+  personality: "var(--topic-self)",
+  intelligence: "var(--topic-self)",
+  emotion: "var(--topic-emotion)",
+  mental: "var(--topic-emotion)",
+  fun: "var(--topic-emotion)",
+  relationship: "var(--topic-relationship)",
+  social: "var(--topic-relationship)",
+  career: "var(--topic-life)",
+  lifestyle: "var(--topic-life)",
 };
+
+/**
+ * The one resolver for a quiz's accent. Both halves of the catalog go through
+ * it -- the legacy normalizer and `defineQuiz` -- so a quiz cannot acquire an
+ * accent of its own by declaring one.
+ */
+export function categoryAccent(category: string) {
+  return CATEGORY_COLORS[category] ?? "var(--accent)";
+}

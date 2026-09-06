@@ -20,10 +20,14 @@ export async function POST(request: Request) {
   if (accountError) return accountError;
   if (!allowRateLimitedRequest(request, `community-post:${user.id}`, 5)) return rateLimitResponse();
   try {
-    const id = await createCommunityPost(user.id, await readJson(request, 16_000));
+    // A 12,000-character text post can occupy roughly 48 KB in UTF-8 JSON.
+    // Leave room for field names and options while retaining a bounded body.
+    const id = await createCommunityPost(user.id, await readJson(request, 64_000));
     return json({ id }, 201);
   } catch (cause) {
     if (cause instanceof CommunityValidationError) return error(cause.message, cause.status, cause.code);
+    if (cause instanceof Error && cause.message === "请求内容过大") return error(cause.message, 413, "PAYLOAD_TOO_LARGE");
+    if (cause instanceof Error && cause.message === "请求格式无效") return error(cause.message, 400, "INVALID_DATA");
     console.error("Community post creation failed", cause);
     return error("暂时无法发布，请稍后再试", 500);
   }

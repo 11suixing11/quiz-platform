@@ -127,7 +127,6 @@ const definition = defineQuiz({
   id: "personality-archetype",
   kind: "type",
   category: "personality",
-  accent: legacy.color ?? "#795548",
   duration: "4-7",
   title: {
     zh: "人格原型测试",

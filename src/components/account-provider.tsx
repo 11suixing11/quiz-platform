@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   getAccount,
   getCloudSnapshot,
@@ -27,21 +27,37 @@ export interface SyncSummary {
   sessions: number;
 }
 
-interface AccountContextValue {
+/**
+ * The account state is split by how often it changes. Most consumers only need
+ * to know who is signed in; keeping the sync ticker and the action callbacks in
+ * their own contexts means a sync no longer re-renders every avatar and feed on
+ * the page.
+ */
+export interface AccountIdentity {
   user: AccountUser | null;
   profile: LocalProfile | null;
+}
+
+export interface AccountSyncStatus {
   syncState: SyncState;
   syncError: string;
   syncChoice: SyncChoice | null;
   /** Counts from the last successful cloud synchronization. */
   cloudSummary: SyncSummary | null;
+  /** When the last successful synchronization finished, for "saved / synced" copy. */
+  lastSyncedAt: number | null;
+}
+
+export interface AccountActions {
   saveProfile(profile: LocalProfile): Promise<{ profile: LocalProfile; localSaved: boolean; remoteSaved: boolean }>;
   refreshAccount(): Promise<void>;
   syncNow(): Promise<void>;
   signOut(): Promise<void>;
 }
 
-const AccountContext = createContext<AccountContextValue | null>(null);
+const AccountIdentityContext = createContext<AccountIdentity | null>(null);
+const AccountSyncContext = createContext<AccountSyncStatus | null>(null);
+const AccountActionsContext = createContext<AccountActions | null>(null);
 
 function reconcileCloudSnapshot(local: StorageSnapshot, remote: StorageSnapshot): StorageSnapshot {
   const localById = new Map(local.attempts.map((attempt) => [attempt.id, attempt]));
@@ -87,6 +103,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const [syncChoice, setSyncChoiceState] = useState<SyncChoice | null>(null);
   const [cloudSummary, setCloudSummary] = useState<SyncSummary | null>(null);
   const [syncState, setSyncState] = useState<SyncState>("loading");
+  const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
   const [syncError, setSyncError] = useState("");
   const timer = useRef<number | null>(null);
   const applyingRemote = useRef(false);
@@ -226,6 +243,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
           writeAccountSnapshot(currentUser.id, latestLocal);
           syncQueued.current = true;
         }
+        setLastSyncedAt(Date.now());
         setSyncState("ready");
         return true;
       } catch (error) {
@@ -285,6 +303,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       if (!account.user) {
         setChoice(null);
         setCloudSummary(null);
+        setLastSyncedAt(null);
         setSyncState("guest");
         return;
       }
@@ -325,6 +344,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     setProfileSafely(null);
     setChoice(null);
     setCloudSummary(null);
+    setLastSyncedAt(null);
     setSyncState("guest");
     setSyncError("");
   }, [activateScopeSafely, setChoice, setProfileSafely]);
@@ -385,23 +405,41 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     };
   }, [syncChoice, syncNow, user]);
 
-  const value = useMemo(() => ({
-    user,
-    profile,
-    syncState,
-    syncError,
-    syncChoice,
-    cloudSummary,
-    saveProfile,
-    refreshAccount,
-    syncNow,
-    signOut,
-  }), [cloudSummary, profile, refreshAccount, saveProfile, signOut, syncError, syncChoice, syncNow, syncState, user]);
-  return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;
+  const identity = useMemo<AccountIdentity>(() => ({ user, profile }), [profile, user]);
+  const sync = useMemo<AccountSyncStatus>(
+    () => ({ syncState, syncError, syncChoice, cloudSummary, lastSyncedAt }),
+    [cloudSummary, lastSyncedAt, syncChoice, syncError, syncState],
+  );
+  const actions = useMemo<AccountActions>(
+    () => ({ saveProfile, refreshAccount, syncNow, signOut }),
+    [refreshAccount, saveProfile, signOut, syncNow],
+  );
+
+  return (
+    <AccountActionsContext.Provider value={actions}>
+      <AccountIdentityContext.Provider value={identity}>
+        <AccountSyncContext.Provider value={sync}>{children}</AccountSyncContext.Provider>
+      </AccountIdentityContext.Provider>
+    </AccountActionsContext.Provider>
+  );
 }
 
-export function useAccount() {
-  const context = useContext(AccountContext);
-  if (!context) throw new Error("useAccount must be used inside AccountProvider");
-  return context;
+function requireAccountContext<T>(value: T | null, hook: string): T {
+  if (!value) throw new Error(`${hook} must be used inside AccountProvider`);
+  return value;
+}
+
+/** Who is signed in. The hook most consumers want. */
+export function useAccountIdentity(): AccountIdentity {
+  return requireAccountContext(use(AccountIdentityContext), "useAccountIdentity");
+}
+
+/** Cloud synchronization status. Re-renders on every sync tick by design. */
+export function useAccountSync(): AccountSyncStatus {
+  return requireAccountContext(use(AccountSyncContext), "useAccountSync");
+}
+
+/** Stable callbacks; this context value never changes after mount. */
+export function useAccountActions(): AccountActions {
+  return requireAccountContext(use(AccountActionsContext), "useAccountActions");
 }

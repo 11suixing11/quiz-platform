@@ -9,7 +9,7 @@ const content = {
   zh: {
     title: "隐私说明",
     updated: "更新于 2026 年 8 月 28 日",
-    intro: "认识你自己是一款本地优先的自我反思应用。游客测评数据留在当前设备；注册并验证邮箱后，本机与云端测评数据会自动合并，你也可以创建私密图像札记并选择是否发布公开快照。",
+    intro: "认识你自己是一款本地优先的自我反思应用。游客测评数据留在当前设备；注册并验证邮箱后，本机与云端测评数据会自动合并。你可以在社区主动发布文字、测评分享或图像札记公开快照。",
     items: [
       ["登录后自动同步", "不登录时，结果、收藏、偏好和未完成进度保存在当前浏览器。注册或登录后，这些本机数据会自动与账号云端数据合并；头像、个性签名和标签也会随账号同步。"],
       ["账号验证与云端数据范围", "注册需要显示名称、邮箱、密码和一次 Cloudflare Turnstile 验证；验证 token 只用于当次请求。服务器保存密码哈希而不是明文密码。上传图片与发布札记前必须完成邮箱验证。"],
@@ -25,7 +25,7 @@ const content = {
       ["账号资料：显示名称、邮箱、密码哈希与登录会话", "账号资料保留到你删除账号；登录会话最长 30 天，并可能在持续使用时更新。", "在账号页永久删除账号。"],
       ["云端数据：结果、测评名称、完成时间、收藏、偏好、头像、个性签名与标签", "保留到你删除相关记录或删除账号。云端不保留已完成测评的原始答案。", "在历史页删除结果，或在账号页永久删除账号及全部云端数据。"],
       ["私密图像札记：标题、正文、内容语言、图片变体、说明、alt、排序和修订状态", "草稿保留到你删除札记或账号。原始上传在处理后删除；私密变体不会由 Caddy 直接公开。", "在札记库删除札记，或在账号页永久删除账号。"],
-      ["公开社区：图像札记快照、测评分享、留言和共鸣", "发布后内容立即公开并可被搜索引擎索引。札记公开版是不可变快照；取消公开会停止站内访问，删除则同时进入媒体清理流程。搜索引擎或第三方缓存仍可能保留旧副本。", "在对应详情页取消公开或删除自己的内容，或删除账号。"],
+      ["公开社区：文字、图像札记快照、测评分享、留言和共鸣", "你主动发布的文字帖子、测评分享和图像札记公开版会立即出现在社区，并可能被搜索引擎索引。札记公开版是不可变快照；取消公开会停止站内访问，删除则同时进入媒体清理流程。搜索引擎或第三方缓存仍可能保留旧副本。", "在对应内容页删除自己的帖子，或在札记详情页取消公开/删除内容；也可以删除账号。"],
       ["举报、投诉、账号治理与审计记录", "举报用于自动隐藏和管理员处理；隐私与版权投诉可不登录提交。账号限制与管理操作写入追加式审计日志，并按运营与争议处理需要保留。", "可通过下方投诉入口请求处理；账号删除会移除账号关联内容，但必要的操作审计可能以最小化形式继续保留。"],
       ["未完成进度：当前题目与暂存回答", "云端最多保留 24 小时；每次保存后重新计算，完成测评或到期后删除。", "完成测评、等待进度到期，或删除账号以删除云端进度。"],
       ["本机一致性备份：SQLite、私密与公开媒体、删除墓碑", "每日在同一 VPS 创建一次，滚动保留 30 天。它不构成主机或磁盘故障下的异地灾难恢复。", "备份到期后自动滚动删除；恢复时重放删除墓碑，避免恢复已经删除的媒体。"],
@@ -42,7 +42,7 @@ const content = {
   en: {
     title: "Privacy notes",
     updated: "Updated August 28, 2026",
-    intro: "Know Yourself is a local-first reflection app. Guest assessment data stays on the current device. After registering and verifying email, assessment data can sync with your account, and you can create private image journals with optional public snapshots.",
+    intro: "Know Yourself is a local-first reflection app. Guest assessment data stays on the current device. After registering and verifying email, assessment data can sync with your account. You can choose to publish a text post, assessment share, or image-journal snapshot in the community.",
     items: [
       ["Automatic sync after sign-in", "Without signing in, results, bookmarks, preferences, and unfinished progress stay in this browser. Registration or sign-in automatically merges this device data with the account cloud copy. Avatar, bio, and personality tags also sync with the account."],
       ["Account verification and cloud data", "Registration requires a display name, email address, password, and one Cloudflare Turnstile check. The verification token is used only for that request. The server stores a password hash, not the plain password. Email verification is required before image uploads and journal publishing."],
@@ -58,7 +58,7 @@ const content = {
       ["Account data: display name, email, password hash, and sign-in sessions", "Account data is kept until you delete the account. Sign-in sessions last up to 30 days and may refresh while you keep using the service.", "Permanently delete the account on the Account page."],
       ["Cloud data: results, assessment name, completion time, bookmarks, preferences, avatar, bio, and tags", "Kept until you delete the related records or delete the account. Completed raw answers are not retained in the cloud.", "Delete results in History, or permanently delete the account and all cloud data on the Account page."],
       ["Private image journals: title, body, language, image variants, captions, alt text, order, and revision state", "Drafts remain until the journal or account is deleted. Originals are discarded after processing; private variants are not served directly by Caddy.", "Delete the journal in your library, or permanently delete the account."],
-      ["Public community: image-journal snapshots, assessment shares, responses, and resonances", "Publication is immediate and indexable. A journal's public version is an immutable snapshot. Unpublishing stops site access; deletion also enters the media cleanup flow. Search engines or third-party caches may retain copies.", "Unpublish or delete from the relevant detail page, or delete the account."],
+      ["Public community: text posts, image-journal snapshots, assessment shares, responses, and resonances", "Text posts, assessment shares, and image-journal public snapshots that you choose to publish appear in the community immediately and may be indexed. A journal's public version is an immutable snapshot. Unpublishing stops site access; deletion also enters the media cleanup flow. Search engines or third-party caches may retain copies.", "Delete your own post from its content page, or unpublish/delete a journal from its detail page; you can also delete the account."],
       ["Reports, complaints, account governance, and audit records", "Reports support automatic hiding and admin decisions. Privacy and copyright complaints can be submitted without an account. Account restrictions and admin actions are written to an append-only audit log and retained as needed for operations and disputes.", "Use the complaint form below for content issues. Account deletion removes account-linked content, while minimal operational audit records may remain."],
       ["Unfinished progress: current question and draft answers", "Cloud drafts are kept for up to 24 hours. The period restarts after each save; completion or expiry removes the draft.", "Finish the assessment, wait for the draft to expire, or delete the account to remove cloud drafts."],
       ["Local consistency backups: SQLite, private and public media, and deletion tombstones", "Created daily on the same VPS and retained on a 30-day rolling basis. This is not off-host disaster recovery for server or disk failure.", "Expired snapshots are rotated automatically. Restore replays deletion tombstones so deleted media is not revived."],

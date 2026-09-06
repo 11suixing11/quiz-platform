@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Check, LockKeyhole, X } from "lucide-react";
 import { useState } from "react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity } from "@/components/account-provider";
 import { CommunityApiError, publishCommunityPost } from "@/lib/community";
 import { submitCloudQuiz } from "@/lib/account";
 import { replaceAttempt } from "@/lib/storage";
@@ -21,7 +21,7 @@ export function CommunityComposer({ attemptId, testId, answers, testName, result
   onAttemptSynced: (attemptId: string) => void;
   onClose: () => void;
 }) {
-  const { user, profile } = useAccount();
+  const { user, profile } = useAccountIdentity();
   const [reflection, setReflection] = useState("");
   const [showResultType, setShowResultType] = useState(true);
   const [showDimensions, setShowDimensions] = useState(false);
@@ -32,11 +32,11 @@ export function CommunityComposer({ attemptId, testId, answers, testName, result
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
-  if (!user) return <section className="community-composer"><button className="community-composer-close" onClick={onClose} aria-label={language === "zh" ? "关闭" : "Close"}><X /></button><h2>{language === "zh" ? "登录后分享这次发现" : "Sign in to share this discovery"}</h2><p>{language === "zh" ? "测评分享区只收录用户主动发布的内容。登录后，你可以预览并决定公开哪些结果信息。" : "Shared reflections only contains content people choose to publish. After signing in, you can preview and choose what becomes public."}</p><Link href="/account/" className="atlas-primary-action mt-5 justify-center">{language === "zh" ? "登录或注册" : "Sign in or register"}</Link></section>;
-  if (done) return <section className="community-composer community-composer-done"><Check /><h2>{language === "zh" ? "已经分享出去了" : "Your reflection is now shared"}</h2><p>{language === "zh" ? "你可以前往测评分享区查看，也可以随时删除自己的分享。" : "View it with the shared reflections, where you can also delete it at any time."}</p><div><Link href="/community/" className="atlas-primary-action">{language === "zh" ? "查看测评分享" : "View shared reflections"}</Link><button className="atlas-secondary-action" onClick={onClose}>{language === "zh" ? "留在这里" : "Stay here"}</button></div></section>;
+  if (!user) return <section className="community-composer"><button className="community-composer-close" onClick={onClose} aria-label={language === "zh" ? "关闭" : "Close"}><X /></button><h2>{language === "zh" ? "登录后分享这次发现" : "Sign in to share this discovery"}</h2><p>{language === "zh" ? "社区只收录用户主动发布的内容。登录后，你可以预览并决定公开哪些结果信息。" : "The community only contains content people choose to publish. After signing in, you can preview and choose what becomes public."}</p><Link href="/account/" className="atlas-primary-action mt-5 justify-center">{language === "zh" ? "登录或注册" : "Sign in or register"}</Link></section>;
+  if (done) return <section className="community-composer community-composer-done"><Check /><h2>{language === "zh" ? "已经分享到社区" : "Your reflection is now shared"}</h2><p>{language === "zh" ? "你可以在统一的社区流中查看，也可以随时删除自己的分享。" : "View it in the unified community feed, where you can also delete it at any time."}</p><div><Link href="/community/" className="atlas-primary-action">{language === "zh" ? "查看社区" : "View community"}</Link><button className="atlas-secondary-action" onClick={onClose}>{language === "zh" ? "留在这里" : "Stay here"}</button></div></section>;
 
   const submit = async () => {
-    if (!reflection.trim() || !confirmed || busy) return;
+    if (!reflection.trim() && !attemptId || !confirmed || busy) return;
     setBusy(true); setError("");
     try {
       await syncNow();
@@ -63,8 +63,8 @@ export function CommunityComposer({ attemptId, testId, answers, testName, result
     <p>{language === "zh" ? "先看清公开内容，再决定是否发布。原始答案、邮箱和账号编号不会公开。" : "Review what will be public before posting. Raw answers, email, and account identifiers stay private."}</p>
     <div className="community-composer-grid">
       <div>
-        <label className="community-composer-label" htmlFor="community-reflection">{language === "zh" ? "这次测评让你想到什么？" : "What did this assessment bring to mind?"}</label>
-        <textarea id="community-reflection" rows={6} maxLength={500} value={reflection} onChange={(event) => setReflection(event.target.value)} placeholder={language === "zh" ? "写下你愿意公开的一点感受或发现…" : "Write one feeling or discovery you are comfortable making public…"} />
+        <label className="community-composer-label" htmlFor="community-reflection">{language === "zh" ? "想说些什么？（可选）" : "Add a thought (optional)"}</label>
+        <textarea id="community-reflection" rows={6} maxLength={500} value={reflection} onChange={(event) => setReflection(event.target.value)} placeholder={language === "zh" ? "可以只分享结果，也可以写下一点感受…" : "Share the result alone, or add a feeling or discovery…"} />
         <span className="community-field-status">{Array.from(reflection).length}/500</span>
         <fieldset><legend>{language === "zh" ? "公开选项" : "Public options"}</legend>
           <label><input aria-label={language === "zh" ? "显示结果类型" : "Show result type"} type="checkbox" checked={showResultType} onChange={(event) => setShowResultType(event.target.checked)} />{language === "zh" ? "显示结果类型" : "Show result type"}</label>
@@ -83,6 +83,6 @@ export function CommunityComposer({ attemptId, testId, answers, testName, result
       </aside>
     </div>
     <label className="community-confirm"><input aria-label={language === "zh" ? "我确认以上内容可以公开展示" : "I confirm that the content above can be shown publicly"} type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />{language === "zh" ? "我确认以上内容可以公开展示" : "I confirm that the content above can be shown publicly"}</label>
-    <div className="community-composer-actions"><span role="status">{error}</span><button className="atlas-secondary-action" onClick={onClose}>{language === "zh" ? "取消" : "Cancel"}</button><button className="atlas-primary-action" disabled={!reflection.trim() || !confirmed || busy} onClick={submit}>{busy ? (language === "zh" ? "发布中…" : "Publishing…") : (language === "zh" ? "公开发布" : "Publish publicly")}</button></div>
+    <div className="community-composer-actions"><span role="status">{error}</span><button className="atlas-secondary-action" onClick={onClose}>{language === "zh" ? "取消" : "Cancel"}</button><button className="atlas-primary-action" disabled={!attemptId || !confirmed || busy} onClick={submit}>{busy ? (language === "zh" ? "发布中…" : "Publishing…") : (language === "zh" ? "公开发布" : "Publish publicly")}</button></div>
   </section>;
 }

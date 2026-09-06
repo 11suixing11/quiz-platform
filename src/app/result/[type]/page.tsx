@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ResultClient from "@/components/result/result-client";
-import { getQuizEntry, QUIZ_IDS } from "@/core/quiz";
+import { getQuizEntry, loadQuizPaper, QUIZ_IDS } from "@/core/quiz";
 import { PRIVATE_PAGE_METADATA } from "@/lib/site-config";
 
 export const dynamicParams = false;
@@ -22,6 +22,9 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
 
 export default async function ResultPage({ params }: { params: Promise<{ type: string }> }) {
   const { type } = await params;
-  if (!getQuizEntry(type)) notFound();
-  return <ResultClient testId={type} />;
+  const entry = getQuizEntry(type);
+  if (!entry) notFound();
+  const paper = await loadQuizPaper(type);
+  if (!paper) notFound();
+  return <ResultClient paper={paper} topic={entry.topic} />;
 }

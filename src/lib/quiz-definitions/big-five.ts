@@ -75,7 +75,6 @@ const definition = defineQuiz({
   id: "big-five",
   kind: "dimensions",
   category: "personality",
-  accent: legacy.color ?? "#00BFA5",
   duration: "10-18",
   title: {
     zh: "大五人格测试",

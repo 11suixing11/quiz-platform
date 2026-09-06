@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import NextImage from "next/image";
 import { Camera, Check, Pencil, Plus, Trash2, X } from "lucide-react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity, useAccountActions } from "@/components/account-provider";
 import type { LocalProfile } from "@/lib/local-profile";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +40,8 @@ function resizeAvatar(file: File): Promise<string> {
 }
 
 export function ProfileEditor({ userId, displayName, email, zh, syncMode }: { userId: string; displayName: string; email: string; zh: boolean; syncMode: "merge" | null }) {
-  const { user, profile, saveProfile } = useAccount();
+  const { user, profile } = useAccountIdentity();
+  const { saveProfile } = useAccountActions();
   const currentProfile = profile ?? { avatar: "", bio: "", tags: [], updatedAt: 0 };
   const [draft, setDraft] = useState<LocalProfile>(currentProfile);
   const [tag, setTag] = useState("");

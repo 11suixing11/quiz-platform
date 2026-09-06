@@ -55,7 +55,6 @@ const definition = defineQuiz({
   id: "conflict-resolution",
   kind: "score",
   category: "relationship",
-  accent: legacy.color ?? "#4CAF50",
   duration: "4-7",
   title: { zh: "冲突处理方式测试", en: "Conflict Response Test" },
   description: {

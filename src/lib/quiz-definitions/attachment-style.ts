@@ -133,7 +133,6 @@ const definition = defineQuiz({
   id: "attachment-style",
   kind: "type",
   category: "relationship",
-  accent: legacy.color ?? "#E91E63",
   duration: "6-11",
   title: { zh: "依恋风格测试", en: "Attachment Style Test" },
   description: {

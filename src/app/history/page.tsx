@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Clock3, Trash2 } from "lucide-react";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity, useAccountSync } from "@/components/account-provider";
 import { useAttempts, useLanguage } from "@/hooks/use-local-storage";
 import { getQuizEntry, getResultKey, getResultScore, getScoreBand, loadQuizDefinition, type QuizDefinition, type QuizResult } from "@/core/quiz";
 import { clearCloudAttempts, deleteCloudAttempt } from "@/lib/account";
@@ -78,7 +78,8 @@ function resultLabel(result: QuizResult, language: "zh" | "en", definition?: Qui
 export default function HistoryPage() {
   const { language } = useLanguage();
   const { attempts, deleteAttempt } = useAttempts();
-  const { user, syncChoice } = useAccount();
+  const { user } = useAccountIdentity();
+  const { syncChoice } = useAccountSync();
   const [confirmClear, setConfirmClear] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState("");

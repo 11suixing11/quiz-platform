@@ -51,7 +51,6 @@ const definition = defineQuiz({
   id: "stress-resilience",
   kind: "dimensions",
   category: "mental",
-  accent: legacy.color ?? "#607D8B",
   duration: "3-6",
   title: { zh: "压力韧性测试", en: "Stress Resilience Test" },
   description: {

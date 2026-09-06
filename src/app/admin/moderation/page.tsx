@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArchiveX, Check, RefreshCw, Search, ShieldCheck } from "lucide-react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity, useAccountSync } from "@/components/account-provider";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { useLanguage } from "@/hooks/use-local-storage";
 
@@ -35,8 +35,8 @@ function formatDate(value: unknown, language: "zh" | "en") {
 
 function targetLabel(type: ContentTargetType, language: "zh" | "en") {
   const labels = language === "zh"
-    ? { entry: "图像札记", comment: "札记留言", community_post: "测评分享", community_comment: "测评留言" }
-    : { entry: "Image journal", comment: "Journal response", community_post: "Assessment share", community_comment: "Assessment response" };
+    ? { entry: "图像札记", comment: "札记留言", community_post: "社区分享", community_comment: "社区留言" }
+    : { entry: "Image journal", comment: "Journal response", community_post: "Community share", community_comment: "Community response" };
   return labels[type];
 }
 
@@ -67,7 +67,8 @@ function ModerationItem({ type, row, language, busy, onAction }: { type: Content
 
 export default function ModerationPage() {
   const { language } = useLanguage();
-  const { user, syncState } = useAccount();
+  const { user } = useAccountIdentity();
+  const { syncState } = useAccountSync();
   const [tab, setTab] = useState<AdminTab>("queue");
   const [data, setData] = useState<ModerationDashboard>(EMPTY_DASHBOARD);
   const [loading, setLoading] = useState(true);

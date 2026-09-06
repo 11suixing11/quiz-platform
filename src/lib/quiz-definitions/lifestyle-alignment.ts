@@ -51,7 +51,6 @@ const definition = defineQuiz({
   id: "lifestyle-alignment",
   kind: "dimensions",
   category: "lifestyle",
-  accent: legacy.color ?? "#26A69A",
   duration: "3-6",
   title: { zh: "生活一致性测试", en: "Lifestyle Alignment Test" },
   description: {

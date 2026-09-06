@@ -47,6 +47,16 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-style: normal;
+  letter-spacing: var(--tracking-title);
+}
+
+/* Negative tracking is a Latin adjustment. Han glyphs are drawn on a full em
+ * square already, so pulling them together closes the gap a reader uses to tell
+ * one character from the next. Zero it out for the whole Chinese display tier --
+ * the two classes are the display headings that are not h1-h4 elements. */
+html[lang="zh-CN"] :is(h1, h2, h3, h4),
+html[lang="zh-CN"] .atlas-section-title,
+html[lang="zh-CN"] .atlas-result-identity-title {
   letter-spacing: 0;
 }
 
@@ -226,11 +236,15 @@ textarea {
   box-shadow: 0 -1rem 2rem color-mix(in oklab, var(--surface-contrast) 18%, transparent);
 }
 
+/* 11px is the floor for a label a thumb navigates by. Six cells across a 360px
+ * viewport leave ~56px each, and the longest label ("Community") measures ~52px
+ * at this size with the tracking below, so nothing has to shrink further. */
 .atlas-mobile-nav-link {
   min-height: 3.35rem;
   border-radius: var(--radius-media);
   color: color-mix(in oklab, var(--surface-contrast-ink) 63%, transparent);
-  font-size: 0.62rem;
+  font-size: 0.6875rem;
+  letter-spacing: -0.01em;
 }
 
 @media (hover: hover) {
@@ -512,6 +526,7 @@ textarea {
 
 .home-hero-copy {
   position: relative;
+  container-type: inline-size;
   max-width: 34rem;
   padding-left: clamp(1rem, 2vw, 2rem);
 }
@@ -545,10 +560,17 @@ textarea {
   line-height: 1.7;
 }
 
+/* Two ways in, and they are peers: a structured assessment and an open-ended
+ * journal, not a primary and a secondary. So the columns are equal and the cards
+ * stretch to a single height. This replaced a 1.08/0.92 split with the journal
+ * card dropped 2--4.5rem down the page. That kind of editorial stagger needs to
+ * be either obvious or absent: at 54/46 it is too close to equal to read as
+ * hierarchy and too far off for any edge to line up, so all the eye registers is
+ * that two things which should match do not. */
 .home-paths {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
   gap: clamp(var(--space-xs), 2vw, var(--space-md));
 }
 
@@ -565,10 +587,6 @@ textarea {
   transition: transform var(--duration-medium) var(--ease-out), box-shadow var(--duration-medium) var(--ease-out), border-color var(--duration-medium) var(--ease-out);
 }
 
-.home-path--journal {
-  margin-top: clamp(var(--space-lg), 8vw, var(--space-2xl));
-}
-
 @media (hover: hover) {
   .home-path:hover {
     border-color: var(--color-teal);
@@ -577,11 +595,24 @@ textarea {
   }
 }
 
+/* The image band is a fixed proportion of the card rather than a function of
+ * whichever file it holds. `QuizVisualFrame` writes the image's intrinsic ratio
+ * inline on the frame, so the frame is stretched to this band instead -- with
+ * both insets set its own ratio no longer applies -- and the two cards keep one
+ * shared horizon even if a future cover is not 4:3. */
 .home-path-media {
   position: relative;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
   background: var(--color-teal-soft);
+}
+
+.home-path-visual {
+  position: absolute;
+  border: 0;
+  border-radius: 0;
+  inset: 0;
 }
 
 .home-path-visual,
@@ -621,9 +652,12 @@ textarea {
   font-weight: 700;
 }
 
+/* The body absorbs whatever height the taller card sets, so the two "browse /
+ * open" actions sit on one line instead of each floating under its own text. */
 .home-path-body {
   display: flex;
   min-height: 11.5rem;
+  flex: 1;
   flex-direction: column;
   padding: clamp(var(--space-sm), 2.2vw, var(--space-lg));
 }
@@ -921,7 +955,7 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: var(--space-3xs);
-  color: var(--color-warm-ink);
+  color: var(--color-sheet-ink);
   font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
@@ -1308,7 +1342,7 @@ textarea {
   color: var(--ink);
   font-size: 1.6rem;
   font-weight: 780;
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-display);
   line-height: 1;
 }
 
@@ -1316,14 +1350,8 @@ textarea {
   margin-top: var(--space-sm);
 }
 
-.atlas-progress-route {
-  height: 0.5rem;
-  border-radius: var(--radius-pill);
-  background: color-mix(in oklab, var(--ink) 12%, transparent);
-}
-
-.atlas-progress-route span {
-  background: var(--color-accent);
+.quiz-progress-block .atlas-meter {
+  height: 0.85rem;
 }
 
 .quiz-progress-meta {
@@ -1379,7 +1407,7 @@ textarea {
   color: var(--ink);
   font-size: clamp(1.75rem, 1.1rem + 2.2vw, 2.5rem);
   font-weight: 750;
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-display);
   line-height: 1.14;
   text-wrap: balance;
 }
@@ -2014,14 +2042,6 @@ html[lang="zh-CN"] .community-intro h1 {
     font-size: 2rem;
   }
 
-  /* The second path card is the narrow one: 203-217px of text width across the
-   * desktop range. A seven-character Chinese heading needs 224px at 2rem, so it
-   * wrapped 4+3 and split the compound 图像 down the middle. Hold the CJK size
-   * to what the narrow card can fit on one line. */
-  html[lang="zh-CN"] .home-path-body h2 {
-    font-size: 1.75rem;
-  }
-
   .home-principles {
     grid-template-columns: minmax(15rem, 0.72fr) minmax(0, 1.28fr);
     align-items: start;
@@ -2162,10 +2182,6 @@ html[lang="zh-CN"] .community-intro h1 {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .home-path--journal {
-    margin-top: 0;
-  }
-
   .assessment-catalog-intro {
     margin-inline: calc(var(--space-sm) * -1);
     padding-inline: var(--space-sm);
@@ -2246,10 +2262,6 @@ html[lang="zh-CN"] .community-intro h1 {
 }
 
 @media (max-width: 360px) {
-  .atlas-mobile-nav-link {
-    font-size: 0.55rem;
-  }
-
   .home-hero-copy h1 {
     font-size: 4.2rem;
   }
@@ -2260,40 +2272,27 @@ html[lang="zh-CN"] .community-intro h1 {
 }
 
 /* Latin display tier for the home hero. The copy column is sized for han glyphs
- * (认识 / 你自己 need ~290px at 96px), so "Yourself" — 4.125x its font size, the
- * longest unbreakable word on the site — does not fit the same column and the
- * global `overflow-wrap: anywhere` silently split it as "Yours / elf". Sizes
- * below are the measured fits: 264px of text width at 320px, 305px at 361px,
- * and 278-325px across the two-column range from 961px up. */
-@media (max-width: 520px) {
-  html[lang="en"] .home-hero-copy h1 {
-    font-size: 4.25rem;
-  }
-}
-
-@media (max-width: 360px) {
-  html[lang="en"] .home-hero-copy h1 {
-    font-size: 3.7rem;
-  }
+ * (认识 / 你自己 need ~290px at 96px), so "Yourself" — the longest unbreakable
+ * word on the site, a little over four times its own font size — does not fit
+ * the same column, and the global `overflow-wrap: anywhere` silently split it as
+ * "Yours / elf". This was four measured breakpoints, which only held for the one
+ * face they were measured against; the copy column is now its own container, so
+ * a single rule sizes the word against the room it actually has in every band --
+ * 264px at 320px, 283px where the two-column layout opens, 334px at full width.
+ * 21cqi leaves headroom up to a 4.76x ratio, and `normal` wrapping means a face
+ * wider than that would push its line rather than break the word in half. */
+html[lang="en"] .home-hero-copy h1 {
+  font-size: min(4.5rem, 21cqi);
+  overflow-wrap: normal;
 }
 
 /* The two-column hero opens at 961px with only 278px of copy width, where even
  * the han display overflows its line: 你自己 needs 288px at 6rem and broke to
- * 你自 / 己, stranding a glyph through the compound 自己. Both scripts step down
- * for that band and step back up at 1100px, where the column reaches 319px. */
+ * 你自 / 己, stranding a glyph through the compound 自己. Chinese still steps down
+ * for that band; English is handled by the container rule above at every width. */
 @media (min-width: 961px) and (max-width: 1099px) {
-  html[lang="en"] .home-hero-copy h1 {
-    font-size: 4rem;
-  }
-
   html[lang="zh-CN"] .home-hero-copy h1 {
     font-size: 5.5rem;
-  }
-}
-
-@media (min-width: 1100px) {
-  html[lang="en"] .home-hero-copy h1 {
-    font-size: 4.5rem;
   }
 }
 

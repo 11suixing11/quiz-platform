@@ -730,7 +730,9 @@ function publishJournalEntryUnlocked(userId: string, entryId: string) {
   const entry = ownerEntry(userId, entryId);
   const previousRevisionId = String(entry.published_revision_id ?? "");
   if (String(entry.status) === "hidden") throw new JournalError("这篇札记正在审核中", "JOURNAL_HIDDEN", 409);
-  const title = text(entry.title, JOURNAL_LIMITS.title, true);
+  // A community image post may be intentionally image-only. Keep the title
+  // optional and let readers see the localized fallback used by the UI.
+  const title = text(entry.title, JOURNAL_LIMITS.title);
   const assets = getDatabase().prepare(`
     SELECT ea.*, a.status FROM journal_entry_assets ea JOIN journal_assets a ON a.id = ea.asset_id
     WHERE ea.entry_id = ? ORDER BY ea.position
@@ -941,15 +943,35 @@ export function getPublishedJournalEntry(entryId: string, viewerId: string | nul
   return publicPayload(publicEntryRow(entryId), viewerId, true);
 }
 
-export function listPublishedJournalEntries(viewerId: string | null, cursor?: number) {
-  const before = Number.isFinite(cursor) && Number(cursor) > 0 ? Number(cursor) : Number.MAX_SAFE_INTEGER;
+export type JournalFeedSort = "latest" | "resonant";
+
+/**
+ * List public journal entries for a feed. The historical two-argument form
+ * `(viewerId, cursor)` remains valid for latest ordering; passing a sort
+ * string as the second argument is supported for feed consumers. Resonant
+ * ordering currently returns its first page because its reaction-aware cursor
+ * is not represented by the legacy numeric cursor.
+ */
+export function listPublishedJournalEntries(
+  viewerId: string | null,
+  cursorOrSort?: number | JournalFeedSort,
+  sortOrCursor?: JournalFeedSort | number,
+) {
+  const cursor = typeof cursorOrSort === "number"
+    ? cursorOrSort
+    : typeof sortOrCursor === "number" ? sortOrCursor : undefined;
+  const sort: JournalFeedSort = cursorOrSort === "resonant" || sortOrCursor === "resonant" ? "resonant" : "latest";
+  const before = sort === "latest" && Number.isFinite(cursor) && Number(cursor) > 0 ? Number(cursor) : Number.MAX_SAFE_INTEGER;
+  const order = sort === "resonant"
+    ? "reaction_count DESC, e.published_at DESC, e.id DESC"
+    : "e.published_at DESC, e.id DESC";
   const rows = getDatabase().prepare(`
     SELECT e.id, e.user_id, e.created_at, e.published_at, e.published_revision_id, r.revision_number,
       r.title, r.body, r.content_language, r.allow_comments, r.author_display_name, r.created_at AS revision_created_at,
       (SELECT COUNT(*) FROM journal_reactions x WHERE x.entry_id = e.id) AS reaction_count,
       (SELECT COUNT(*) FROM journal_comments c WHERE c.entry_id = e.id AND c.status = 'visible') AS comment_count
     FROM journal_entries e JOIN journal_revisions r ON r.id = e.published_revision_id
-    WHERE e.status = 'published' AND e.published_at < ? ORDER BY e.published_at DESC LIMIT ?
+    WHERE e.status = 'published' AND e.published_at < ? ORDER BY ${order} LIMIT ?
   `).all(before, JOURNAL_LIMITS.pageSize) as DatabaseRow[];
   return rows.map((row) => publicPayload(row, viewerId, false));
 }

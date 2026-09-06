@@ -1,9 +1,18 @@
 ﻿import type { Metadata, Viewport } from "next";
+import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import "./rebuild.css";
 import { MobileNav, PreferenceSync } from "@/components/shell/app-shell";
 import { AccountProvider } from "@/components/account-provider";
 import { OG_IMAGE_URL, serializeJsonLd, SITE_DESCRIPTION, SITE_DESCRIPTION_EN, SITE_NAME, SITE_URL, siteUrl } from "@/lib/site-config";
+
+/* Archivo sets every heading and IBM Plex Mono every number the product
+ * reports. next/font self-hosts both, so there is no third-party connection
+ * and no metric swap after paint. Archivo is loaded as a variable font because
+ * the display tier already uses 620 and 820 -- weights no static cut carries.
+ * Neither face has han glyphs; CJK stays on the system stack behind them. */
+const archivo = Archivo({ subsets: ["latin"], display: "swap", variable: "--font-archivo" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-plex-mono" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -28,7 +37,7 @@ export const metadata: Metadata = {
   other: { "apple-mobile-web-app-capable": "yes", "apple-mobile-web-app-status-bar-style": "default", "apple-mobile-web-app-title": "认识你自己" },
 };
 
-export const viewport: Viewport = { themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F4F0E8" }, { media: "(prefers-color-scheme: dark)", color: "#18231F" }], colorScheme: "light dark" };
+export const viewport: Viewport = { themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F2F6FA" }, { media: "(prefers-color-scheme: dark)", color: "#061220" }], colorScheme: "light dark" };
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -44,7 +53,7 @@ const preferenceScript = `(function(){try{var raw=localStorage.getItem('know-you
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="zh-CN" className={`${archivo.variable} ${plexMono.variable} h-full antialiased`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head><link rel="apple-touch-icon" href="/icons/icon-192.svg" /><script dangerouslySetInnerHTML={{ __html: preferenceScript }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} /></head>
       <body className="min-h-full bg-paper font-sans text-ink dark:bg-night dark:text-white"><a className="skip-link" href="#main-content">跳到主要内容 / Skip to main content</a><AccountProvider><PreferenceSync />{children}<MobileNav /></AccountProvider></body>
     </html>

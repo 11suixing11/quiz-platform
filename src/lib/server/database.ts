@@ -86,6 +86,10 @@ function migrate(database: SQLiteDatabase) {
     CREATE TABLE IF NOT EXISTS community_posts (
       id TEXT PRIMARY KEY NOT NULL,
       user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      post_kind TEXT NOT NULL DEFAULT 'assessment'
+        CHECK (post_kind IN ('assessment', 'text')),
+      title TEXT NOT NULL DEFAULT '',
+      content_language TEXT NOT NULL DEFAULT 'zh',
       attempt_id TEXT NOT NULL,
       test_id TEXT NOT NULL,
       test_name TEXT NOT NULL,
@@ -389,12 +393,22 @@ function migrate(database: SQLiteDatabase) {
   `);
 
   const communityPostColumns = database.prepare("PRAGMA table_info(community_posts)").all() as Array<{ name: string }>;
+  if (!communityPostColumns.some((column) => column.name === "post_kind")) {
+    database.exec("ALTER TABLE community_posts ADD COLUMN post_kind TEXT NOT NULL DEFAULT 'assessment' CHECK (post_kind IN ('assessment', 'text'))");
+  }
+  if (!communityPostColumns.some((column) => column.name === "title")) {
+    database.exec("ALTER TABLE community_posts ADD COLUMN title TEXT NOT NULL DEFAULT ''");
+  }
+  if (!communityPostColumns.some((column) => column.name === "content_language")) {
+    database.exec("ALTER TABLE community_posts ADD COLUMN content_language TEXT NOT NULL DEFAULT 'zh'");
+  }
   if (!communityPostColumns.some((column) => column.name === "moderation_status")) {
     database.exec("ALTER TABLE community_posts ADD COLUMN moderation_status TEXT NOT NULL DEFAULT 'visible' CHECK (moderation_status IN ('visible', 'hidden', 'removed'))");
   }
   if (!communityPostColumns.some((column) => column.name === "hidden_at")) {
     database.exec("ALTER TABLE community_posts ADD COLUMN hidden_at INTEGER");
   }
+  database.exec("CREATE INDEX IF NOT EXISTS community_posts_kind_idx ON community_posts(post_kind, deleted_at, created_at DESC)");
   const communityCommentColumns = database.prepare("PRAGMA table_info(community_comments)").all() as Array<{ name: string }>;
   if (!communityCommentColumns.some((column) => column.name === "moderation_status")) {
     database.exec("ALTER TABLE community_comments ADD COLUMN moderation_status TEXT NOT NULL DEFAULT 'visible' CHECK (moderation_status IN ('visible', 'hidden', 'removed'))");

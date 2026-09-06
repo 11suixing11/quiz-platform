@@ -11,9 +11,10 @@ const root = process.cwd();
 const testsDir = path.join(root, "src", "lib", "tests");
 
 function resolveModule(request, parentFile) {
-  if (request.startsWith("@/")) return path.join(root, "src", request.slice(2));
-  if (!request.startsWith(".")) return request;
-  const base = path.resolve(path.dirname(parentFile), request);
+  if (!request.startsWith("@/") && !request.startsWith(".")) return request;
+  const base = request.startsWith("@/")
+    ? path.join(root, "src", request.slice(2))
+    : path.resolve(path.dirname(parentFile), request);
   for (const candidate of [base, `${base}.ts`, `${base}.js`, path.join(base, "index.ts")]) {
     try {
       readFileSync(candidate);

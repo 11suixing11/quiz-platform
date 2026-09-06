@@ -1,4 +1,4 @@
-import type { QuizDefinition, QuizKind, QuizResult, QuizVisual, ScoringAdapter, ScoreBand } from "./types";
+import type { QuizDefinition, QuizKind, QuizPaper, QuizResult, QuizVisual, ScoringAdapter, ScoreBand } from "./types";
 
 function executeCalculator(definition: QuizDefinition, answers: number[]): QuizResult {
   if (answers.length !== definition.questions.length) {
@@ -50,7 +50,7 @@ export function getResultScore(result: QuizResult): number | null {
   return null;
 }
 
-export function getScoreBand(definition: QuizDefinition, result: QuizResult): ScoreBand | undefined {
+export function getScoreBand(definition: QuizPaper, result: QuizResult): ScoreBand | undefined {
   const score = getResultScore(result);
   if (score === null) return undefined;
   return definition.resultContent.scoreBands?.find((band) => score >= band.min && score <= band.max);
@@ -73,7 +73,7 @@ function getDominantVisualKey(result: QuizResult): string | undefined {
   return ranked[0][0];
 }
 
-export function getQuizVisualSelection(definition: QuizDefinition, result: QuizResult): QuizVisualSelection | undefined {
+export function getQuizVisualSelection(definition: QuizPaper, result: QuizResult): QuizVisualSelection | undefined {
   const media = definition.media;
   if (!media) return undefined;
 

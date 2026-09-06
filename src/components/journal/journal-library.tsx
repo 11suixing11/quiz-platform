@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, FileImage, ImagePlus, LockKeyhole, LogIn, RefreshCw, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity, useAccountSync } from "@/components/account-provider";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
 import { useLanguage } from "@/hooks/use-local-storage";
 import { getJournalLibrary, journalImageSource, type JournalLibraryResponse, type JournalStatus, type JournalSummary } from "@/lib/journal";
@@ -61,7 +61,8 @@ function JournalLibraryCard({ entry, language, tab }: { entry: JournalSummary; l
 
 export function JournalLibrary() {
   const { language } = useLanguage();
-  const { user, syncState } = useAccount();
+  const { user } = useAccountIdentity();
+  const { syncState } = useAccountSync();
   const [data, setData] = useState<JournalLibraryResponse | null>(null);
   const [tab, setTab] = useState<LibraryTab>("drafts");
   const [loading, setLoading] = useState(true);

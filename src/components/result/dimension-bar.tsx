@@ -6,6 +6,12 @@ interface DimensionBarProps {
   description?: string;
 }
 
+/**
+ * A dimension read on the same exposure meter the quiz uses for its progress, so
+ * "how far along" and "how strong" are the same instrument seen twice. The value
+ * travels as `--progress` (0-1) on the track: the fill scales from it and the
+ * brass needle is positioned from it.
+ */
 export function DimensionBar({
   name,
   percentage,
@@ -18,21 +24,19 @@ export function DimensionBar({
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between text-sm">
         <span className="font-medium text-foreground">{name}</span>
-        <span className="tabular-nums text-muted-foreground">{clamped}%</span>
+        <span className="atlas-dimension-value">{clamped}%</span>
       </div>
       {description && <p className="atlas-dimension-description">{description}</p>}
       <div
-        className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted"
+        className="atlas-meter"
+        style={{ "--progress": clamped / 100, "--meter-fill": accentColor } as React.CSSProperties}
         role="progressbar"
         aria-label={name}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={clamped}
       >
-        <div
-          className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 ease-out motion-reduce:transition-none"
-          style={{ width: `${clamped}%`, backgroundColor: accentColor }}
-        />
+        <span className="atlas-meter-fill" />
       </div>
     </div>
   );

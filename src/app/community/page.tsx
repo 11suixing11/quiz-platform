@@ -2,29 +2,38 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, LockKeyhole, NotebookPen } from "lucide-react";
+import { ArrowRight, ImagePlus, MessageSquarePlus } from "lucide-react";
 import { CommunityFeed } from "@/components/community/community-feed";
-import { JournalCommunityFeed } from "@/components/community/journal-feed";
+import { CommunityTextComposer } from "@/components/community/community-text-composer";
 import { AppHeader, PageContainer } from "@/components/shell/app-shell";
-import { useAccount } from "@/components/account-provider";
+import { useAccountIdentity } from "@/components/account-provider";
 import { useLanguage } from "@/hooks/use-local-storage";
 
 export default function CommunityPage() {
   const { language } = useLanguage();
-  const { user } = useAccount();
-  const [tab, setTab] = useState<"journals" | "assessments">("journals");
+  const { user } = useAccountIdentity();
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [feedVersion, setFeedVersion] = useState(0);
+  const text = language === "zh";
   return <div className="atlas-page min-h-screen">
-    <AppHeader section={language === "zh" ? "社区" : "Community"} />
+    <AppHeader section={text ? "社区" : "Community"} />
     <PageContainer className="community-page max-w-4xl">
       <header className="community-intro">
-        <div><h1>{language === "zh" ? "把一次看见，留给可能懂你的人" : "Leave one observation for someone who may understand"}</h1><p>{language === "zh" ? "阅读公开的图像札记，或浏览大家主动分享的测评发现。两类内容各自成流，不混合排序。" : "Read public image journals or browse assessment discoveries people chose to share. Each has its own feed."}</p></div>
-        <aside>{tab === "journals" ? <NotebookPen aria-hidden="true" /> : <LockKeyhole aria-hidden="true" />}<p>{tab === "journals" ? (language === "zh" ? "公开版是发布时的不可变快照，作者的后续编辑不会自动替换它。" : "A public version is an immutable publishing snapshot; later edits do not replace it automatically.") : (language === "zh" ? "原始答案不会公开。结果只有在本人主动确认后才会出现在这里。" : "Raw answers are never public. A result appears only after its owner confirms sharing.")}</p>{user ? <Link href={tab === "journals" ? "/journal/new/" : "/history/"} className="atlas-text-link">{tab === "journals" ? (language === "zh" ? "写一篇图像札记" : "Write an image journal") : (language === "zh" ? "从历史记录分享结果" : "Share from history")}<ArrowRight /></Link> : <Link href="/account/" className="atlas-text-link">{language === "zh" ? "登录后参与交流" : "Sign in to participate"}<ArrowRight /></Link>}</aside>
+        <div><h1>{text ? "把想法留给可能懂你的人" : "Leave a thought for someone who may understand"}</h1><p>{text ? "测评、文字和图像现在在同一个社区里。你可以选择最适合此刻的一种表达方式。" : "Assessments, words, and images now live in one community. Choose the form that fits this moment."}</p></div>
+        <aside><p>{text ? "主题不设预设范围，你可以选择文字、测评或图像来表达。公开发布前，你可以先看清会出现什么；未来如提供 AI 功能，也会单独征得同意。" : "There is no preset topic list. Choose words, an assessment, or images. Review what will be public before posting; if AI features are offered later, they will require separate consent."}</p><Link href="/history/" className="atlas-text-link">{text ? "从测评记录开始" : "Start from an assessment"}<ArrowRight aria-hidden="true" /></Link></aside>
       </header>
-      <div className="mb-8 grid grid-cols-2 rounded-lg border border-ink/12 p-1 dark:border-white/12" role="tablist" aria-label={language === "zh" ? "社区内容" : "Community content"}>
-        <button type="button" role="tab" aria-selected={tab === "journals"} onClick={() => setTab("journals")} className={`min-h-11 rounded-md px-3 text-sm font-semibold ${tab === "journals" ? "bg-ink text-paper" : "text-ink/55 dark:text-white/55"}`}>{language === "zh" ? "图像札记" : "Image journals"}</button>
-        <button type="button" role="tab" aria-selected={tab === "assessments"} onClick={() => setTab("assessments")} className={`min-h-11 rounded-md px-3 text-sm font-semibold ${tab === "assessments" ? "bg-ink text-paper" : "text-ink/55 dark:text-white/55"}`}>{language === "zh" ? "测评分享" : "Assessment shares"}</button>
+
+      <div className="community-create-actions" aria-label={text ? "创建社区内容" : "Create community content"}>
+        <button type="button" className="atlas-primary-action" onClick={() => setComposerOpen(true)}><MessageSquarePlus aria-hidden="true" />{text ? "写一段文字" : "Write a text post"}</button>
+        <Link href="/journal/new/?from=community" className="atlas-secondary-action"><ImagePlus aria-hidden="true" />{text ? "发一篇图文帖" : "Create an image post"}</Link>
+        <div className="community-create-meta">
+          <span className="community-create-note">{text ? "图像上传需要验证邮箱" : "Email verification is required for image uploads"}</span>
+          {!user && <Link href="/account/" className="atlas-text-link">{text ? "登录后参与" : "Sign in to participate"}<ArrowRight aria-hidden="true" /></Link>}
+        </div>
       </div>
-      {tab === "journals" ? <JournalCommunityFeed language={language} /> : <CommunityFeed language={language} />}
+
+      {composerOpen && <CommunityTextComposer language={language} onClose={() => setComposerOpen(false)} onPublished={() => { setComposerOpen(false); setFeedVersion((value) => value + 1); }} />}
+      <CommunityFeed key={feedVersion} language={language} onCreateText={() => setComposerOpen(true)} />
     </PageContainer>
   </div>;
 }

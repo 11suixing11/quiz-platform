@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, Check, Cloud, RefreshCw, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { loadQuizDefinition, getQuizEntry, getQuizVisualSelection, getResultKey, getResultScore, getScoreBand, type QuizDefinition, type QuizResult } from "@/core/quiz";
-import { useAccount } from "@/components/account-provider";
-import { AppHeader, PageContainer } from "@/components/shell/app-shell";
+import { getQuizVisualSelection, getResultKey, getResultScore, getScoreBand } from "@/core/quiz/scoring";
+import { useAccountActions, useAccountIdentity, useAccountSync } from "@/components/account-provider";
+import { AppHeader, FocusHeader, PageContainer } from "@/components/shell/app-shell";
 import { NarrativeSection } from "@/components/result/narrative-section";
 import { ReflectionGuide } from "@/components/result/reflection-guide";
 import { ResultDetails } from "@/components/result/result-details";
@@ -14,20 +15,24 @@ import { QuizVisualFrame } from "@/components/quiz/quiz-visual";
 import { useLanguage } from "@/hooks/use-local-storage";
 import { getAttemptById, getLatestAttempt } from "@/lib/storage";
 import { copyOrShare } from "@/lib/share";
-import { CommunityComposer } from "@/components/community/community-composer";
-import type { ArchetypeData, DimensionData, Lang, ScoreBand } from "@/core/quiz";
+/**
+ * The composer is a form, an upload and a preview that only a minority of
+ * readers open. It is fetched when they do, not with the result page.
+ */
+const CommunityComposer = dynamic(() => import("@/components/community/community-composer").then((mod) => mod.CommunityComposer), { ssr: false });
+import type { ArchetypeData, DimensionData, Lang, PublicQuizCatalogEntry, QuizPaper, QuizResult, ScoreBand } from "@/core/quiz/types";
 
-function pickNarrative(definition: QuizDefinition, key: string, language: Lang) {
+function pickNarrative(definition: QuizPaper, key: string, language: Lang) {
   const entry = definition.resultContent.narrative?.[key] ?? definition.resultContent.narrative?.[Object.keys(definition.resultContent.narrative ?? {})[0]];
   return entry?.[language];
 }
 
-function pickType(definition: QuizDefinition, key: string, language: Lang) {
+function pickType(definition: QuizPaper, key: string, language: Lang) {
   const entry = definition.resultContent.types?.[key] ?? definition.resultContent.types?.[Object.keys(definition.resultContent.types ?? {})[0]];
   return entry?.[language];
 }
 
-function pickArchetype(definition: QuizDefinition, key: string, language: Lang) {
+function pickArchetype(definition: QuizPaper, key: string, language: Lang) {
   const entry = definition.resultContent.archetypes?.[key];
   if (!entry) return undefined;
   const localize = (zh: keyof ArchetypeData, en: keyof ArchetypeData) => language === "zh" ? entry[zh] : entry[en];
@@ -85,7 +90,7 @@ function getResultLead(category: string, language: Lang) {
   return language === "zh" ? copy.zh : copy.en;
 }
 
-function getDominantDimension(definition: QuizDefinition, result: QuizResult, language: Lang) {
+function getDominantDimension(definition: QuizPaper, result: QuizResult, language: Lang) {
   const first = Object.entries(result.percentages ?? {}).sort((a, b) => b[1] - a[1])[0];
   if (!first) return undefined;
   const [key, score] = first;
@@ -102,7 +107,7 @@ interface ResultSummaryItem {
   value: string;
 }
 
-function getResultSummary(definition: QuizDefinition, result: QuizResult, language: Lang): ResultSummaryItem[] {
+function getResultSummary(definition: QuizPaper, result: QuizResult, language: Lang): ResultSummaryItem[] {
   if (result.dimensions?.length) {
     return result.dimensions.map((dimension) => {
       const metadata = definition.resultContent.dimensions?.[dimension.name];
@@ -155,7 +160,7 @@ interface ResultDimensionEntry {
   metadata?: DimensionData;
 }
 
-function getResultDimensionEntries(definition: QuizDefinition, result: QuizResult, language: Lang): ResultDimensionEntry[] {
+function getResultDimensionEntries(definition: QuizPaper, result: QuizResult, language: Lang): ResultDimensionEntry[] {
   if (result.dimensions?.length) {
     return result.dimensions.map((dimension) => ({
       key: dimension.name,
@@ -204,7 +209,7 @@ function getDimensionDetailText(
 }
 
 function getResultDetails(
-  definition: QuizDefinition,
+  definition: QuizPaper,
   result: QuizResult,
   language: Lang,
   narrative: ReturnType<typeof pickNarrative>,
@@ -336,11 +341,16 @@ function getResultDetails(
   return null;
 }
 
-export default function ResultClient({ testId }: { testId: string }) {
+/** The topic label travels as plain data so the result never imports the catalog. */
+type ResultTopic = PublicQuizCatalogEntry["topic"];
+
+export default function ResultClient({ paper, topic }: { paper: QuizPaper; topic: ResultTopic }) {
   const router = useRouter();
   const { language } = useLanguage();
-  const { user, syncChoice, syncState, syncNow } = useAccount();
-  const [definition, setDefinition] = useState<QuizDefinition | null>(null);
+  const { user } = useAccountIdentity();
+  const { syncChoice, syncState } = useAccountSync();
+  const { syncNow } = useAccountActions();
+  const testId = paper.id;
   const [result, setResult] = useState<QuizResult | null>(null);
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [attemptAnswers, setAttemptAnswers] = useState<number[] | null>(null);
@@ -351,24 +361,22 @@ export default function ResultClient({ testId }: { testId: string }) {
   const [syncWarning, setSyncWarning] = useState(false);
   const [visualFeedback, setVisualFeedback] = useState<"idle" | "sending" | "yes" | "no" | "error">("idle");
   const [loadedAccountScope, setLoadedAccountScope] = useState<string | null>();
-  const entry = getQuizEntry(testId);
   const accountScope = user?.id ?? null;
 
+  // The quiz arrives prerendered; only the attempt is local. This waits for the
+  // account scope to settle, then reads it — there is no paper to fetch.
   useEffect(() => {
     if (syncState === "loading" || syncState === "syncing") return;
-
-    let cancelled = false;
-    loadQuizDefinition(testId).then((loaded) => {
-      if (cancelled) return;
-      setDefinition(loaded);
+    const timer = window.setTimeout(() => {
       setVisualFeedback("idle");
-      const queryAttempt = new URLSearchParams(window.location.search).get("attempt");
-      setSyncWarning(new URLSearchParams(window.location.search).get("sync") === "failed");
-      const attempt = queryAttempt ? getAttemptById(queryAttempt) : getLatestAttempt(testId);
-      if (attempt?.testId === testId) {
-        setResult(attempt.result);
-        setAttemptId(attempt.id);
-        setAttemptAnswers(attempt.answers.length > 0 ? attempt.answers : null);
+      const query = new URLSearchParams(window.location.search);
+      setSyncWarning(query.get("sync") === "failed");
+      const queryAttempt = query.get("attempt");
+      const stored = queryAttempt ? getAttemptById(queryAttempt) : getLatestAttempt(testId);
+      if (stored?.testId === testId) {
+        setResult(stored.result);
+        setAttemptId(stored.id);
+        setAttemptAnswers(stored.answers.length > 0 ? stored.answers : null);
       } else {
         setResult(null);
         setAttemptId(null);
@@ -376,18 +384,18 @@ export default function ResultClient({ testId }: { testId: string }) {
       }
       setLoadedAccountScope(accountScope);
       setLoading(false);
-    });
-    return () => { cancelled = true; };
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [accountScope, syncChoice, syncState, testId]);
 
   const content = useMemo(() => {
-    if (!definition || !result) return null;
-    const dominantDimension = getDominantDimension(definition, result, language);
+    if (!result) return null;
+    const dominantDimension = getDominantDimension(paper, result, language);
     const key = getResultKey(result) || dominantDimension?.key || "";
-    const narrative = pickNarrative(definition, key, language);
-    const typeData = pickType(definition, key, language);
-    const archetype = pickArchetype(definition, key, language);
-    const scoreBand = getScoreBand(definition, result);
+    const narrative = pickNarrative(paper, key, language);
+    const typeData = pickType(paper, key, language);
+    const archetype = pickArchetype(paper, key, language);
+    const scoreBand = getScoreBand(paper, result);
     const title = (scoreBand?.title[language] ?? narrative?.archetype ?? archetype?.title ?? typeData?.name ?? dominantDimension?.label ?? key) || (language === "zh" ? "这次的结果" : "Your result");
     const description = scoreBand?.description[language]
       ?? narrative?.subtitle
@@ -400,16 +408,16 @@ export default function ResultClient({ testId }: { testId: string }) {
           ? `在这次回答里，「${dominantDimension.label}」相对更明显。它只是整体轮廓的一部分，其他方向也会随着情境变化。`
           : `${dominantDimension.label} stands out more in this response. It is one part of a wider profile, and other tendencies may shift with context.`)
         : undefined);
-    const resultLabel = definition.kind === "type"
+    const resultLabel = paper.kind === "type"
       ? (language === "zh" ? "你的类型" : "Your type")
-      : definition.kind === "score"
+      : paper.kind === "score"
         ? (language === "zh" ? "这次的状态区间" : "Your current range")
         : (language === "zh" ? "这次更鲜明的方向" : "What stands out this time");
-    const identityNote = definition.kind === "type"
+    const identityNote = paper.kind === "type"
       ? (language === "zh"
         ? "这是一种你可以认领的倾向；在不同情境里，它也会呈现出不同侧面。"
         : "This is a tendency you can claim as your own; different situations may bring out different sides.")
-      : definition.kind === "score"
+      : paper.kind === "score"
         ? (language === "zh" ? "把它当作理解最近状态的一扇窗。" : "Use it as a window into how you have been lately.")
         : (language === "zh" ? "这些方向共同构成了这次回答的轮廓。" : "Together, these directions form the shape of this response.");
     return {
@@ -420,15 +428,15 @@ export default function ResultClient({ testId }: { testId: string }) {
       description,
       resultLabel,
       identityNote,
-      summary: getResultSummary(definition, result, language),
-      lead: getResultLead(entry?.topic.id ?? "self", language),
-      details: getResultDetails(definition, result, language, narrative, typeData, archetype, scoreBand),
-      visualSelection: getQuizVisualSelection(definition, result),
+      summary: getResultSummary(paper, result, language),
+      lead: getResultLead(topic.id, language),
+      details: getResultDetails(paper, result, language, narrative, typeData, archetype, scoreBand),
+      visualSelection: getQuizVisualSelection(paper, result),
     };
-  }, [definition, entry, language, result]);
+  }, [language, paper, result, topic.id]);
 
   const share = useCallback(async () => {
-    if (!content || !entry) return;
+    if (!content) return;
     setShareError(false);
     const shareUrl = new URL(window.location.href);
     const resultRoute = `/result/${testId}`;
@@ -439,8 +447,8 @@ export default function ResultClient({ testId }: { testId: string }) {
     shareUrl.hash = "";
     const url = shareUrl.toString();
     const text = language === "zh"
-      ? `我完成了「${entry.title.zh}」，结果是 ${content.title}。`
-      : `I completed “${entry.title.en}” and got ${content.title}.`;
+      ? `我完成了「${paper.title.zh}」，结果是 ${content.title}。`
+      : `I completed “${paper.title.en}” and got ${content.title}.`;
     try {
       const outcome = await copyOrShare(navigator, { title: content.title, text, url });
       setCopied(outcome === "copied");
@@ -448,7 +456,7 @@ export default function ResultClient({ testId }: { testId: string }) {
     } catch {
       setShareError(true);
     }
-  }, [content, entry, language, testId]);
+  }, [content, language, paper.title.en, paper.title.zh, testId]);
 
   const handleAttemptSynced = useCallback((nextAttemptId: string) => {
     setAttemptId(nextAttemptId);
@@ -481,13 +489,13 @@ export default function ResultClient({ testId }: { testId: string }) {
   }, [content, testId, visualFeedback]);
 
   if (loading || syncState === "loading" || loadedAccountScope !== accountScope) return <Loading language={language} />;
-  if (!definition || !entry || !result || !content) {
+  if (!result || !content) {
     return <div className="atlas-page min-h-screen"><AppHeader /><PageContainer><div className="atlas-empty-state mx-auto mt-16 max-w-lg"><h1 className="text-2xl font-semibold">{language === "zh" ? "还没有找到这次结果" : "No result found yet"}</h1><p className="mt-3 max-w-md text-sm leading-6 text-ink/55 dark:text-white/55">{language === "zh" ? "先完成一次测评。游客结果保存在本机；登录后会自动同步，也能在其他登录设备查看。" : "Complete the assessment once. Guest results stay on this device; after sign-in they sync automatically and are available on your other signed-in devices."}</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><Link href={`/test/${testId}/`} className="atlas-primary-action justify-center">{language === "zh" ? "查看测评说明" : "View assessment details"}<ArrowRight className="size-4" /></Link><Link href="/" className="atlas-secondary-action justify-center">{language === "zh" ? "返回首页" : "Back home"}</Link></div></div></PageContainer></div>;
   }
 
-  const pattern = definition.kind;
-  const accent = definition.accent;
-  const testName = language === "zh" ? entry.title.zh : entry.title.en;
+  const pattern = paper.kind;
+  const accent = paper.accent;
+  const testName = language === "zh" ? paper.title.zh : paper.title.en;
   const cloudSyncEnabled = Boolean(user && syncChoice === "merge");
   const saveStatus = syncWarning
     ? {
@@ -512,7 +520,7 @@ export default function ResultClient({ testId }: { testId: string }) {
 
   return (
     <div className="atlas-page min-h-screen">
-      <AppHeader narrow backHref="/" backLabel={language === "zh" ? "返回首页" : "Back home"} section={testName} />
+      <FocusHeader backHref="/" backLabel={language === "zh" ? "返回首页" : "Back home"} section={testName} />
       <PageContainer className="max-w-3xl">
         <section className={`atlas-result-save-status${saveStatus.warning ? " atlas-result-save-status--warning" : ""}`} aria-label={language === "zh" ? "保存状态" : "Save status"}>
           <div className="atlas-result-save-status-copy" role="status">
@@ -556,11 +564,11 @@ export default function ResultClient({ testId }: { testId: string }) {
 
         {content.details && <ResultDetails {...content.details} />}
 
-        {!(definition.kind === "score" && !Object.keys(result.percentages ?? {}).length && !content.narrative && !content.typeData) && (
-          <section className="atlas-result-panel mt-8"><h2 className="atlas-result-section-title">{language === "zh" ? "结果解释" : "Result interpretation"}</h2><div className="mt-7"><NarrativeSection pattern={pattern} result={result} narrative={content.narrative} typeData={content.typeData} dimensions={definition.resultContent.dimensions} archetypes={definition.resultContent.archetypes} accentColor="var(--accent)" lang={language} introDescription={content.description} /></div></section>
+        {!(paper.kind === "score" && !Object.keys(result.percentages ?? {}).length && !content.narrative && !content.typeData) && (
+          <section className="atlas-result-panel mt-8"><h2 className="atlas-result-section-title">{language === "zh" ? "结果解释" : "Result interpretation"}</h2><div className="mt-7"><NarrativeSection pattern={pattern} result={result} narrative={content.narrative} typeData={content.typeData} dimensions={paper.resultContent.dimensions} archetypes={paper.resultContent.archetypes} accentColor="var(--accent)" lang={language} introDescription={content.description} /></div></section>
         )}
 
-        <ReflectionGuide testId={testId} entry={entry} pattern={pattern} result={result} dimensions={definition.resultContent.dimensions} accentColor={accent} lang={language} />
+        <ReflectionGuide testId={testId} entry={{ topic }} pattern={pattern} result={result} dimensions={paper.resultContent.dimensions} accentColor={accent} lang={language} />
 
         {communityOpen && attemptId && <CommunityComposer attemptId={attemptId} testId={testId} answers={attemptAnswers ?? undefined} testName={testName} resultTitle={content.title} summary={content.summary} language={language} syncNow={syncNow} onAttemptSynced={handleAttemptSynced} onClose={() => setCommunityOpen(false)} />}
         <section className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 dark:border-white/10 sm:flex-row" aria-label={language === "zh" ? "结果操作" : "Result actions"}><button type="button" onClick={() => router.push(`/quiz/${testId}/`)} className="atlas-secondary-action flex-1 justify-center"><RefreshCw className="size-4" aria-hidden="true" />{language === "zh" ? "重新测评" : "Retake"}</button><button type="button" onClick={share} className="atlas-secondary-action flex-1 justify-center" aria-describedby="share-status">{copied ? <Check className="size-4" aria-hidden="true" /> : <Share2 className="size-4" aria-hidden="true" />}{copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "复制分享链接" : "Copy share link")}</button><button type="button" onClick={() => setCommunityOpen(true)} className="atlas-primary-action flex-1 justify-center"><Share2 className="size-4" aria-hidden="true" />{language === "zh" ? "公开分享结果" : "Share publicly"}</button></section>

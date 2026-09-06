@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import QuizEngine from "@/components/quiz/quiz-engine";
-import { getQuizEntry, QUIZ_IDS } from "@/core/quiz";
+import { getQuizEntry, loadQuizQuestionSet, QUIZ_IDS } from "@/core/quiz";
 import { PRIVATE_PAGE_METADATA } from "@/lib/site-config";
 
 export const dynamicParams = false;
@@ -23,5 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
 export default async function QuizPage({ params }: { params: Promise<{ type: string }> }) {
   const { type } = await params;
   if (!getQuizEntry(type)) notFound();
-  return <QuizEngine key={type} testId={type} />;
+  const questionSet = await loadQuizQuestionSet(type);
+  if (!questionSet) notFound();
+  return <QuizEngine key={type} questionSet={questionSet} />;
 }
