@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { ArrowLeft, ClipboardList, History, House, Languages, MessageCircle, Moon, Settings, Sun, UserRound } from "lucide-react";
+import { ArrowLeft, ClipboardList, History, House, Languages, Moon, Settings, Sun, UserRound } from "lucide-react";
 import { useAccountIdentity } from "@/components/account-provider";
 import { useLanguage, useTheme } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
@@ -31,17 +31,18 @@ function AccountAvatar({ displayName, avatar, size = "md" }: { displayName: stri
 const navItems = [
   { href: "/", label: "首页", labelEn: "Home", icon: House },
   { href: "/assessments/", label: "测评", labelEn: "Assess", icon: ClipboardList },
-  { href: "/community/", label: "社区", labelEn: "Community", icon: MessageCircle },
   { href: "/history/", label: "记录", labelEn: "History", icon: History },
   { href: "/account/", label: "账号", labelEn: "Account", icon: UserRound },
 ];
 
-// The desktop bar shows the four content sections; home is the wordmark and the
-// account sits with the preference controls. Sliced once, not once per render.
+// The desktop bar shows the content sections; home (the community feed) is
+// the wordmark and the account sits with the preference controls. The
+// compatibility `/community/` route renders the same stream as home, so the
+// feed is reachable from the wordmark rather than a duplicate nav entry.
 const DESKTOP_NAV_ITEMS = navItems.slice(1, -1);
 
 function isNavItemActive(routePath: string, href: string) {
-  if (href === "/") return routePath === "/";
+  if (href === "/") return routePath === "/" || routePath.startsWith("/community/");
   if (href === "/assessments/" && routePath.startsWith("/test/")) return true;
   return routePath.startsWith(href);
 }
@@ -198,7 +199,7 @@ export function MobileNav() {
   if (routePath.startsWith("/quiz/") || routePath.startsWith("/result/")) return null;
   return (
     <nav className="atlas-mobile-nav fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper px-3 pt-2 dark:border-white/10 dark:bg-night" aria-label={language === "zh" ? "主导航" : "Primary navigation"}>
-      <div className="mx-auto grid max-w-lg grid-cols-5 gap-0.5">
+      <div className="mx-auto grid max-w-lg grid-cols-4 gap-0.5">
         {navItems.map(({ href, label, labelEn, icon: Icon }) => {
           const active = isNavItemActive(routePath, href);
           const showAvatar = href === "/account/" && user;

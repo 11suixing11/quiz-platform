@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import ReflectionHomePage from "@/components/reflection-home-page";
+import { CommunityStream } from "@/components/community/community-stream";
 
 export const metadata: Metadata = {
   title: { absolute: "认识你自己 | Know Yourself" },
-  description: "通过结构化测评或图像札记，记录对性格、情绪、关系与日常生活的观察。 Reflect through structured assessments or image journals.",
+  description: "一个安静的社区：用文字、测评或图像分享你的观察，把此刻留给可能懂你的人。 A calm community to share your observations in words, assessments, or images.",
 };
 
 export default function HomePage() {
-  return <ReflectionHomePage />;
+  return <CommunityStream />;
 }
