@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
+import Link from "next/link";
 import NextImage from "next/image";
 import { Camera, Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useAccountIdentity, useAccountActions } from "@/components/account-provider";
+import { getRemoteBadges, saveRemoteBadgeVisibility, saveRemoteWornBadges, type CollectedBadge } from "@/lib/account";
 import type { LocalProfile } from "@/lib/local-profile";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +39,146 @@ function resizeAvatar(file: File): Promise<string> {
     };
     reader.readAsDataURL(file);
   });
+}
+
+type WornBadgeSelection = Array<{ testId: string; resultKey: string }>;
+
+interface BadgeCollectionState {
+  collected: CollectedBadge[];
+  worn: WornBadgeSelection;
+  showBadges: boolean;
+}
+
+function badgeKey(testId: string, resultKey: string) {
+  return `${testId}\0${resultKey}`;
+}
+
+/**
+ * The badge shelf: earned variants grouped by assessment, an opt-in wear
+ * selection of at most three, and the quiet visibility switch. Badges are
+ * derived on the server from the account's own attempts, so this section only
+ * reads the collection and writes the worn selection and the opt-in.
+ */
+function ProfileBadgeCollection({ userId, zh }: { userId: string; zh: boolean }) {
+  const { user } = useAccountIdentity();
+  const [state, setState] = useState<BadgeCollectionState | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (user?.id !== userId) return;
+    let active = true;
+    getRemoteBadges(userId)
+      .then((data) => {
+        if (!active) return;
+        setState({
+          collected: data.collected,
+          worn: data.worn.map((badge) => ({ testId: badge.testId, resultKey: badge.resultKey })),
+          showBadges: data.showBadges,
+        });
+      })
+      .catch(() => { if (active) setState(null); });
+    return () => { active = false; };
+  }, [userId, user?.id]);
+
+  if (user?.id !== userId || !state) return null;
+
+  const wornKeys = new Set(state.worn.map((item) => badgeKey(item.testId, item.resultKey)));
+  const families = new Map<string, { testId: string; label: string; badges: CollectedBadge[] }>();
+  for (const badge of state.collected) {
+    const family = families.get(badge.testId) ?? { testId: badge.testId, label: zh ? badge.testName : badge.testNameEn, badges: [] };
+    family.badges.push(badge);
+    families.set(badge.testId, family);
+  }
+
+  const toggleWorn = async (badge: CollectedBadge) => {
+    if (busy) return;
+    const key = badgeKey(badge.testId, badge.resultKey);
+    if (!wornKeys.has(key) && state.worn.length >= 3) {
+      setError(zh ? "最多佩戴 3 枚徽章，先摘下一枚再换。" : "Up to three badges can be worn. Remove one first.");
+      return;
+    }
+    const next: WornBadgeSelection = wornKeys.has(key)
+      ? state.worn.filter((item) => badgeKey(item.testId, item.resultKey) !== key)
+      : [...state.worn, { testId: badge.testId, resultKey: badge.resultKey }];
+    setBusy(true);
+    setError("");
+    try {
+      const saved = await saveRemoteWornBadges(userId, next);
+      setState((current) => current && { ...current, worn: saved.worn.map((item) => ({ testId: item.testId, resultKey: item.resultKey })) });
+    } catch (cause) {
+      setError(cause instanceof Error && cause.message ? cause.message : (zh ? "徽章暂时无法更新，请重试。" : "The badge could not be updated. Try again."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const toggleShowBadges = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const saved = await saveRemoteBadgeVisibility(userId, !state.showBadges);
+      setState((current) => current && { ...current, showBadges: saved.profile.showBadges });
+    } catch (cause) {
+      setError(cause instanceof Error && cause.message ? cause.message : (zh ? "设置暂时无法更新，请重试。" : "The setting could not be updated. Try again."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="profile-badges" aria-labelledby="profile-badges-heading">
+      <div className="profile-badges-heading">
+        <h3 id="profile-badges-heading">{zh ? "徽章" : "Badges"}</h3>
+        <p>{zh ? `佩戴中 ${state.worn.length}/3 · 只显示结果标签，不显示分数` : `Worn ${state.worn.length}/3 · result labels only, never scores`}</p>
+      </div>
+      {state.collected.length === 0 ? (
+        <p className="profile-badge-empty">{zh ? "完成一次公开测评后，这里会出现它对应的结果徽章。" : "Complete a public assessment and its result badge appears here."}</p>
+      ) : (
+        <>
+          {[...families.values()].map((family) => (
+            <div key={family.testId} className="profile-badge-family">
+              <span><Link href={`/test/${family.testId}/`}>{family.label}</Link></span>
+              <div className="profile-badge-grid">
+                {family.badges.map((badge) => {
+                  const worn = wornKeys.has(badgeKey(badge.testId, badge.resultKey));
+                  return (
+                    <button
+                      type="button"
+                      key={badge.resultKey}
+                      className={cn("profile-badge-chip", worn && "is-worn")}
+                      disabled={busy}
+                      aria-pressed={worn}
+                      title={worn ? (zh ? "摘下这枚徽章" : "Remove this badge") : (zh ? `佩戴「${badge.resultTitle}」` : `Wear “${badge.resultTitleEn}”`)}
+                      onClick={() => void toggleWorn(badge)}
+                    >
+                      {worn && <Check className="size-3.5" aria-hidden="true" />}
+                      {zh ? badge.resultTitle : badge.resultTitleEn}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          {state.worn.length > 0 && !state.showBadges && (
+            <p className="profile-badge-hint">{zh ? "开启后，其他人会在你的分享旁看到佩戴的徽章。" : "When enabled, others see the badges you wear next to your shares."}</p>
+          )}
+          <label className="profile-badge-toggle">
+            <input
+              type="checkbox"
+              checked={state.showBadges}
+              disabled={busy}
+              onChange={() => void toggleShowBadges()}
+              aria-label={zh ? "在社区展示佩戴的徽章" : "Show worn badges in the community"}
+            />
+            <span>{zh ? "在社区展示佩戴的徽章（默认关闭；徽章只是此刻的观察，不构成身份定义）" : "Show worn badges in the community (off by default; a badge is an observation, not an identity)"}</span>
+          </label>
+        </>
+      )}
+      {error && <p className="mt-2 text-sm text-[color:var(--danger)]" role="alert">{error}</p>}
+    </section>
+  );
 }
 
 export function ProfileEditor({ userId, displayName, email, zh, syncMode }: { userId: string; displayName: string; email: string; zh: boolean; syncMode: "merge" | null }) {
@@ -185,6 +327,7 @@ export function ProfileEditor({ userId, displayName, email, zh, syncMode }: { us
           </div>
         </div>
       )}
+      <ProfileBadgeCollection userId={userId} zh={zh} />
       <p className={cn("profile-feedback", feedback && "is-visible")} role={feedback ? "status" : undefined}>{feedback || (syncMode ? (zh ? "头像、签名与标签会随账号同步" : "Avatar, bio, and tags sync with your account") : (zh ? "头像与标签仅保存在这台设备" : "Avatar and tags stay on this device"))}</p>
     </section>
   );

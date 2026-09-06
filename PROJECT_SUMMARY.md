@@ -1,6 +1,6 @@
 # 认识你自己 | Know Yourself 项目摘要
 
-**更新：2026 年 9 月 6 日**
+**更新：2026 年 9 月 7 日**
 
 ## 产品定位
 
@@ -16,6 +16,7 @@
 - 不可变公开修订、显式更新公开版、取消公开和永久删除
 - 统一社区 Feed：测评、文字和图像三类内容，可按类型筛选
 - 共鸣、留言、举报、自动隐藏、管理员治理和无登录隐私/版权投诉
+- 测评徽章：从账号云端完成记录派生的收藏、最多 3 枚的自愿佩戴、受独立开关门控的社区作者行展示
 - 邮箱密码账号、验证邮件、忘记密码邮件找回、Turnstile、个人资料、改密、自动同步和账号删除
 
 不再生成 analytics、dashboard、stats、trends、compare、compat 等旧 secondary routes，也不兼容旧 URL。
@@ -61,6 +62,7 @@ Next.js 生成 standalone 运行时；生产部署架构由自有 VPS 上的 Nod
 - quiz media：20 张封面/结果视觉、映射、fallback、固有尺寸和双语 alt
 - storage/cloud：Storage v3、历史、收藏、会话、导入导出、云端 revision
 - journal：权限、1/3/6 图、媒体验证、任务恢复、配额、不可变修订、取消公开、删除和墓碑
+- badges：收藏派生、佩戴上限、未获得拒绝、开关门控、级联清理与分享标签一致性
 - governance：自动隐藏、管理员恢复/下架、账号限制、审计和无登录投诉
 - password reset：fail-closed 网关、令牌一次性/过期拒绝、邮箱枚举防护与成功路径
 - standalone：Node 应用、媒体 worker、静态资源及 Linux x64 原生模块

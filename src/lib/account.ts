@@ -1,6 +1,8 @@
 "use client";
 
 import { notifyAuthSessionChanged } from "./auth-client";
+import type { CollectedBadge, WornBadge } from "@/lib/server/badges";
+export type { CollectedBadge, WornBadge };
 import type { StorageSnapshot } from "./storage";
 
 export interface AccountUser {
@@ -68,7 +70,14 @@ export function isSyncRevisionConflict(error: unknown): error is AccountApiError
 }
 
 export type SyncChoice = "merge";
-export interface RemoteProfile { avatar: string; bio: string; tags: string[]; updatedAt: number; }
+export interface RemoteProfile { avatar: string; bio: string; tags: string[]; showBadges: boolean; updatedAt: number; }
+/** The badge collection derives from the account's completed assessments. */
+export interface RemoteBadges {
+  userId: string;
+  collected: CollectedBadge[];
+  worn: WornBadge[];
+  showBadges: boolean;
+}
 
 function accountHeaders(userId: string, json = false) {
   return {
@@ -82,8 +91,23 @@ export async function getRemoteProfile(userId: string) {
   return responseJson<{ userId: string; profile: RemoteProfile }>(await fetch("/api/me/profile", { credentials: "include", cache: "no-store", headers: accountHeaders(userId) }));
 }
 
-export async function saveRemoteProfile(userId: string, profile: RemoteProfile) {
+export async function saveRemoteProfile(userId: string, profile: Omit<RemoteProfile, "showBadges">) {
   return responseJson<{ userId: string; profile: RemoteProfile }>(await fetch("/api/me/profile", { method: "PUT", credentials: "include", headers: accountHeaders(userId, true), body: JSON.stringify({ avatar: profile.avatar, bio: profile.bio, tags: profile.tags }) }));
+}
+
+/** Read the derived badge collection, the worn selection, and the visibility opt-in. */
+export async function getRemoteBadges(userId: string) {
+  return responseJson<RemoteBadges>(await fetch("/api/me/badges", { credentials: "include", cache: "no-store", headers: accountHeaders(userId) }));
+}
+
+/** Replace the complete worn selection (at most three badges). */
+export async function saveRemoteWornBadges(userId: string, worn: Array<{ testId: string; resultKey: string }>) {
+  return responseJson<{ userId: string; worn: WornBadge[] }>(await fetch("/api/me/badges/worn", { method: "PUT", credentials: "include", headers: accountHeaders(userId, true), body: JSON.stringify({ worn }) }));
+}
+
+/** Toggle whether other readers see worn badges; the other profile fields are left unchanged. */
+export async function saveRemoteBadgeVisibility(userId: string, showBadges: boolean) {
+  return responseJson<{ userId: string; profile: RemoteProfile }>(await fetch("/api/me/profile", { method: "PUT", credentials: "include", headers: accountHeaders(userId, true), body: JSON.stringify({ showBadges }) }));
 }
 
 function mapUser(value: BetterAuthUser | null | undefined): AccountUser | null {

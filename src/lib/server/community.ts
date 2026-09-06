@@ -2,6 +2,7 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 import { getResultKey, getResultScore, getScoreBand, loadQuizDefinition, type QuizDefinition, type QuizResult } from "@/core/quiz";
+import { wornBadgesForAuthors, type AuthorBadge } from "./badges";
 import { asRow, getDatabase, withTransaction } from "./database";
 import { assertAccountCanWrite, GovernanceError } from "./governance";
 
@@ -42,7 +43,7 @@ export interface CommunityComment {
   parentId: string | null;
   body: string;
   createdAt: number;
-  author: { displayName: string };
+  author: { displayName: string; badges: AuthorBadge[] };
   isAuthor: boolean;
   canDelete: boolean;
 }
@@ -64,7 +65,7 @@ export interface CommunityPost {
   showAvatar: boolean;
   allowComments: boolean;
   createdAt: number;
-  author: { displayName: string; avatar: string };
+  author: { displayName: string; avatar: string; badges: AuthorBadge[] };
   reactionCount: number;
   commentCount: number;
   reacted: boolean;
@@ -95,7 +96,12 @@ function bool(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
 }
 
-function resultTitle(definition: QuizDefinition, result: QuizResult, language: Lang) {
+/**
+ * The one label derivation shared by community shares and badge collection:
+ * a badge worn next to an author name is always the label a share of the
+ * same attempt would print.
+ */
+export function resultTitle(definition: QuizDefinition, result: QuizResult, language: Lang) {
   const key = getResultKey(result) || Object.entries(result.percentages ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0] || "";
   const scoreBand = getScoreBand(definition, result);
   const narrative = definition.resultContent.narrative?.[key] ?? definition.resultContent.narrative?.[Object.keys(definition.resultContent.narrative ?? {})[0]];
@@ -206,7 +212,7 @@ export async function createCommunityPost(userId: string, value: unknown) {
  * When present, the predicate is applied in SQL before the page-size limit so
  * a busy stream of the other kind cannot starve the requested filter.
  */
-export function listCommunityPosts(viewerId: string | null, sort: "latest" | "resonant" = "latest", kind?: CommunityPostKind) {
+export async function listCommunityPosts(viewerId: string | null, sort: "latest" | "resonant" = "latest", kind?: CommunityPostKind): Promise<CommunityPost[]> {
   const database = getDatabase();
   const order = sort === "resonant"
     ? "reaction_count DESC, p.created_at DESC, p.id DESC"
@@ -239,16 +245,26 @@ export function listCommunityPosts(viewerId: string | null, sort: "latest" | "re
     ORDER BY c.created_at ASC
   `).all(...postIds) as Array<Record<string, unknown>>;
   const comments = new Map<string, CommunityComment[]>();
+  const commentAuthorIds: string[] = [];
+  const commentAuthorOf = new Map<string, string>();
   for (const row of commentRows) {
     const postId = String(row.post_id);
     const list = comments.get(postId) ?? [];
     if (list.length >= COMMUNITY_LIMITS.maxCommentsPerPost) continue;
+    const commentUserId = String(row.user_id);
+    commentAuthorIds.push(commentUserId);
+    const commentId = String(row.id);
+    commentAuthorOf.set(commentId, commentUserId);
     list.push({
-      id: String(row.id), postId, parentId: typeof row.parent_id === "string" ? row.parent_id : null,
-      body: String(row.body), createdAt: Number(row.created_at), author: { displayName: String(row.display_name) },
-      isAuthor: viewerId === row.user_id, canDelete: Boolean(viewerId && (viewerId === row.user_id || viewerId === row.post_user_id)),
+      id: commentId, postId, parentId: typeof row.parent_id === "string" ? row.parent_id : null,
+      body: String(row.body), createdAt: Number(row.created_at), author: { displayName: String(row.display_name), badges: [] },
+      isAuthor: viewerId === commentUserId, canDelete: Boolean(viewerId && (viewerId === commentUserId || viewerId === row.post_user_id)),
     });
     comments.set(postId, list);
+  }
+  const authorBadges = await wornBadgesForAuthors([...rows.map((row) => String(row.user_id)), ...commentAuthorIds]);
+  for (const list of comments.values()) {
+    for (const comment of list) comment.author.badges = authorBadges.get(commentAuthorOf.get(comment.id) ?? "") ?? [];
   }
   return rows.map((row): CommunityPost => ({
     id: String(row.id), kind: String(row.post_kind ?? (row.test_id ? "assessment" : "text")) === "text" ? "text" : "assessment",
@@ -259,7 +275,11 @@ export function listCommunityPosts(viewerId: string | null, sort: "latest" | "re
     dimensions: row.show_dimensions ? parseDimensions(row.dimensions_json) : [], reflection: String(row.reflection),
     showResultType: Boolean(row.show_result_type), showDimensions: Boolean(row.show_dimensions), showAvatar: Boolean(row.show_avatar),
     allowComments: Boolean(row.allow_comments), createdAt: Number(row.created_at),
-    author: { displayName: String(row.display_name), avatar: row.show_avatar && typeof row.avatar === "string" ? row.avatar : "" },
+    author: {
+      displayName: String(row.display_name),
+      avatar: row.show_avatar && typeof row.avatar === "string" ? row.avatar : "",
+      badges: authorBadges.get(String(row.user_id)) ?? [],
+    },
     reactionCount: Number(row.reaction_count), commentCount: Number(row.comment_count), reacted: Boolean(row.reacted),
     isAuthor: viewerId === row.user_id, comments: comments.get(String(row.id)) ?? [],
   }));

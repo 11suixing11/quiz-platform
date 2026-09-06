@@ -22,11 +22,12 @@
         "test:cloud-revision": "node scripts/test-cloud-revision.mjs",
         "test:community": "node scripts/test-community.mjs",
         "test:journal": "node scripts/test-journal.mjs",
+        "test:badges": "node scripts/test-badges.mjs",
         "test:turnstile": "node scripts/test-turnstile.mjs",
         "test:share": "node scripts/test-share.mjs",
         "test:auth-email": "node scripts/test-auth-email.mjs",
         "test:password-reset": "node scripts/test-password-reset.mjs",
-        "test": "npm run check:registry && npm run test:scoring && npm run test:quiz-media && npm run test:storage && npm run test:cloud-revision && npm run test:community && npm run test:journal && npm run test:turnstile && npm run test:share && npm run test:auth-email && npm run test:password-reset"
+        "test": "npm run check:registry && npm run test:scoring && npm run test:quiz-media && npm run test:storage && npm run test:cloud-revision && npm run test:community && npm run test:journal && npm run test:badges && npm run test:turnstile && npm run test:share && npm run test:auth-email && npm run test:password-reset"
     },
     "dependencies": {
         "better-auth": "^1.7.1",

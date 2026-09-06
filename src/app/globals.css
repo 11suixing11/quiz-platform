@@ -176,6 +176,22 @@
 .profile-tags { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .85rem; }
 .profile-tags > span:not(.profile-tag-empty), .profile-tag-edit { display: inline-flex; min-height: 1.9rem; align-items: center; gap: .3rem; border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); padding: .32rem .68rem; color: var(--accent); font-size: .78rem; font-weight: 700; }
 .profile-tag-empty { color: color-mix(in srgb, var(--ink) 40%, transparent); font-size: .78rem; }
+.profile-badges { margin-top: 2rem; border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); padding-top: 1.6rem; }
+.profile-badges-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .8rem; }
+.profile-badges-heading h3 { color: var(--ink); font-size: 1.05rem; font-weight: 650; }
+.profile-badges-heading p { color: color-mix(in srgb, var(--ink) 50%, transparent); font-size: .72rem; }
+.profile-badge-empty { margin-top: .9rem; color: color-mix(in srgb, var(--ink) 55%, transparent); font-size: .82rem; line-height: 1.7; }
+.profile-badge-family { margin-top: 1.15rem; }
+.profile-badge-family > span { display: block; }
+.profile-badge-family > span a { color: color-mix(in srgb, var(--ink) 55%, transparent); font-size: .72rem; font-weight: 750; }
+.profile-badge-family > span a:hover { color: var(--accent); }
+.profile-badge-grid { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .55rem; }
+.profile-badge-chip { display: inline-flex; min-height: 2.2rem; align-items: center; gap: .35rem; border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); border-radius: 999px; padding: .35rem .85rem; color: color-mix(in srgb, var(--ink) 72%, transparent); font-size: .78rem; font-weight: 700; transition: border-color .18s ease, background .18s ease, color .18s ease; }
+.profile-badge-chip:hover { border-color: var(--accent); color: var(--accent); }
+.profile-badge-chip.is-worn { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
+.profile-badge-hint { display: flex; align-items: flex-start; gap: .45rem; margin-top: 1.1rem; color: color-mix(in srgb, var(--ink) 52%, transparent); font-size: .74rem; line-height: 1.65; }
+.profile-badge-toggle { display: flex; align-items: flex-start; gap: .55rem; margin-top: .9rem; color: color-mix(in srgb, var(--ink) 68%, transparent); font-size: .78rem; line-height: 1.55; }
+.profile-badge-toggle input { width: 1rem; height: 1rem; margin-top: .1rem; accent-color: var(--accent); }
 .profile-form { margin-top: 1.6rem; border-top: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); padding-top: 1.5rem; }
 .profile-tag-editor { display: flex; min-height: 3rem; flex-wrap: wrap; align-items: center; gap: .4rem; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); border-radius: 1rem; background: color-mix(in srgb, var(--paper) 92%, white 8%); padding: .45rem; }
 .dark .profile-tag-editor { background: color-mix(in srgb, var(--night) 90%, white 5%); }
@@ -269,6 +285,9 @@
 .atlas-result-save-status-copy > svg { width: 1rem; height: 1rem; margin-top: .15rem; flex: 0 0 auto; color: var(--accent); }
 .atlas-result-save-status-copy strong { display: block; color: var(--ink); font-size: .76rem; font-weight: 750; line-height: 1.5; }
 .atlas-result-save-status-copy p { margin-top: .1rem; color: var(--muted-text); font-size: .72rem; line-height: 1.55; }
+.atlas-result-badge-note { display: flex; align-items: center; gap: .45rem; margin-bottom: 1.1rem; color: var(--muted-text); font-size: .74rem; line-height: 1.6; }
+.atlas-result-badge-note > svg { width: .9rem; height: .9rem; flex: 0 0 auto; color: var(--accent); }
+.atlas-result-badge-note a { color: var(--accent); font-weight: 750; }
 .atlas-result-save-status--warning .atlas-result-save-status-copy > svg, .atlas-result-save-status--warning .atlas-result-save-status-copy strong { color: var(--danger); }
 .atlas-result-identity { max-width: 42rem; border: 1px solid var(--sheet-line); border-radius: 1rem; background: var(--sheet-surface); padding: 1.15rem 1.25rem 1.2rem; }
 .atlas-result-identity-label { color: var(--muted-text); font-size: .72rem; font-weight: 750; letter-spacing: 0; }
@@ -576,6 +595,10 @@
 .community-post-header strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .88rem; }
 .community-post-header span { color: color-mix(in srgb, var(--ink) 42%, transparent); font-size: .7rem; }
 .community-post-kind { justify-self: end; color: var(--accent) !important; font-size: .66rem !important; font-weight: 800; }
+.community-author-badges { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .25rem; }
+.community-badge-chip { display: inline-flex; min-height: 1.35rem; align-items: center; overflow: hidden; max-width: 12rem; border-radius: 999px; background: var(--accent-wash); padding: .18rem .5rem; color: var(--accent); font-size: .64rem; font-weight: 750; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.community-badge-chip:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.community-comment-meta .community-author-badges { align-self: center; margin-top: 0; }
 .community-icon-action { display: inline-flex; width: 2.75rem; height: 2.75rem; align-items: center; justify-content: center; border-radius: 999px; color: color-mix(in srgb, var(--ink) 42%, transparent); }
 .community-icon-action:hover { background: color-mix(in srgb, var(--danger) 9%, transparent); color: var(--danger); }
 .community-icon-action svg { width: 1rem; height: 1rem; }

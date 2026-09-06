@@ -6,9 +6,10 @@ import { allowRateLimitedRequest, assertExpectedAccount, assertTrustedMutation, 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const schema = z.strictObject({
-  avatar: z.string().max(400_000).refine((value) => !value || /^data:image\/jpeg;base64,[a-zA-Z0-9+/=]+$/.test(value), "Invalid avatar"),
-  bio: z.string().max(120),
-  tags: z.array(z.string().min(1).max(16)).max(6),
+  avatar: z.string().max(400_000).refine((value) => !value || /^data:image\/jpeg;base64,[a-zA-Z0-9+/=]+$/.test(value), "Invalid avatar").optional(),
+  bio: z.string().max(120).optional(),
+  tags: z.array(z.string().min(1).max(16)).max(6).optional(),
+  showBadges: z.boolean().optional(),
 });
 const AVATAR_PATTERN = /^data:image\/jpeg;base64,[a-zA-Z0-9+/=]+$/;
 
@@ -19,10 +20,10 @@ function normalizeAvatar(value: unknown) {
 }
 
 function read(userId: string) {
-  const row = asRow(getDatabase().prepare("SELECT avatar, bio, tags_json, updated_at FROM profiles WHERE user_id = ?").get(userId));
+  const row = asRow(getDatabase().prepare("SELECT avatar, bio, tags_json, show_badges, updated_at FROM profiles WHERE user_id = ?").get(userId));
   let tags: string[] = [];
   try { const parsed = JSON.parse(typeof row?.tags_json === "string" ? row.tags_json : "[]"); if (Array.isArray(parsed)) tags = parsed.filter((tag): tag is string => typeof tag === "string").slice(0, 6); } catch { /* use empty tags */ }
-  return { avatar: normalizeAvatar(row?.avatar), bio: typeof row?.bio === "string" ? row.bio.slice(0, 120) : "", tags: tags.map((tag) => tag.trim().slice(0, 16)).filter(Boolean), updatedAt: Number(row?.updated_at) || 0 };
+  return { avatar: normalizeAvatar(row?.avatar), bio: typeof row?.bio === "string" ? row.bio.slice(0, 120) : "", tags: tags.map((tag) => tag.trim().slice(0, 16)).filter(Boolean), showBadges: Number(row?.show_badges) === 1, updatedAt: Number(row?.updated_at) || 0 };
 }
 
 export async function GET(request: Request) {
@@ -43,7 +44,14 @@ export async function PUT(request: Request) {
   if (!allowRateLimitedRequest(request, `profile:${user.id}`)) return rateLimitResponse();
   try {
     const input = schema.parse(await readJson(request, 450_000));
-    getDatabase().prepare(`INSERT INTO profiles (user_id, avatar, bio, tags_json, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET avatar = excluded.avatar, bio = excluded.bio, tags_json = excluded.tags_json, updated_at = excluded.updated_at`).run(user.id, input.avatar, input.bio.trim(), JSON.stringify(input.tags.map((tag) => tag.trim()).filter(Boolean)), Date.now());
+    const current = read(user.id);
+    // Absent fields keep their current value, so badge visibility can be
+    // toggled without the caller re-sending the avatar, bio, and tags.
+    const avatar = input.avatar !== undefined ? normalizeAvatar(input.avatar) : current.avatar;
+    const bio = input.bio !== undefined ? input.bio.trim() : current.bio;
+    const tags = input.tags !== undefined ? input.tags.map((tag) => tag.trim()).filter(Boolean) : current.tags;
+    const showBadges = input.showBadges === undefined ? (current.showBadges ? 1 : 0) : (input.showBadges ? 1 : 0);
+    getDatabase().prepare(`INSERT INTO profiles (user_id, avatar, bio, tags_json, show_badges, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET avatar = excluded.avatar, bio = excluded.bio, tags_json = excluded.tags_json, show_badges = excluded.show_badges, updated_at = excluded.updated_at`).run(user.id, avatar, bio, JSON.stringify(tags), showBadges, Date.now());
     return json({ userId: user.id, profile: read(user.id) });
   } catch { return error("个人资料格式无效", 400, "INVALID_PROFILE"); }
 }

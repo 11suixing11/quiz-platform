@@ -952,6 +952,20 @@ export type JournalFeedSort = "latest" | "resonant";
  * ordering currently returns its first page because its reaction-aware cursor
  * is not represented by the legacy numeric cursor.
  */
+function listPublishedJournalRows(before: number, sort: JournalFeedSort): DatabaseRow[] {
+  const order = sort === "resonant"
+    ? "reaction_count DESC, e.published_at DESC, e.id DESC"
+    : "e.published_at DESC, e.id DESC";
+  return getDatabase().prepare(`
+    SELECT e.id, e.user_id, e.created_at, e.published_at, e.published_revision_id, r.revision_number,
+      r.title, r.body, r.content_language, r.allow_comments, r.author_display_name, r.created_at AS revision_created_at,
+      (SELECT COUNT(*) FROM journal_reactions x WHERE x.entry_id = e.id) AS reaction_count,
+      (SELECT COUNT(*) FROM journal_comments c WHERE c.entry_id = e.id AND c.status = 'visible') AS comment_count
+    FROM journal_entries e JOIN journal_revisions r ON r.id = e.published_revision_id
+    WHERE e.status = 'published' AND e.published_at < ? ORDER BY ${order} LIMIT ?
+  `).all(before, JOURNAL_LIMITS.pageSize) as DatabaseRow[];
+}
+
 export function listPublishedJournalEntries(
   viewerId: string | null,
   cursorOrSort?: number | JournalFeedSort,
@@ -962,18 +976,20 @@ export function listPublishedJournalEntries(
     : typeof sortOrCursor === "number" ? sortOrCursor : undefined;
   const sort: JournalFeedSort = cursorOrSort === "resonant" || sortOrCursor === "resonant" ? "resonant" : "latest";
   const before = sort === "latest" && Number.isFinite(cursor) && Number(cursor) > 0 ? Number(cursor) : Number.MAX_SAFE_INTEGER;
-  const order = sort === "resonant"
-    ? "reaction_count DESC, e.published_at DESC, e.id DESC"
-    : "e.published_at DESC, e.id DESC";
-  const rows = getDatabase().prepare(`
-    SELECT e.id, e.user_id, e.created_at, e.published_at, e.published_revision_id, r.revision_number,
-      r.title, r.body, r.content_language, r.allow_comments, r.author_display_name, r.created_at AS revision_created_at,
-      (SELECT COUNT(*) FROM journal_reactions x WHERE x.entry_id = e.id) AS reaction_count,
-      (SELECT COUNT(*) FROM journal_comments c WHERE c.entry_id = e.id AND c.status = 'visible') AS comment_count
-    FROM journal_entries e JOIN journal_revisions r ON r.id = e.published_revision_id
-    WHERE e.status = 'published' AND e.published_at < ? ORDER BY ${order} LIMIT ?
-  `).all(before, JOURNAL_LIMITS.pageSize) as DatabaseRow[];
-  return rows.map((row) => publicPayload(row, viewerId, false));
+  return listPublishedJournalRows(before, sort).map((row) => publicPayload(row, viewerId, false));
+}
+
+/**
+ * Feed-only companion to `listPublishedJournalEntries`. The public payloads
+ * stay identical; the extra author user id never crosses to the client. The
+ * unified feed adapter consumes it server-side to attach worn badges, keeping
+ * the journal API free of internal account identifiers.
+ */
+export function listPublishedJournalFeedEntries(viewerId: string | null, sort: JournalFeedSort) {
+  return listPublishedJournalRows(Number.MAX_SAFE_INTEGER, sort).map((row) => ({
+    ...publicPayload(row, viewerId, false),
+    authorUserId: String(row.user_id),
+  }));
 }
 
 export function readJournalMedia(scope: "private" | "public", userId: string | null, assetId: string, width: number, revisionId = "") {

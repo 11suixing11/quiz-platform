@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const user = await getCurrentUser();
   const sort = new URL(request.url).searchParams.get("sort") === "resonant" ? "resonant" : "latest";
-  return json({ posts: listCommunityPosts(user?.id ?? null, sort) });
+  return json({ posts: await listCommunityPosts(user?.id ?? null, sort) });
 }
 
 export async function POST(request: Request) {

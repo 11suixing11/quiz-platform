@@ -98,6 +98,17 @@ Keep every item unchecked until it has been verified in the named environment. A
 - [ ] Read-only, suspended, and banned accounts cannot create community writes; upload-blocked accounts can still perform allowed non-upload writes.
 - [ ] Report dialogs have a name, initial focus, Escape behavior, focus containment, focus return, and recoverable submission feedback.
 
+## Badges
+
+- [ ] A signed-in account completing a public assessment sees the earned result badge appear in its profile collection, grouped by assessment family, with matching labels in both UI languages.
+- [ ] Wearing works by tapping a badge chip, removing by tapping again, and a fourth simultaneous wear is rejected with a clear in-page message and no partial save.
+- [ ] A variant the account never earned, or a badge from a non-public internal route, is rejected with distinct feedback.
+- [ ] While the visibility switch stays off, other readers and guests never see worn badges anywhere; after opting in, worn badges appear next to the author name on community posts, comments, and image posts in the viewer's language, linking to the assessment page.
+- [ ] Guests see a quiet sign-in nudge on the result page instead of any badge UI, with no dialog interrupting the share flow.
+- [ ] Deleting the underlying attempt through a cloud replace removes the badge from the collection and silently filters the stale worn row on the next read.
+- [ ] Account deletion cascades to the worn-badge rows.
+- [ ] A worn badge label equals the label a public share of the same attempt prints, in both Chinese and English.
+
 ## Moderation and complaints
 
 - [ ] One high-risk report (`illegal`, `minor_sexual`, `nonconsensual_intimate`, `privacy`, or `explicit_harm`) hides the target immediately.

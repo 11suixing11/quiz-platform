@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, Check, Cloud, RefreshCw, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
+import { AlertTriangle, ArrowRight, Award, Check, Cloud, RefreshCw, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getQuizVisualSelection, getResultKey, getResultScore, getScoreBand } from "@/core/quiz/scoring";
 import { useAccountActions, useAccountIdentity, useAccountSync } from "@/components/account-provider";
@@ -529,6 +529,7 @@ export default function ResultClient({ paper, topic }: { paper: QuizPaper; topic
           </div>
           {showGuestAccountAction && <Link href="/account/" className="atlas-text-link shrink-0">{language === "zh" ? "登录后跨设备查看" : "Sign in for access across devices"}<ArrowRight className="size-3.5" aria-hidden="true" /></Link>}
         </section>
+        <p className="atlas-result-badge-note"><Award className="size-3.5" aria-hidden="true" />{user ? <>{language === "zh" ? "新徽章已加入收藏 · " : "New badge added to your collection · "}<Link href="/account/">{language === "zh" ? "在个人资料中佩戴" : "wear it from your profile"}</Link></> : <Link href="/account/">{language === "zh" ? "登录后可收藏并佩戴这枚徽章" : "Sign in to collect and wear this badge"}</Link>}</p>
         <div className="atlas-result-intro-block" style={{ "--result-accent": accent } as React.CSSProperties}>
           <p className="atlas-result-question">{content.lead}</p>
           <div className={`atlas-result-visual-layout${content.visualSelection ? " atlas-result-visual-layout--active" : ""}`}>

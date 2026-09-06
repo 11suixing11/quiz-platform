@@ -13,5 +13,5 @@ export async function GET(request: Request) {
   const sort = params.get("sort") === "resonant" ? "resonant" : "latest";
   const requestedFilter = params.get("type") as CommunityFeedFilter;
   const filter = filters.has(requestedFilter) ? requestedFilter : "all";
-  return json({ posts: listCommunityFeed(user?.id ?? null, sort, filter) });
+  return json({ posts: await listCommunityFeed(user?.id ?? null, sort, filter) });
 }

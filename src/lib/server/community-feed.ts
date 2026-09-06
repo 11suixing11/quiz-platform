@@ -1,7 +1,8 @@
 import "server-only";
 
-import { listPublishedJournalEntries } from "./journal";
+import { listPublishedJournalFeedEntries } from "./journal";
 import { listCommunityPosts, type CommunityPost } from "./community";
+import { wornBadgesForAuthors, type AuthorBadge } from "./badges";
 
 export type CommunityFeedFilter = "all" | "assessment" | "text" | "image";
 
@@ -42,7 +43,7 @@ export interface CommunityFeedJournalItem {
   showAvatar: boolean;
   allowComments: boolean;
   createdAt: number;
-  author: { displayName: string; avatar: string };
+  author: { displayName: string; avatar: string; badges: AuthorBadge[] };
   reactionCount: number;
   commentCount: number;
   reacted: boolean;
@@ -101,7 +102,7 @@ function mapCommunityPost(post: CommunityPost): CommunityFeedCommunityItem {
   };
 }
 
-function mapJournalEntry(entry: Record<string, unknown>): CommunityFeedJournalItem {
+function mapJournalEntry(entry: Record<string, unknown>, badges: AuthorBadge[]): CommunityFeedJournalItem {
   // The public list intentionally returns only a cover to keep the feed small.
   // Detail pages still load the complete immutable revision.
   const rawCover = entry.cover && typeof entry.cover === "object" ? entry.cover as JournalImage : null;
@@ -132,7 +133,7 @@ function mapJournalEntry(entry: Record<string, unknown>): CommunityFeedJournalIt
     showAvatar: false,
     allowComments: entry.allowComments !== false,
     createdAt: publishedAt,
-    author: { displayName: string(author.displayName, "社区成员"), avatar: string(author.avatar) },
+    author: { displayName: string(author.displayName, "社区成员"), avatar: string(author.avatar), badges },
     reactionCount: number(entry.reactionCount),
     commentCount: number(entry.commentCount),
     reacted: entry.reacted === true,
@@ -145,17 +146,21 @@ function mapJournalEntry(entry: Record<string, unknown>): CommunityFeedJournalIt
   };
 }
 
-export function listCommunityFeed(viewerId: string | null, sort: "latest" | "resonant" = "latest", filter: CommunityFeedFilter = "all") {
+export async function listCommunityFeed(viewerId: string | null, sort: "latest" | "resonant" = "latest", filter: CommunityFeedFilter = "all") {
   // Apply the type filter at the source. Each source has its own page limit,
   // so filtering after a mixed query could return fewer than 20 matching
   // items whenever the other post kind is more active.
   const communityKind = filter === "assessment" || filter === "text" ? filter : undefined;
   const communityItems = filter === "image"
     ? []
-    : listCommunityPosts(viewerId, sort, communityKind).map(mapCommunityPost);
-  const journalItems = filter === "assessment" || filter === "text"
+    : (await listCommunityPosts(viewerId, sort, communityKind)).map(mapCommunityPost);
+  const journalEntries = filter === "assessment" || filter === "text"
     ? []
-    : listPublishedJournalEntries(viewerId, sort).map((entry) => mapJournalEntry(entry as unknown as Record<string, unknown>));
+    : listPublishedJournalFeedEntries(viewerId, sort);
+  // Journal authors are named by their revision snapshot; their worn badges
+  // are attached here, keyed by the internal user id that never leaves the server.
+  const journalBadges = await wornBadgesForAuthors(journalEntries.map((entry) => entry.authorUserId));
+  const journalItems = journalEntries.map((entry) => mapJournalEntry(entry as unknown as Record<string, unknown>, journalBadges.get(entry.authorUserId) ?? []));
   const all = [...communityItems, ...journalItems]
     .filter((item) => filter === "all"
       || (filter === "image" && item.source === "journal")

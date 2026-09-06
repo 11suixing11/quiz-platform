@@ -62,8 +62,21 @@ function migrate(database: SQLiteDatabase) {
       avatar TEXT NOT NULL DEFAULT '',
       bio TEXT NOT NULL DEFAULT '',
       tags_json TEXT NOT NULL DEFAULT '[]',
+      show_badges INTEGER NOT NULL DEFAULT 0,
       updated_at INTEGER NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS profile_badges (
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      test_id TEXT NOT NULL,
+      result_key TEXT NOT NULL,
+      position INTEGER NOT NULL DEFAULT 0,
+      worn_at INTEGER NOT NULL,
+      PRIMARY KEY (user_id, test_id, result_key)
+    );
+
+    CREATE INDEX IF NOT EXISTS profile_badges_user_idx
+      ON profile_badges(user_id, position);
 
     CREATE TABLE IF NOT EXISTS quiz_sessions (
       user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
@@ -443,6 +456,18 @@ function migrate(database: SQLiteDatabase) {
     CREATE UNIQUE INDEX IF NOT EXISTS deletion_tombstones_pending_unique_idx
       ON deletion_tombstones(entity_type, entity_id, storage_scope, storage_key) WHERE replayed_at IS NULL
   `);
+  const profileColumns = database.prepare("PRAGMA table_info(profiles)").all() as Array<{ name: string }>;
+  if (!profileColumns.some((column) => column.name === "show_badges")) {
+    try {
+      database.exec("ALTER TABLE profiles ADD COLUMN show_badges INTEGER NOT NULL DEFAULT 0");
+    } catch (cause) {
+      // Next.js collects page data with concurrent workers, each running this
+      // migration against the same database. Another worker may have added the
+      // column between this probe and the ALTER; only fail if it is still absent.
+      const recheck = database.prepare("PRAGMA table_info(profiles)").all() as Array<{ name: string }>;
+      if (!recheck.some((column) => column.name === "show_badges")) throw cause;
+    }
+  }
 
   // Better Auth creates its `user` table on first start, after this module is
   // initialized. Leave foreign-key enforcement off only while defining the

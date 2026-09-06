@@ -21,6 +21,21 @@ import type { Lang } from "@/core/quiz";
 
 function initials(name: string) { return Array.from(name.trim()).slice(0, 2).join("").toUpperCase() || "ME"; }
 
+/**
+ * Worn badges render as quiet chips beside the author name, linking to the
+ * assessment they came from. An author wearing none renders nothing.
+ */
+function AuthorBadges({ badges, language }: { badges: CommunityPost["author"]["badges"]; language: Lang }) {
+  if (!badges.length) return null;
+  return <span className="community-author-badges">
+    {badges.slice(0, 3).map((badge) => (
+      <Link key={`${badge.testId}-${badge.resultTitle}`} href={`/test/${badge.testId}/`} className="community-badge-chip" title={`${language === "zh" ? badge.testName : badge.testNameEn} · ${language === "zh" ? badge.resultTitle : badge.resultTitleEn}`}>
+        {language === "zh" ? badge.resultTitle : badge.resultTitleEn}
+      </Link>
+    ))}
+  </span>;
+}
+
 const REPORT_REASONS = [
   ["illegal", "违法内容", "Illegal content"],
   ["minor_sexual", "涉及未成年人性内容", "Sexual content involving minors"],
@@ -86,7 +101,7 @@ function CommentItem({ comment, post, language, refresh }: { comment: CommunityC
   const [replying, setReplying] = useState(false);
   const replies = post.comments.filter((item) => item.parentId === comment.id);
   return <div className="community-comment">
-    <div className="community-comment-meta"><strong>{comment.author.displayName}</strong><span>{timeLabel(comment.createdAt, language)}</span></div>
+    <div className="community-comment-meta"><strong>{comment.author.displayName}</strong><AuthorBadges badges={comment.author.badges} language={language} /><span>{timeLabel(comment.createdAt, language)}</span></div>
     <p>{comment.body}</p>
     <div className="community-comment-actions">
       {user && !comment.parentId && <button type="button" onClick={() => setReplying((value) => !value)}><Reply aria-hidden="true" />{language === "zh" ? "回复" : "Reply"}</button>}
@@ -104,7 +119,7 @@ function CommunityPostCard({ post, language, user, refresh }: { post: CommunityP
   return <article className="community-post">
     <header className="community-post-header">
       <span className="community-avatar" aria-hidden="true">{post.author.avatar ? <Image src={post.author.avatar} alt="" width={80} height={80} unoptimized /> : initials(post.author.displayName)}</span>
-      <div><strong>{post.author.displayName}</strong><span>{timeLabel(post.createdAt, language)}</span></div>
+      <div><strong>{post.author.displayName}</strong><span>{timeLabel(post.createdAt, language)}</span><AuthorBadges badges={post.author.badges} language={language} /></div>
       <span className="community-post-kind">{assessment ? (language === "zh" ? "测评" : "Assessment") : (language === "zh" ? "文字" : "Text")}</span>
       {post.isAuthor && user && <button type="button" className="community-icon-action" title={language === "zh" ? "删除分享" : "Delete post"} onClick={async () => { if (window.confirm(language === "zh" ? "删除这篇公开分享及其留言？" : "Delete this public post and its responses?")) { await deleteCommunityPost(user.id, post.id); refresh(); } }}><Trash2 aria-hidden="true" /></button>}
     </header>
@@ -130,7 +145,7 @@ function JournalPostCard({ item, language }: { item: CommunityFeedJournalItem; l
   return <article className="community-post community-post--image">
     <header className="community-post-header">
       <span className="community-avatar" aria-hidden="true">{initials(item.author.displayName)}</span>
-      <div><strong>{item.author.displayName}</strong><span>{timeLabel(item.publishedAt, language)}</span></div>
+      <div><strong>{item.author.displayName}</strong><span>{timeLabel(item.publishedAt, language)}</span><AuthorBadges badges={item.author.badges} language={language} /></div>
       <span className="community-post-kind">{language === "zh" ? "图像" : "Image"}</span>
     </header>
     <Link
